@@ -65,6 +65,7 @@ private:
    * A list of second-order piezoelectric coefficients.
    */
   std::list<double> second_order_piezoelectric_coefficients;
+
 };
 
 
