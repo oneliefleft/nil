@@ -112,13 +112,13 @@ void
 Step0<dim, ValueType>::distribute_first_order_piezoelectric_coefficients 
 (const std::list<ValueType> coefficients)
 {
-  AssertThrow (coefficients.size ()!=0, 
-	       dealii::ExcMessage ("The number of coefficients can not be zero."));
+  Assert (coefficients.size ()!=0, 
+	  dealii::ExcMessage ("The number of coefficients can not be zero."));
 
   // At this point we are interested in zinc-blende structure only,
   // hence:
-  AssertThrow (coefficients.size ()==0, 
-	       dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
+  Assert (coefficients.size ()==0, 
+	  dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
 
   // Then distribute the coefficients on to the tensor.
   // for (unsigned int i=0; i<dim; ++i)
@@ -131,13 +131,13 @@ void
 Step0<dim, ValueType>::distribute_second_order_piezoelectric_coefficients 
 (const std::list<ValueType> coefficients)
 {
-  AssertThrow (coefficients.size ()!=0, 
-	       dealii::ExcMessage ("The number of coefficients can not be zero."));
+  Assert (coefficients.size ()!=0, 
+	  dealii::ExcMessage ("The number of coefficients can not be zero."));
 
   // At this point we are interested in zinc-blende structure only,
   // hence:
-  AssertThrow (coefficients.size ()==0, 
-	       dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
+  Assert (coefficients.size ()==0, 
+	  dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
 }
 
 
