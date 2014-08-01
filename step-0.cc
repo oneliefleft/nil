@@ -7,7 +7,7 @@
 #include <fstream>
 #include <iostream>
 
-template <int dim>
+template <int dim, typename ValueType = double>
 class Step0
 {
 public:
@@ -38,13 +38,13 @@ private:
    * Distribute <code>coefficients</code> on to the first-order
    * piezoelectric tensor.
    */
-  void distribute_first_order_piezoelectric_coefficients (const std::list<double> coefficients);
+  void distribute_first_order_piezoelectric_coefficients (const std::list<ValueType> coefficients);
 
   /**
    * Distribute <code>coefficients</code> on to the second-order
    * piezoelectric tensor.
    */
-  void distribute_second_order_piezoelectric_coefficients (const std::list<double> coefficients);
+  void distribute_second_order_piezoelectric_coefficients (const std::list<ValueType> coefficients);
 
   /**
    * A tensor holding the first order piezoelectric constants.
@@ -59,47 +59,49 @@ private:
   /**
    * A list of first-order piezoelectric coefficients.
    */
-  std::list<double> first_order_piezoelectric_coefficients;
+  std::list<ValueType> first_order_piezoelectric_coefficients;
 
   /**
    * A list of second-order piezoelectric coefficients.
    */
-  std::list<double> second_order_piezoelectric_coefficients;
+  std::list<ValueType> second_order_piezoelectric_coefficients;
 
 };
 
 
-template <int dim>
-Step0<dim>::Step0 ()
+template <int dim, typename ValueType>
+Step0<dim, ValueType>::Step0 ()
 {}
 
 
-template <int dim>
-Step0<dim>::~Step0 ()
+template <int dim, typename ValueType>
+Step0<dim, ValueType>::~Step0 ()
 {}
 
 
-template <int dim>
+template <int dim, typename ValueType>
 void 
-Step0<dim>::distribute_first_order_piezoelectric_coefficients (const std::list<double> coefficients)
+Step0<dim, ValueType>::distribute_first_order_piezoelectric_coefficients 
+(const std::list<ValueType> coefficients)
 {
   AssertThrow (coefficients.size ()!=0, 
 	       dealii::ExcMessage ("The number of coefficients can not be zero."));
 }
 
 
-template <int dim>
+template <int dim, typename ValueType>
 void 
-Step0<dim>::distribute_second_order_piezoelectric_coefficients (const std::list<double> coefficients)
+Step0<dim, ValueType>::distribute_second_order_piezoelectric_coefficients 
+(const std::list<ValueType> coefficients)
 {
   AssertThrow (coefficients.size ()!=0, 
 	       dealii::ExcMessage ("The number of coefficients can not be zero."));
 }
 
 
-template <int dim>
+template <int dim, typename ValueType>
 void 
-Step0<dim>::run ()
+Step0<dim, ValueType>::run ()
 {
   // First up, fill the piezoelectric tensors with coefficent
   // values. First-order coefficients...
@@ -119,7 +121,7 @@ int main (int argc, char **argv)
       dealii::deallog.depth_console (0);
 
       // Initialise the problem.
-      Step0<3> problem;
+      Step0<3, double> problem;
 
       // Parse the command line and input file.
       problem.command_line.parse_command_line (argc, argv); 
