@@ -38,13 +38,13 @@ private:
    * Distribute <code>coefficients</code> on to the first order
    * piezoelectric tensor.
    */
-  void distribute_first_order_piezoelectric_coefficients (const std::vector<double> coefficients);
+  void distribute_first_order_piezoelectric_coefficients (const std::list<double> coefficients);
 
   /**
    * Distribute <code>coefficients</code> on to the second order
    * piezoelectric tensor.
    */
-  void distribute_second_order_piezoelectric_coefficients (const std::vector<double> coefficients);
+  void distribute_second_order_piezoelectric_coefficients (const std::list<double> coefficients);
 
   /**
    * A tensor holding the first order piezoelectric constants.
@@ -70,7 +70,26 @@ Step0<dim>::~Step0 ()
 
 
 template <int dim>
-void Step0<dim>::run ()
+void 
+Step0<dim>::distribute_first_order_piezoelectric_coefficients (const std::list<double> coefficients)
+{
+  AssertThrow (coefficients.size ()!=0, 
+	       "The number of coefficients can not be zero.");
+}
+
+
+template <int dim>
+void 
+Step0<dim>::distribute_second_order_piezoelectric_coefficients (const std::list<double> coefficients)
+{
+  AssertThrow (coefficients.size ()!=0, 
+	       "The number of coefficients can not be zero.");
+}
+
+
+template <int dim>
+void 
+Step0<dim>::run ()
 {}
 
 
@@ -126,7 +145,7 @@ int main (int argc, char **argv)
       return 1;
     }
   
-  // If we got to this point, the application performed as was
-  // expected and we can return without error.
+  // At this point, the application performed as was expected - return
+  // without error.
   return 0;
 }
