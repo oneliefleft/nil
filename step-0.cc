@@ -7,6 +7,11 @@
 #include <fstream>
 #include <iostream>
 
+
+/**
+ * This is an example class that makes very little sense here. @note
+ * The convention is dim, rank, ValueType, ...
+ */
 template <int dim, typename ValueType = double>
 class Step0
 {
@@ -86,6 +91,11 @@ Step0<dim, ValueType>::distribute_first_order_piezoelectric_coefficients
 {
   AssertThrow (coefficients.size ()!=0, 
 	       dealii::ExcMessage ("The number of coefficients can not be zero."));
+
+  // At this point we are interested in zinc-blende structure only,
+  // hence:
+  AssertThrow (coefficients.size ()==0, 
+	       dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
 }
 
 
@@ -96,6 +106,11 @@ Step0<dim, ValueType>::distribute_second_order_piezoelectric_coefficients
 {
   AssertThrow (coefficients.size ()!=0, 
 	       dealii::ExcMessage ("The number of coefficients can not be zero."));
+
+  // At this point we are interested in zinc-blende structure only,
+  // hence:
+  AssertThrow (coefficients.size ()==0, 
+	       dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
 }
 
 
@@ -104,7 +119,7 @@ void
 Step0<dim, ValueType>::run ()
 {
   // First up, fill the piezoelectric tensors with coefficent
-  // values. First-order coefficients...
+  // values. Starting with first-order coefficients...
   distribute_first_order_piezoelectric_coefficients (first_order_piezoelectric_coefficients);
 
   // and then second-order coefficients.
