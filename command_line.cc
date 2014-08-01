@@ -21,8 +21,8 @@ namespace nil
     for (int i=0; i<argc; ++i)
       args.push_back (argv[i]);
     
-    // Keep reading command line arhuements until the number of command
-    // line arguements reduces to zero.
+    // Keep reading command line arguements until the number of
+    // command line arguements reduces to zero.
     while (args.size ())
       {
 	
@@ -45,7 +45,7 @@ namespace nil
 	  {
 	    break;
 	  }
-    }
+      }
   }
   
 } // namespace nil
