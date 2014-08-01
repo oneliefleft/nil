@@ -40,6 +40,11 @@ public:
 private:
 
   /**
+   * Initialise all tensors used in this problem.
+   */
+  void setup_problem ();
+
+  /**
    * Distribute <code>coefficients</code> on to the first-order
    * piezoelectric tensor.
    */
@@ -52,9 +57,14 @@ private:
   void distribute_second_order_piezoelectric_coefficients (const std::list<ValueType> coefficients);
 
   /**
-   * A tensor holding the first order piezoelectric constants.
+   * A tensor holding the first-order piezoelectric constants.
    */
   dealii::Tensor<2, dim> first_order_piezoelectric;
+
+  /**
+   * A tensor holding the second-order piezoelectric constants.
+   */
+  dealii::Tensor<2, dim> second_order_piezoelectric;
 
   /**
    * A tensor holding the first order mechanical strain.
@@ -86,6 +96,19 @@ Step0<dim, ValueType>::~Step0 ()
 
 template <int dim, typename ValueType>
 void 
+Step0<dim, ValueType>::setup_problem ()
+{
+  // Initialise the first- and second-order piezoelectric tensors...
+  first_order_piezoelectric.reinit ();
+  second_order_piezoelectric.reinit ();
+
+  // and then the strain tensor.
+  first_order_strain.reinit ();
+}
+
+
+template <int dim, typename ValueType>
+void 
 Step0<dim, ValueType>::distribute_first_order_piezoelectric_coefficients 
 (const std::list<ValueType> coefficients)
 {
@@ -96,6 +119,10 @@ Step0<dim, ValueType>::distribute_first_order_piezoelectric_coefficients
   // hence:
   AssertThrow (coefficients.size ()==0, 
 	       dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
+
+  // Then distribute the coefficients on to the tensor.
+  // for (unsigned int i=0; i<dim; ++i)
+    
 }
 
 
@@ -124,6 +151,10 @@ Step0<dim, ValueType>::run ()
 
   // and then second-order coefficients.
   distribute_second_order_piezoelectric_coefficients (second_order_piezoelectric_coefficients);
+
+  // Having done that now we want to start applying an incremental
+  // strain pattern
+  
 }
 
 
