@@ -35,13 +35,13 @@ public:
 private:
 
   /**
-   * Distribute <code>coefficients</code> on to the first order
+   * Distribute <code>coefficients</code> on to the first-order
    * piezoelectric tensor.
    */
   void distribute_first_order_piezoelectric_coefficients (const std::list<double> coefficients);
 
   /**
-   * Distribute <code>coefficients</code> on to the second order
+   * Distribute <code>coefficients</code> on to the second-order
    * piezoelectric tensor.
    */
   void distribute_second_order_piezoelectric_coefficients (const std::list<double> coefficients);
@@ -56,6 +56,15 @@ private:
    */
   dealii::Tensor<2, dim> first_order_strain;
 
+  /**
+   * A list of first-order piezoelectric coefficients.
+   */
+  std::list<double> first_order_piezoelectric_coefficients;
+
+  /**
+   * A list of second-order piezoelectric coefficients.
+   */
+  std::list<double> second_order_piezoelectric_coefficients;
 };
 
 
@@ -74,7 +83,7 @@ void
 Step0<dim>::distribute_first_order_piezoelectric_coefficients (const std::list<double> coefficients)
 {
   AssertThrow (coefficients.size ()!=0, 
-	       "The number of coefficients can not be zero.");
+	       dealii::ExcMessage ("The number of coefficients can not be zero."));
 }
 
 
@@ -83,14 +92,21 @@ void
 Step0<dim>::distribute_second_order_piezoelectric_coefficients (const std::list<double> coefficients)
 {
   AssertThrow (coefficients.size ()!=0, 
-	       "The number of coefficients can not be zero.");
+	       dealii::ExcMessage ("The number of coefficients can not be zero."));
 }
 
 
 template <int dim>
 void 
 Step0<dim>::run ()
-{}
+{
+  // First up, fill the piezoelectric tensors with coefficent
+  // values. First-order coefficients...
+  distribute_first_order_piezoelectric_coefficients (first_order_piezoelectric_coefficients);
+
+  // and then second-order coefficients.
+  distribute_second_order_piezoelectric_coefficients (second_order_piezoelectric_coefficients);
+}
 
 
 int main (int argc, char **argv)
