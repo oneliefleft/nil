@@ -1,94 +1,61 @@
 
+// deal.II headers
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/tensor.h>
 
+// Library-based headers.
+#include "piezoelectric_tensor.h"
+
+// Application-base headers.
 #include "command_line.h"
 
 #include <fstream>
 #include <iostream>
 
 
-/**
- * This is an example class that makes very little sense here. @note
- * The convention is dim, rank, ValueType, ...
- */
 template <int dim, typename ValueType = double>
 class Step0
 {
 public:
 
-  /**
-   * Constructor.
-   */
+  // First, are the usual class constructors and destructors.
   Step0 ();
-
-  /**
-   * Destructor.
-   */
   ~Step0 ();
-
-  /**
-   * Run the problem.
-   */  
+  
   void run ();
   
-  /**
-   * Read in file from the command line.
-   */
+  // Coefficients are held in a parameter file, so it will be
+  // necessary to read in a file from the command line.
   nil::CommandLine command_line;
   
 private:
-
-  /**
-   * Initialise all tensors used in this problem.
-   */
+  
+  // First is a list of functions that belong to this class.
   void setup_problem ();
-
-  /**
-   * Distribute <code>coefficients</code> on to the first-order
-   * piezoelectric tensor.
-   */
-  void distribute_first_order_piezoelectric_coefficients (const std::list<ValueType> coefficients);
-
-  /**
-   * Distribute <code>coefficients</code> on to the second-order
-   * piezoelectric tensor.
-   */
-  void distribute_second_order_piezoelectric_coefficients (const std::list<ValueType> coefficients);
-
-  /**
-   * A tensor holding the first-order piezoelectric constants.
-   */
-  dealii::Tensor<2, dim> first_order_piezoelectric;
-
-  /**
-   * A tensor holding the second-order piezoelectric constants.
-   */
-  dealii::Tensor<2, dim> second_order_piezoelectric;
-
-  /**
-   * A tensor holding the first order mechanical strain.
-   */
-  dealii::Tensor<2, dim> first_order_strain;
-
-  /**
-   * A list of first-order piezoelectric coefficients.
-   */
+  
+  // Following that we have a list of the tensors that will be used in
+  // this calculation. They are, first- and second-order piezoelectric
+  // tensors, a first-order strain tensor, and a tensor of first-order
+  // displacement
+  nil::PiezoelectricTensor<3, 1, ValueType> first_order_piezoelectric;
+  nil::PiezoelectricTensor<3, 2, ValueType> second_order_piezoelectric;
+  
+  dealii::Tensor<1, dim> first_order_displacement;
+  dealii::Tensor<1, dim> first_order_strain;
+  
+  // Additionally, lists of coefficients are needed for those tensors
+  // that are tensors of empirical moduli.
   std::list<ValueType> first_order_piezoelectric_coefficients;
-
-  /**
-   * A list of second-order piezoelectric coefficients.
-   */
   std::list<ValueType> second_order_piezoelectric_coefficients;
 
 };
 
-
+// The constructor is typically borning...
 template <int dim, typename ValueType>
 Step0<dim, ValueType>::Step0 ()
 {}
 
-
+// as is the destructor.
 template <int dim, typename ValueType>
 Step0<dim, ValueType>::~Step0 ()
 {}
@@ -106,52 +73,19 @@ Step0<dim, ValueType>::setup_problem ()
   first_order_strain.reinit ();
 }
 
-
-template <int dim, typename ValueType>
-void 
-Step0<dim, ValueType>::distribute_first_order_piezoelectric_coefficients 
-(const std::list<ValueType> coefficients)
-{
-  Assert (coefficients.size ()!=0, 
-	  dealii::ExcMessage ("The number of coefficients can not be zero."));
-
-  // At this point we are interested in zinc-blende structure only,
-  // hence:
-  Assert (coefficients.size ()==0, 
-	  dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
-
-  // Then distribute the coefficients on to the tensor.
-  // for (unsigned int i=0; i<dim; ++i)
-    
-}
-
-
-template <int dim, typename ValueType>
-void 
-Step0<dim, ValueType>::distribute_second_order_piezoelectric_coefficients 
-(const std::list<ValueType> coefficients)
-{
-  Assert (coefficients.size ()!=0, 
-	  dealii::ExcMessage ("The number of coefficients can not be zero."));
-
-  // At this point we are interested in zinc-blende structure only,
-  // hence:
-  Assert (coefficients.size ()==0, 
-	  dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
-}
-
-
 template <int dim, typename ValueType>
 void 
 Step0<dim, ValueType>::run ()
 {
   // First up, fill the piezoelectric tensors with coefficent
-  // values. Starting with first-order coefficients...
-  distribute_first_order_piezoelectric_coefficients (first_order_piezoelectric_coefficients);
-
+  // values. Starting with first-order coefficients...  
+  first_order_piezoelectric
+    .distribute_first_order_piezoelectric_coefficients (first_order_piezoelectric_coefficients);
+  
   // and then second-order coefficients.
-  distribute_second_order_piezoelectric_coefficients (second_order_piezoelectric_coefficients);
-
+  second_order_piezoelectric
+    .distribute_second_order_piezoelectric_coefficients (second_order_piezoelectric_coefficients);
+  
   // Having done that now we want to start applying an incremental
   // strain pattern
   

@@ -1,7 +1,7 @@
 // -------------------------------------------------------------------
 // @author Toby D. Young
 //
-// Copyright 2014 nil authors. All rights reserved.
+// Copyright 2010 nil authors. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -34,68 +34,61 @@
 // implied, of the namespace ewalena authors.
 // -------------------------------------------------------------------
 
-#include "command_line.h"
+#include "piezoelectric_tensor.h"
 
-#include <fstream>
-#include <iostream>
 
 namespace nil
-{
-  
-  CommandLine::CommandLine () 
-    :
-    found_prm_file (false)
+{  
+
+  template <int dim, int order, typename ValueType>
+  PiezoelectricTensor<dim, order, ValueType>::~PiezoelectricTensor ()
   {}
-  
-  CommandLine::~CommandLine () {}
-  
-  void CommandLine::parse_command_line (const int    argc,
-					char *const *argv)
+
+
+  template <int dim, int order, typename ValueType>
+  void 
+  PiezoelectricTensor<dim, order, ValueType>::distribute_first_order_piezoelectric_coefficients 
+  (const std::list<ValueType> coefficients)
   {
-
-    // Blindly read in the command line parameters.
-    for (int i=1; i<argc; ++i)
-      args.push_back (argv[i]);
+    Assert (coefficients.size ()!=0, 
+	    dealii::ExcMessage ("The number of coefficients can not be zero."));
     
-    // Keep reading command line arguements until the number of
-    // command line arguements reduces to zero.
-    while (args.size ())
-      {
-
-	// See if there is a parameter file to use.
-	if ((!found_prm_file)                       && 
-	    ((args.front () == std::string ("-pf")) ||
-	     (args.front () == std::string ("--parameter-file"))))
-	  {
-	    // Get rid of the command...
-	    args.pop_front ();
-	    
-	    // and read in the data.
-	    runtime_parameters.prm_file = args.front ();
-	    args.pop_front ();
-	    found_prm_file = true;
-	  }
-	
-	// Otherwise, give up.
-	else
-	  {
-	    break;
-	  }
-      }
-
-    if (!found_prm_file)
-      {
-	// write a usage message to terminal.
-	std::cout << std::endl << std::endl
-		  << "Usage: step-0 [option]... [file]..."
-		  << std::endl << std::endl
-		  << "  -pf, --parameter-file name of the parameter file. "
-		  << std::endl << std::endl;
-
-	// and exit nicely.
-	exit (0);
-      }
-
+    // At this point we are interested in zinc-blende structure only,
+    // hence:
+    Assert (coefficients.size ()==0, 
+	    dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
+    
+    // Then distribute the coefficients on to the tensor.
+    // for (unsigned int i=0; i<dim; ++i)
+    
   }
   
+  
+  template <int dim, int order, typename ValueType>
+  void 
+    PiezoelectricTensor<dim, order, ValueType>::distribute_second_order_piezoelectric_coefficients 
+  (const std::list<ValueType> coefficients)
+  {
+    Assert (coefficients.size ()!=0, 
+	    dealii::ExcMessage ("The number of coefficients can not be zero."));
+    
+    // At this point we are interested in zinc-blende structure only,
+    // hence:
+    Assert (coefficients.size ()==0, 
+	    dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
+}
+
+  
 } // namespace nil
+
+
+// -------------- Explicit Instantiations -------------------------------
+
+// First-order tensors
+template class 
+nil::PiezoelectricTensor<3, 1, double>;
+
+// second-order tensors
+template class 
+nil::PiezoelectricTensor<3, 2, double>;
+
