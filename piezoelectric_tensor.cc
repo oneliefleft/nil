@@ -74,8 +74,8 @@ namespace nil
     
     // At this point we are interested in zinc-blende structure only,
     // hence:
-    Assert (coefficients.size ()==0, 
-	    dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
+    // Assert (coefficients.size ()==0, 
+    // 	    dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
 }
 
   

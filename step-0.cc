@@ -92,18 +92,24 @@ Step0<dim, ValueType>::get_parameters ()
   parameters.declare_entry ("First-order piezoelectric constants",
 			    "1., 1., 1., 1., 1.",
 			    dealii::Patterns::List (dealii::Patterns::Double (0), 1),
-			    "A list of the first-order elastic constants. Default is zinc-blende GaAs.");
+			    "A list of the first-order piezoelectric constants." 
+			    "Default is zinc-blende GaAs.");
   
   parameters.declare_entry ("Second-order piezoelectric constants",
 			    "1., 1., 1., 1., 1.",
 			    dealii::Patterns::List (dealii::Patterns::Double (0.), 1.),
-			    "A list of the second-order elastic constants. Default is zinc-blende GaAs.");
+			    "A list of the second-order piezoelectric constants."
+			    "Default is zinc-blende GaAs.");
 
   parameters.read_input (command_line.get_prm_file ());
 
   first_order_piezoelectric_coefficients = 
     dealii::Utilities::string_to_double
     (dealii::Utilities::split_string_list (parameters.get ("First-order piezoelectric constants")));
+
+  second_order_piezoelectric_coefficients = 
+    dealii::Utilities::string_to_double
+    (dealii::Utilities::split_string_list (parameters.get ("Second-order piezoelectric constants")));
 }
 
 
