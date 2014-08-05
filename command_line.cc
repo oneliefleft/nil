@@ -25,11 +25,11 @@ namespace nil
     // command line arguements reduces to zero.
     while (args.size ())
       {
-	
+
 	// See if there is a parameter file to use.
 	if ((!found_prm_file)                       && 
 	    ((args.front () == std::string ("-pf")) ||
-	     (args.front () == std::string ("--parameter_file"))))
+	     (args.front () == std::string ("--parameter-file"))))
 	  {
 	    // Get rid of the command...
 	    args.pop_front ();
@@ -46,6 +46,16 @@ namespace nil
 	    break;
 	  }
       }
+
+    if (!found_prm_file)
+      {
+	std::cout << std::endl << std::endl
+		  << "Usage: nil [option]... [file]..."
+		  << std::endl << std::endl
+		  << "  -pf, --parameter-file name of the parameter file. "
+		  << std::endl << std::endl;
+      }
+
   }
   
 } // namespace nil
