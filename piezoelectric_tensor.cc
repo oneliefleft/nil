@@ -48,15 +48,15 @@ namespace nil
   template <int dim, int order, typename ValueType>
   void 
   PiezoelectricTensor<dim, order, ValueType>::distribute_first_order_piezoelectric_coefficients 
-  (const std::list<ValueType> coefficients)
+  (const std::vector<ValueType> coefficients)
   {
     Assert (coefficients.size ()!=0, 
 	    dealii::ExcMessage ("The number of coefficients can not be zero."));
     
     // At this point we are interested in zinc-blende structure only,
     // hence:
-    Assert (coefficients.size ()==0, 
-	    dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
+    // Assert (coefficients.size ()==0, 
+    // 	    dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
     
     // Then distribute the coefficients on to the tensor.
     // for (unsigned int i=0; i<dim; ++i)
@@ -66,8 +66,8 @@ namespace nil
   
   template <int dim, int order, typename ValueType>
   void 
-    PiezoelectricTensor<dim, order, ValueType>::distribute_second_order_piezoelectric_coefficients 
-  (const std::list<ValueType> coefficients)
+  PiezoelectricTensor<dim, order, ValueType>::distribute_second_order_piezoelectric_coefficients 
+  (const std::vector<ValueType> coefficients)
   {
     Assert (coefficients.size ()!=0, 
 	    dealii::ExcMessage ("The number of coefficients can not be zero."));

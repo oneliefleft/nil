@@ -1,6 +1,7 @@
 
 // deal.II headers
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/tensor.h>
 
 // Library-based headers.
@@ -30,24 +31,29 @@ public:
   
 private:
   
-  // First is a list of functions that belong to this class.
+  // First is a list of functions that belong to this class (they are
+  // explained later on).
   void setup_problem ();
+  void get_parameters ();
   
   // Following that we have a list of the tensors that will be used in
   // this calculation. They are, first- and second-order piezoelectric
   // tensors, a first-order strain tensor, and a tensor of first-order
   // displacement
-  nil::PiezoelectricTensor<3, 1, ValueType> first_order_piezoelectric;
-  nil::PiezoelectricTensor<3, 2, ValueType> second_order_piezoelectric;
+  nil::PiezoelectricTensor<3, 1, ValueType> first_order_piezoelectric_tensor;
+  nil::PiezoelectricTensor<3, 2, ValueType> second_order_piezoelectric_tensor;
   
   dealii::Tensor<1, dim> first_order_displacement;
   dealii::Tensor<1, dim> first_order_strain;
   
   // Additionally, lists of coefficients are needed for those tensors
   // that are tensors of empirical moduli.
-  std::list<ValueType> first_order_piezoelectric_coefficients;
-  std::list<ValueType> second_order_piezoelectric_coefficients;
+  std::vector<ValueType> first_order_piezoelectric_coefficients;
+  std::vector<ValueType> second_order_piezoelectric_coefficients;
 
+  // Then we need an object to hold various run-time parameters that
+  // are specified in an "prm file".
+  dealii::ParameterHandler parameters;
 };
 
 // The constructor is typically borning...
@@ -66,28 +72,59 @@ void
 Step0<dim, ValueType>::setup_problem ()
 {
   // Initialise the first- and second-order piezoelectric tensors...
-  first_order_piezoelectric.reinit ();
-  second_order_piezoelectric.reinit ();
+  first_order_piezoelectric_tensor.reinit ();
+  second_order_piezoelectric_tensor.reinit ();
 
   // and then the strain tensor.
   first_order_strain.reinit ();
 }
 
+
+// The next step is to obtain a complete list of the coefficients
+// needed for this calculation. First comes a declaration of the
+// entries expected to be find in the parameter file and then they are
+// read into the object parameters.
+template <int dim, typename ValueType>
+void 
+Step0<dim, ValueType>::get_parameters ()
+{
+  // First declare the parameters that are expected to be found.
+  parameters.declare_entry ("First-order piezoelectric constants",
+			    "1., 1., 1., 1., 1.",
+			    dealii::Patterns::List (dealii::Patterns::Double (0), 1),
+			    "A list of the first-order elastic constants. Default is zinc-blende GaAs.");
+  
+  parameters.declare_entry ("Second-order piezoelectric constants",
+			    "1., 1., 1., 1., 1.",
+			    dealii::Patterns::List (dealii::Patterns::Double (0.), 1.),
+			    "A list of the second-order elastic constants. Default is zinc-blende GaAs.");
+
+  parameters.read_input (command_line.get_prm_file ());
+
+  first_order_piezoelectric_coefficients = 
+    dealii::Utilities::string_to_double
+    (dealii::Utilities::split_string_list (parameters.get ("First-order piezoelectric constants")));
+}
+
+
 template <int dim, typename ValueType>
 void 
 Step0<dim, ValueType>::run ()
 {
+  // First find the parameters need for this calculation
+  get_parameters ();
+
   // First up, fill the piezoelectric tensors with coefficent
   // values. Starting with first-order coefficients...  
-  first_order_piezoelectric
+  first_order_piezoelectric_tensor
     .distribute_first_order_piezoelectric_coefficients (first_order_piezoelectric_coefficients);
   
   // and then second-order coefficients.
-  second_order_piezoelectric
+  second_order_piezoelectric_tensor
     .distribute_second_order_piezoelectric_coefficients (second_order_piezoelectric_coefficients);
   
   // Having done that now we want to start applying an incremental
-  // strain pattern
+  // strain pattern. This is done 
   
 }
 
