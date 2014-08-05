@@ -17,8 +17,9 @@ namespace nil
   void CommandLine::parse_command_line (const int    argc,
 					char *const *argv)
   {
+
     // Blindly read in the command line parameters.
-    for (int i=0; i<argc; ++i)
+    for (int i=1; i<argc; ++i)
       args.push_back (argv[i]);
     
     // Keep reading command line arguements until the number of
