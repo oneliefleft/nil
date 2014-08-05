@@ -46,9 +46,18 @@ namespace nil
     :
     found_prm_file (false)
   {}
+
   
-  CommandLine::~CommandLine () {}
+  CommandLine::~CommandLine () 
+  {}
+
+
+  std::string CommandLine::get_prm_file ()
+  {
+    return runtime_parameters.prm_file;
+  }
   
+
   void CommandLine::parse_command_line (const int    argc,
 					char *const *argv)
   {

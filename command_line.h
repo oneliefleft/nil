@@ -58,6 +58,11 @@ namespace nil
      * Destructor.
      */
     ~CommandLine ();
+
+    /**
+     * Return the name of the parameter file as an <code>std::string</code>.
+     */
+    std::string get_prm_file ();
     
     /**
      * Parse the command line. @note <code>arg<code> and
@@ -75,7 +80,8 @@ namespace nil
     struct RuntimeParameters
     {
       std::string prm_file;  
-    };
+    } 
+    runtime_parameters;
     
     /**
      * A vector to hold command line arguments.
@@ -88,11 +94,6 @@ namespace nil
      * deal.II standard.
      */
     bool found_prm_file;
-    
-    /**
-     * A collection of runtime parameters given by the user.
-     */
-    RuntimeParameters runtime_parameters;
     
   }; // class CommandLine
   
