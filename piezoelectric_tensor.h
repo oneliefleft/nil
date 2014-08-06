@@ -56,7 +56,7 @@ namespace nil
   template <int dim, int order, typename ValueType = double>
     class PiezoelectricTensor
     :
-    public dealii::Tensor<2*order, dim, ValueType>
+    public dealii::Tensor<2*order+1, dim, ValueType>
     {
     public:
     
@@ -88,7 +88,7 @@ namespace nil
     /**
      * The underlying tensor.
      */
-    dealii::Tensor<2*order, dim, ValueType> tensor;
+    dealii::Tensor<2*order+1, dim, ValueType> tensor;
     
     }; /* PiezoelectricTensor */
   

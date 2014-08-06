@@ -50,6 +50,9 @@ namespace nil
   PiezoelectricTensor<dim, order, ValueType>::distribute_first_order_piezoelectric_coefficients 
   (const std::vector<ValueType> coefficients)
   {
+    Assert (tensor.rank==3,
+	    dealii::ExcMessage ("The rank of this tesor is not correct."));
+
     Assert (coefficients.size ()!=0, 
 	    dealii::ExcMessage ("The number of coefficients can not be zero."));
     
@@ -69,6 +72,9 @@ namespace nil
   PiezoelectricTensor<dim, order, ValueType>::distribute_second_order_piezoelectric_coefficients 
   (const std::vector<ValueType> coefficients)
   {
+    Assert (tensor.rank==5,
+	    dealii::ExcMessage ("The rank of this tesor is not correct."));
+
     Assert (coefficients.size ()!=0, 
 	    dealii::ExcMessage ("The number of coefficients can not be zero."));
     
