@@ -1,9 +1,9 @@
 # Listing of Parameters
 # ---------------------
 # A list of the first-order piezoelectric constants. Default is zinc-blende
-# GaAs.
-set First-order piezoelectric constants  = 1., 1., 1., 1., 1.
+# GaAs. See: PRL 96, 187602 (2006).
+set First-order piezoelectric constants  = -0.230
 
 # A list of the second-order piezoelectric constants. Default is zinc-blende
-# GaAs.
-set Second-order piezoelectric constants = 1., 1., 1., 1., 1.
+# GaAs. See: PRL 96, 187602 (2006).
+set Second-order piezoelectric constants = -0.439, -3.765, -0.492

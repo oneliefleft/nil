@@ -90,16 +90,18 @@ Step0<dim, ValueType>::get_parameters ()
 {
   // First declare the parameters that are expected to be found.
   parameters.declare_entry ("First-order piezoelectric constants",
-			    "1., 1., 1., 1., 1.",
-			    dealii::Patterns::List (dealii::Patterns::Double (0), 1),
+			    "-0.230",
+			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
 			    "A list of the first-order piezoelectric constants. " 
-			    "Default is zinc-blende GaAs.");
+			    "Default is zinc-blende GaAs. "
+			    "See: PRL 96, 187602 (2006). ");
   
   parameters.declare_entry ("Second-order piezoelectric constants",
-			    "1., 1., 1., 1., 1.",
-			    dealii::Patterns::List (dealii::Patterns::Double (0.), 1.),
+			    "-0.439, -3.765, -0.492",
+			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
 			    "A list of the second-order piezoelectric constants. "
-			    "Default is zinc-blende GaAs.");
+			    "Default is zinc-blende GaAs. "
+			    "See: PRL 96, 187602 (2006). ");
 
   parameters.read_input (command_line.get_prm_file ());
 

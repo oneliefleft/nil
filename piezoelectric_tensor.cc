@@ -57,12 +57,16 @@ namespace nil
 	    dealii::ExcMessage ("The number of coefficients can not be zero."));
     
     // At this point we are interested in zinc-blende structure only,
-    // hence:
-    // Assert (coefficients.size ()==0, 
-    // 	    dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
+    // hence the number of independent coefficients is one.
+    Assert (coefficients.size ()==1,
+     	    dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
     
-    // Then distribute the coefficients on to the tensor.
-    // for (unsigned int i=0; i<dim; ++i)
+    // Then distribute the coefficients on to the tensor. It seems
+    // there is no automagic way to do this, so first zero out all the
+    // elemtns and second insert those elements that are non-zero.
+    //
+    // In Voight notation these are:  e_14=e_26=e_36.
+    
     
   }
   
@@ -79,9 +83,14 @@ namespace nil
 	    dealii::ExcMessage ("The number of coefficients can not be zero."));
     
     // At this point we are interested in zinc-blende structure only,
+    // hence the number of independent coefficients is one.
+    Assert (coefficients.size ()==3,
+     	    dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
+
+    // At this point we are interested in zinc-blende structure only,
     // hence:
-    // Assert (coefficients.size ()==0, 
-    // 	    dealii::ExcMessage ("The number of coefficients does not match the number required for zinc-blende structure."));
+    Assert (coefficients.size ()==3, 
+     	    dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
 }
 
   
