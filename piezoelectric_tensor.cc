@@ -48,17 +48,17 @@ namespace nil
   template <int dim, int order, typename ValueType>
   void 
   PiezoelectricTensor<dim, order, ValueType>::distribute_first_order_piezoelectric_coefficients 
-  (const std::vector<ValueType> coefficients)
+  (const std::vector<ValueType> &coefficients)
   {
     Assert (this->tensor.rank==3,
 	    dealii::ExcMessage ("The rank of this tesor is not correct."));
 
-    Assert (this->coefficients.size ()!=0, 
+    Assert (coefficients.size ()!=0, 
 	    dealii::ExcMessage ("The number of coefficients can not be zero."));
     
     // At this point we are interested in zinc-blende structure only,
     // hence the number of independent coefficients is one.
-    AssertThrow (this->coefficients.size ()==1,
+    AssertThrow (coefficients.size ()==1,
 		 dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
     
     // Then distribute the coefficients on to the tensor. It seems
@@ -69,13 +69,13 @@ namespace nil
     this->tensor = 0;
 
     // e_14 \mapsto e_123 = e_132
-    this->tensor[0][1][2] = this->tensor[0][2][1] = this->coefficients[0];
+    this->tensor[0][1][2] = this->tensor[0][2][1] = coefficients[0];
 
     // e_26 \mapsto e_212 = e_221
-    this->tensor[1][0][1] = this->tensor[1][1][0] = this->coefficients[0];
+    this->tensor[1][0][1] = this->tensor[1][1][0] = coefficients[0];
 
     // e_36 \mapsto e_312 = e_321
-    this->tensor[2][0][1] = this->tensor[2][1][0] = this->coefficients[0];
+    this->tensor[2][0][1] = this->tensor[2][1][0] = coefficients[0];
     
   }
   
@@ -83,17 +83,17 @@ namespace nil
   template <int dim, int order, typename ValueType>
   void 
   PiezoelectricTensor<dim, order, ValueType>::distribute_second_order_piezoelectric_coefficients 
-  (const std::vector<ValueType> coefficients)
+  (const std::vector<ValueType> &coefficients)
   {
     Assert (this->tensor.rank==5,
 	    dealii::ExcMessage ("The rank of this tesor is not correct."));
 
-    Assert (this->coefficients.size ()!=0, 
+    Assert (coefficients.size ()!=0, 
 	    dealii::ExcMessage ("The number of coefficients can not be zero."));
     
     // At this point we are interested in zinc-blende structure only,
     // hence the default number of independent coefficients is three.
-    AssertThrow (this->coefficients.size ()==3,
+    AssertThrow (coefficients.size ()==3,
 		 dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
     
     // Then distribute the coefficients on to the tensor. It seems

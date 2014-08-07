@@ -89,13 +89,13 @@ namespace nil
      * Distribute <code>coefficients</code> on to the first-order
      * piezoelectric tensor.
      */
-    void distribute_first_order_piezoelectric_coefficients (const std::vector<ValueType> coefficients);
+    void distribute_first_order_piezoelectric_coefficients (const std::vector<ValueType> &coefficients);
     
     /**
      * Distribute <code>coefficients</code> on to the second-order
      * piezoelectric tensor.
      */
-    void distribute_second_order_piezoelectric_coefficients (const std::vector<ValueType> coefficients);
+    void distribute_second_order_piezoelectric_coefficients (const std::vector<ValueType> &coefficients);
     
     private:
     
