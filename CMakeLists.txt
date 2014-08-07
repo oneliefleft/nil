@@ -8,6 +8,7 @@ SET(TARGET "step-0")
 SET(TARGET_SRC
   command_line.cc
   piezoelectric_tensor.cc
+  piezoelectric_tensor_base.cc
   ${TARGET}.cc
   )
 

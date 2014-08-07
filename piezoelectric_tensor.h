@@ -39,6 +39,8 @@
 
 #include <deal.II/base/tensor.h>
 
+#include "group_symmetries.h"
+
 #include <fstream>
 #include <iostream>
 #include <list>
