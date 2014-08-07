@@ -101,6 +101,11 @@ namespace nil
      * Make the order of this tensor known to the class.
      */
     const int order_;
+
+    /**
+     * Zero out a tensor. @note Only zero is allowed as an input to this function
+     */
+    /* operator = ValueType; */
     
     }; /* PiezoelectricTensor */
   
@@ -118,8 +123,7 @@ namespace nil
     distribute_first_order_coefficients (dealii::Tensor<3, 3, double> &tensor,
 					 const std::vector<double>    &coefficients)
   {
-    Assert (tensor.rank==3,
-	    dealii::ExcInternalError ());
+    Assert (tensor.rank==3, dealii::ExcInternalError ());
     
     // At this point we are interested in zinc-blende structure only,
     // hence the number of independent coefficients is one.
@@ -140,9 +144,6 @@ namespace nil
     
     // e_36 \mapsto e_312 = e_321
     tensor[2][0][1] = tensor[2][1][0] = coefficients[0];
-    
-    std::cout << tensor 
-	      << std::endl;    
   }
   
   /**
@@ -155,8 +156,7 @@ namespace nil
     distribute_second_order_coefficients (PiezoelectricTensor<2, double> &tensor,
 					  const std::vector<double>      &coefficients)
   {
-    Assert (tensor.rank==5,
-	    dealii::ExcInternalError ());
+    Assert (tensor.rank==5, dealii::ExcInternalError ());
     
     // At this point we are interested in zinc-blende structure only,
     // hence the default number of independent coefficients is three.
@@ -165,13 +165,11 @@ namespace nil
     
     // Then distribute the coefficients on to the tensor. It seems
     // there is no automagic way to do this, so first zero out all the
-    // elementss and second insert those elements that are non-zero.
+    // elements and second insert those elements that are non-zero.
     //
     // In Voight notation these are: e_114 = e_124 = e_156, and
     // additionally, cyclic permutations x->y->z->. In total there are
     // 24 non-zero elements.
-    std::cout << "Setting up second-order coefficients..." 
-	      << std::endl;
     
     // e_114 = e_225 = e_336 \mapsto:
     tensor[0][0][0][1][2] = tensor[0][0][0][2][1] = tensor[0][1][2][0][0] = tensor[0][2][1][0][0] 
@@ -181,12 +179,33 @@ namespace nil
       tensor[2][2][2][0][1] = tensor[2][2][2][1][0] = tensor[2][0][1][2][2] = tensor[2][1][0][2][2] 
       =
       coefficients[0];
-    
-    // tensor[][][][][]
-    // tensor[][][][][]
-    
-    std::cout << tensor 
-	      << std::endl;    
+
+    // e_124 = e_134 = e_215 = e_235 = e_316 = e_326 \mapsto:
+    tensor[0][1][1][1][2] = tensor[0][1][1][2][1] = tensor[0][1][2][1][1] = tensor[0][2][1][1][1] 
+      = 
+      tensor[0][1][2][2][2] = tensor[0][2][1][2][2] = tensor[0][2][2][2][1] = tensor[0][2][2][1][2] 
+      = 
+      tensor[1][2][0][0][0] = tensor[1][0][2][0][0] = tensor[1][0][0][2][0] = tensor[1][0][0][0][2] 
+      =
+      tensor[1][2][2][2][0] = tensor[1][2][2][0][2] = tensor[1][2][0][2][2] = tensor[1][0][2][2][2] 
+      =
+      tensor[2][0][1][0][0] = tensor[2][1][0][0][0] = tensor[2][0][0][0][1] = tensor[2][0][0][1][0] 
+      =
+      tensor[2][0][1][1][1] = tensor[2][1][0][1][1] = tensor[2][1][1][0][1] = tensor[2][1][1][1][0] 
+      =
+      coefficients[1];
+
+    // e_345 = e_246 = e_156 \mapsto:
+    tensor[0][2][0][0][1] = tensor[0][0][2][0][1] = tensor[0][2][0][1][0] = tensor[0][2][0][0][1] = 
+      tensor[0][0][1][2][0] = tensor[0][1][0][2][0] = tensor[0][0][1][2][0] = tensor[0][0][1][0][2] 
+      = 
+      tensor[1][1][2][0][1] = tensor[1][2][1][0][1] = tensor[1][1][2][1][0] = tensor[1][2][1][1][0] = 
+      tensor[1][0][1][1][2] = tensor[1][1][0][1][2] = tensor[1][0][1][2][1] = tensor[1][1][0][2][1] 
+      =
+      tensor[2][1][2][2][0] = tensor[2][2][1][2][0] = tensor[2][1][2][0][2] = tensor[2][2][1][0][2] = 
+      tensor[2][2][0][1][2] = tensor[2][0][2][1][2] = tensor[2][2][0][2][1] = tensor[2][0][2][2][1] 
+      =  
+      coefficients[2];
   }
   
 } /* namespace nil */
