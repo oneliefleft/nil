@@ -36,20 +36,53 @@
 
 #include "piezoelectric_tensor_base.h"
 
-
 namespace nil
 {  
 
   template <int rank, typename ValueType>
   PiezoelectricTensorBase<rank, ValueType>::PiezoelectricTensorBase ()
     :
-    order (2*rank+1)
+    order_ (2*rank+1),
+    group_symmetry_ (None)
   {}
+
+
+  template <int rank, typename ValueType>
+  PiezoelectricTensorBase<rank, ValueType>::PiezoelectricTensorBase (GroupSymmetry &group_symmetry)
+    :
+    order_ (2*rank+1),
+    group_symmetry_ (group_symmetry)
+  {}
+
 
   template <int rank, typename ValueType>
   PiezoelectricTensorBase<rank, ValueType>::~PiezoelectricTensorBase ()
   {}
+
+
+  template <int rank, typename ValueType>
+  unsigned int 
+  order ()
+  {
+    // return this->order_;
+  }
+
+
+  template <int rank, typename ValueType>
+  unsigned int 
+  dim ()
+  {
+    return 3;
+  }
+
+  template <int rank, typename ValueType>
+  void 
+  reinit (GroupSymmetry &group_symmetry)
+  {
+    // this->group_symmetry_ = group_symmetry;
+  }
    
+
 } // namespace nil
 
 

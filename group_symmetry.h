@@ -56,6 +56,7 @@ namespace nil
    */  
   enum GroupSymmetry
   {
+    None,
     ZincBlende,
     Wurtzite
   };

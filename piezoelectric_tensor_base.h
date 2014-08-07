@@ -1,7 +1,7 @@
 // -------------------------------------------------------------------
 // @author Toby D. Young
 //
-// Copyright 2010 nil authors. All rights reserved.
+// Copyright 2014 nil authors. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -39,7 +39,7 @@
 
 #include <deal.II/base/tensor.h>
 
-#include "group_symmetries.h"
+#include "group_symmetry.h"
 
 #include <fstream>
 #include <iostream>
@@ -83,33 +83,68 @@ namespace nil
     PiezoelectricTensorBase ();
     
     /**
+     * Constructor. Initialise a piezoelectric tensor with a specific
+     * group symmetry.
+     */
+    PiezoelectricTensorBase (GroupSymmetry &group_symmetry = None);
+    
+    /**
      * Virtual destructor. 
      */
     ~PiezoelectricTensorBase (); 
     
-    private:
-    
     /**
-     * The underlying tensor.
+     * Reinitialise (zero out) this tensor with this symmetry.
      */
-    dealii::Tensor<rank, 3, ValueType> tensor; 
+    void reinit (GroupSymmetry &group_symmetry = None);
+
+    /**
+     * Make the order of this tensor public.
+     */
+    unsigned int order () const;
+
+    /**
+     * Make the dimension of this tensor public. @note This function
+     * just returns the number three, since these tensors are defined
+     * for three-dimensions only.
+     */
+    unsigned int dim () const;
+
+    /**
+     * Make the group symmetry of this tensor public.
+     */
+    GroupSymmetry group_symmetry () const;
     
+    protected:
+        
     /**
      * Make the order of this tensor known to all derived classes.
      */
-    const int order; 
-
+    const int order_; 
+    
+    /**
+     * Make the group symmetry of this tensor known to all derived classes.
+     */
+    GroupSymmetry group_symmetry_; 
+    
     /**
      * Zero out a tensor. @note Only zero is allowed as an input to this function
      */
     /* operator = ValueType; */
     
+    private:
+
+    /**
+     * The underlying tensor.
+     */
+    dealii::Tensor<rank, 3, ValueType> tensor; 
+
     }; /* PiezoelectricTensorBase */
 
   
   /* ----------------- Non-member functions operating on tensors. ------------ */
   
-    
+  
 } /* namespace nil */
 
 

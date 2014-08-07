@@ -39,7 +39,7 @@
 
 #include <deal.II/base/tensor.h>
 
-#include "group_symmetries.h"
+#include "group_symmetry.h"
 #include "piezoelectric_tensor_base.h"
 
 #include <fstream>
@@ -48,7 +48,7 @@
 
 namespace nil
 {
-
+  
   /**
    * \brief Piezoelectric Tensor.
    *
@@ -91,6 +91,11 @@ namespace nil
      * Make the order of this tensor known to the class.
      */
     const int order_;
+    
+    /**
+     * Make the group symmetry of this tensor known to the class.
+     */
+    GroupSymmetry group_symmetry_;
 
     /**
      * Zero out a tensor. @note Only zero is allowed as an input to this function

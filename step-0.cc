@@ -5,6 +5,7 @@
 #include <deal.II/base/tensor.h>
 
 // Library-based headers.
+#include "group_symmetry.h"
 #include "piezoelectric_tensor.h"
 
 // Application-base headers.
@@ -72,8 +73,8 @@ void
 Step0<dim, ValueType>::setup_problem ()
 {
   // Initialise the first- and second-order piezoelectric tensors...
-  first_order_piezoelectric_tensor.reinit ();
-  second_order_piezoelectric_tensor.reinit ();
+  first_order_piezoelectric_tensor.reinit (nil::GroupSymmetry::Wurtzite);
+  second_order_piezoelectric_tensor.reinit (nil::GroupSymmetry::Wurtzite);
 
   // and then the strain tensor.
   first_order_strain.reinit ();
