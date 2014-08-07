@@ -77,25 +77,25 @@ namespace nil
     /**
      * Constructor. 
      */
-    PiezoelectricTensor () 
-    {}
+    PiezoelectricTensor ();
     
     /**
      * Virtual destructor. 
      */
     virtual ~PiezoelectricTensor (); 
-    
+
     /**
      * Distribute <code>coefficients</code> on to the first-order
      * piezoelectric tensor.
      */
-    void distribute_first_order_piezoelectric_coefficients (const std::vector<ValueType> &coefficients);
+    void distribute_coefficients (const std::vector<ValueType> &coefficients);
+
+    private:
     
-    /**
-     * Distribute <code>coefficients</code> on to the second-order
-     * piezoelectric tensor.
-     */
-    void distribute_second_order_piezoelectric_coefficients (const std::vector<ValueType> &coefficients);
+    void distribute_first_order_coefficients (const std::vector<ValueType> &coefficients); 
+    
+
+    void distribute_second_order_coefficients (const std::vector<ValueType> &coefficients);  
     
     private:
     
@@ -104,12 +104,25 @@ namespace nil
      */
     dealii::Tensor<2*order+1, 3, ValueType> tensor;
     
+    /**
+     * Make the order of this tensor known to the class.
+     */
+    const int order_;
+
     }; /* PiezoelectricTensor */
   
+
+  /* ----------------- Non-member functions operating on tensors. ------------ */
+
+
+  /**
+   * Distribute <code>coefficients</code> on to the first-order
+   * piezoelectric tensor.
+   */
   template <int order, typename ValueType>
     inline
     void 
-    PiezoelectricTensor<order, ValueType>::distribute_first_order_piezoelectric_coefficients 
+    PiezoelectricTensor<order, ValueType>::distribute_first_order_coefficients 
     (const std::vector<ValueType> &coefficients)
     {
       Assert ((order==1) || (this->tensor.rank==3),
@@ -143,11 +156,14 @@ namespace nil
 		<< std::endl;    
     }
   
-
+  /**
+   * Distribute <code>coefficients</code> on to the second-order
+   * piezoelectric tensor.
+   */
   template <int order, typename ValueType>
     inline
     void 
-    PiezoelectricTensor<order, ValueType>::distribute_second_order_piezoelectric_coefficients 
+    PiezoelectricTensor<order, ValueType>::distribute_second_order_coefficients 
     (const std::vector<ValueType> &coefficients)
     {
       Assert ((order==2) || (this->tensor.rank==5),
