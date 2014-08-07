@@ -83,19 +83,12 @@ namespace nil
      * Virtual destructor. 
      */
     virtual ~PiezoelectricTensor (); 
-
-    /**
-     * Distribute <code>coefficients</code> on to the first-order
-     * piezoelectric tensor.
-     */
-    void distribute_coefficients (const std::vector<ValueType> &coefficients);
-
-    private:
     
-    void distribute_first_order_coefficients (const std::vector<ValueType> &coefficients); 
-    
-
-    void distribute_second_order_coefficients (const std::vector<ValueType> &coefficients);  
+    /* /\** */
+    /*  * Distribute <code>coefficients</code> on to the first-order */
+    /*  * piezoelectric tensor. */
+    /*  *\/ */
+    /* void distribute_coefficients (const std::vector<ValueType> &coefficients); */
     
     private:
     
@@ -108,100 +101,96 @@ namespace nil
      * Make the order of this tensor known to the class.
      */
     const int order_;
-
+    
     }; /* PiezoelectricTensor */
   
-
+  
   /* ----------------- Non-member functions operating on tensors. ------------ */
-
-
+  
+  
   /**
    * Distribute <code>coefficients</code> on to the first-order
    * piezoelectric tensor.
    */
-  template <int order, typename ValueType>
-    inline
-    void 
-    PiezoelectricTensor<order, ValueType>::distribute_first_order_coefficients 
-    (const std::vector<ValueType> &coefficients)
-    {
-      Assert ((order==1) || (this->tensor.rank==3),
-	      dealii::ExcInternalError ());
-      
-      Assert (coefficients.size ()!=0, 
-	      dealii::ExcMessage ("The number of coefficients can not be zero."));
-      
-      // At this point we are interested in zinc-blende structure only,
-      // hence the number of independent coefficients is one.
-      AssertThrow (coefficients.size ()==1,
-		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
-      
-      // Then distribute the coefficients on to the tensor. It seems
-      // there is no automagic way to do this, so first zero out all the
-      // elemtns and second insert those elements that are non-zero.
-      //
-      // In Voight notation these are:  e_14 = e_26 = e_36.
-      this->tensor = 0;
-      
-      // e_14 \mapsto e_123 = e_132
-      this->tensor[0][1][2] = this->tensor[0][2][1] = coefficients[0];
-      
-      // e_26 \mapsto e_212 = e_221
-      this->tensor[1][0][1] = this->tensor[1][1][0] = coefficients[0];
-      
-      // e_36 \mapsto e_312 = e_321
-      this->tensor[2][0][1] = this->tensor[2][1][0] = coefficients[0];
-            
-      std::cout << this->tensor 
-		<< std::endl;    
-    }
+  /* template <typename ValueType> */
+  inline
+  void 
+    distribute_first_order_coefficients (dealii::Tensor<3, 3, double> &tensor,
+					 const std::vector<double>    &coefficients)
+  {
+    Assert (tensor.rank==3,
+	    dealii::ExcInternalError ());
+    
+    // At this point we are interested in zinc-blende structure only,
+    // hence the number of independent coefficients is one.
+    AssertThrow (coefficients.size ()==1,
+		 dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
+    
+    // Then distribute the coefficients on to the tensor. It seems
+    // there is no automagic way to do this, so first zero out all the
+    // elemtns and second insert those elements that are non-zero.
+    //
+    // In Voight notation these are:  e_14 = e_26 = e_36.
+    
+    // e_14 \mapsto e_123 = e_132
+    tensor[0][1][2] = tensor[0][2][1] = coefficients[0];
+    
+    // e_26 \mapsto e_212 = e_221
+    tensor[1][0][1] = tensor[1][1][0] = coefficients[0];
+    
+    // e_36 \mapsto e_312 = e_321
+    tensor[2][0][1] = tensor[2][1][0] = coefficients[0];
+    
+    std::cout << tensor 
+	      << std::endl;    
+  }
   
   /**
    * Distribute <code>coefficients</code> on to the second-order
    * piezoelectric tensor.
    */
-  template <int order, typename ValueType>
-    inline
-    void 
-    PiezoelectricTensor<order, ValueType>::distribute_second_order_coefficients 
-    (const std::vector<ValueType> &coefficients)
-    {
-      Assert ((order==2) || (this->tensor.rank==5),
-	      dealii::ExcInternalError ());
-      
-      Assert (coefficients.size ()!=0, 
-	    dealii::ExcMessage ("The number of coefficients can not be zero."));
-      
-      // At this point we are interested in zinc-blende structure only,
-      // hence the default number of independent coefficients is three.
-      AssertThrow (coefficients.size ()==3,
-		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
+  /* template <typename ValueType> */
+  inline 
+  void 
+    distribute_second_order_coefficients (PiezoelectricTensor<2, double> &tensor,
+					  const std::vector<double>      &coefficients)
+  {
+    Assert (tensor.rank==5,
+	    dealii::ExcInternalError ());
     
-      // Then distribute the coefficients on to the tensor. It seems
-      // there is no automagic way to do this, so first zero out all the
-      // elementss and second insert those elements that are non-zero.
-      //
-      // In Voight notation these are: e_114 = e_124 = e_156, and
-      // additionally, cyclic permutations x->y->z->. In total there are
-      // 24 non-zero elements.
-      this->tensor = 0;
-      
-      std::cout << "Setting up second-order coefficients..." 
-		<< std::endl;
-      // e_114 = e_225 = e_336 \mapsto:
-      // this->tensor[0][0][0][1][2] //= this->tensor[0][0][0][2][1] = this->tensor[0][1][2][0][0] = this->tensor[0][2][1][0][0] 
-      // = 
-      // this->tensor[1][1][1][0][2] = this->tensor[1][1][1][2][0] = this->tensor[1][0][2][1][1] = this->tensor[1][2][0][1][1] 
-      // = 
-      // this->tensor[2][2][2][0][1] = this->tensor[2][2][2][1][0] = this->tensor[2][0][1][2][2] = this->tensor[2][1][0][2][2] 
-      // =
-      // coefficients[0];
-      
-      // this->tensor[][][][][]
-      // this->tensor[][][][][]
-    }
+    // At this point we are interested in zinc-blende structure only,
+    // hence the default number of independent coefficients is three.
+    AssertThrow (coefficients.size ()==3,
+		 dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
+    
+    // Then distribute the coefficients on to the tensor. It seems
+    // there is no automagic way to do this, so first zero out all the
+    // elementss and second insert those elements that are non-zero.
+    //
+    // In Voight notation these are: e_114 = e_124 = e_156, and
+    // additionally, cyclic permutations x->y->z->. In total there are
+    // 24 non-zero elements.
+    std::cout << "Setting up second-order coefficients..." 
+	      << std::endl;
+    
+    // e_114 = e_225 = e_336 \mapsto:
+    tensor[0][0][0][1][2] = tensor[0][0][0][2][1] = tensor[0][1][2][0][0] = tensor[0][2][1][0][0] 
+      = 
+      tensor[1][1][1][0][2] = tensor[1][1][1][2][0] = tensor[1][0][2][1][1] = tensor[1][2][0][1][1] 
+      = 
+      tensor[2][2][2][0][1] = tensor[2][2][2][1][0] = tensor[2][0][1][2][2] = tensor[2][1][0][2][2] 
+      =
+      coefficients[0];
+    
+    // tensor[][][][][]
+    // tensor[][][][][]
+    
+    std::cout << tensor 
+	      << std::endl;    
+  }
   
 } /* namespace nil */
+
 
 #endif /* __nil_piezoelectric_tensor_h */
 

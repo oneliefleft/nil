@@ -50,23 +50,27 @@ namespace nil
   PiezoelectricTensor<order, ValueType>::~PiezoelectricTensor ()
   {}
 
-  template <int order, typename ValueType>
-  void
-  PiezoelectricTensor<order, ValueType>::distribute_coefficients (const std::vector<ValueType> &coefficients)
-  {
-    switch (order)
-      {
-      case 1:
-	break;
+  // template <int order, typename ValueType>
+  // void
+  // PiezoelectricTensor<order, ValueType>::distribute_coefficients (const std::vector<ValueType> &coefficients)
+  // {
 
-      case 2:
-	break;
-
-      default:
+  //   switch (order)
+  //     {
+  //     case 1:
+  // 	distribute_first_order_coefficients ((*this), coefficients);
+  // 	break;
 	
-	AssertThrow (false, dealii::ExcNotImplemented ());
-      };
-  }
+  //     case 2:
+  // 	distribute_second_order_coefficients ((*this), coefficients);
+  // 	break;
+	
+  //     default:
+  // 	AssertThrow (false, dealii::ExcNotImplemented ());
+  // 	break;
+  //     }
+
+  // } // PiezoelectricTensor
    
 } // namespace nil
 
@@ -81,3 +85,9 @@ nil::PiezoelectricTensor<1, double>;
 template class 
 nil::PiezoelectricTensor<2, double>;
 
+// extern template return-type name < argument-list > ( parameter-list ) ;  (since C++11)
+
+// extern template 
+// void
+// nil::distribute_coefficients<double> (nil::PiezoelectricTensor<1, double> &, 
+// 				      std::vector<double>                 &);

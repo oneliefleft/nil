@@ -124,12 +124,17 @@ Step0<dim, ValueType>::run ()
 
   // First up, fill the piezoelectric tensors with coefficent
   // values. Starting with first-order coefficients...  
-  first_order_piezoelectric_tensor
-    .distribute_first_order_piezoelectric_coefficients (first_order_piezoelectric_coefficients);
+  // first_order_piezoelectric_tensor
+  //   .distribute_coefficients (first_order_piezoelectric_coefficients);
+
+  
+  distribute_first_order_coefficients (first_order_piezoelectric_tensor, 
+				       first_order_piezoelectric_coefficients);
   
   // and then second-order coefficients.
-  second_order_piezoelectric_tensor
-    .distribute_second_order_piezoelectric_coefficients (second_order_piezoelectric_coefficients);
+  
+  distribute_second_order_coefficients (second_order_piezoelectric_tensor, 
+					second_order_piezoelectric_coefficients);
   
   // Having done that now we want to start applying an incremental
   // strain pattern. This is done 
