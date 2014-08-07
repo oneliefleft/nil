@@ -19,3 +19,13 @@
 *.exe
 *.out
 *.app
+
+# Standard build directory
+build
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+step-0
