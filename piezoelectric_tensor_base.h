@@ -68,7 +68,7 @@ namespace nil
    * macierzowym" Państwowe Wydawnictwo Naukowa (1962). Tłumaczył z
    * języka angielskiego J. Rauułuszhiewicz.
    *
-   * @author Toby D. Young  2014.
+   * @author Toby D. Young 2014.
    */  
   template <int rank, typename ValueType = double>
     class PiezoelectricTensorBase
@@ -92,12 +92,12 @@ namespace nil
     /**
      * The underlying tensor.
      */
-    dealii::Tensor<rank, 3, ValueType> tensor;
+    dealii::Tensor<rank, 3, ValueType> tensor; 
     
     /**
      * Make the order of this tensor known to all derived classes.
      */
-    const int order;
+    const int order; 
 
     /**
      * Zero out a tensor. @note Only zero is allowed as an input to this function

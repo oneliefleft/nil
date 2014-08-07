@@ -40,6 +40,7 @@
 #include <deal.II/base/tensor.h>
 
 #include "group_symmetries.h"
+#include "piezoelectric_tensor_base.h"
 
 #include <fstream>
 #include <iostream>
@@ -53,26 +54,13 @@ namespace nil
    *
    * \f$N\,\f$-order piezoelectric tensor. 
    *
-   * @note In the inline documentation, mappings of the piezoelectric
-   * constants in Voight notation is taken from:
-   *
-   * H. Grimmer, "The piezoelectric effect of second order in stress
-   * or strain: its form for crystals and quasicrystals of any
-   * symmetry", Acta Cryst. (2007) A36, 441.
-   *
-   * @note In the inline documentation, Various mappings from Voight
-   * notation to proper tensor notation is taken from:
-   *
-   * J. F. Nye, "Własnosści fizyczne kryształów w Ujęciu tensorowym i
-   * macierzowym" Państwowe Wydawnictwo Naukowa (1962). Tłumaczył z
-   * języka angielskiego J. Rauułuszhiewicz.
-   *
    * @author Toby D. Young  2010, 2011, 2014.
    */  
   template <int order, typename ValueType = double>
     class PiezoelectricTensor
     :
     public dealii::Tensor<2*order+1, 3, ValueType>
+    /* public PiezoelectricTensorBase<2*order+1, ValueType> */
     {
     public:
     
