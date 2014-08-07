@@ -44,6 +44,7 @@ namespace nil
   
   CommandLine::CommandLine () 
     :
+    found_help     (false),
     found_prm_file (false)
   {}
 
