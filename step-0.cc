@@ -40,8 +40,8 @@ private:
   // this calculation. They are, first- and second-order piezoelectric
   // tensors, a first-order strain tensor, and a tensor of first-order
   // displacement
-  nil::PiezoelectricTensor<3, 1, ValueType> first_order_piezoelectric_tensor;
-  nil::PiezoelectricTensor<3, 2, ValueType> second_order_piezoelectric_tensor;
+  nil::PiezoelectricTensor<1, ValueType> first_order_piezoelectric_tensor;
+  nil::PiezoelectricTensor<2, ValueType> second_order_piezoelectric_tensor;
   
   dealii::Tensor<1, dim> first_order_displacement;
   dealii::Tensor<1, dim> first_order_strain;
