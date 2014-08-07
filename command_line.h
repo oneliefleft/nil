@@ -87,7 +87,13 @@ namespace nil
      * A vector to hold command line arguments.
      */
     std::list<std::string> args;
-    
+
+    /**
+     * True if the help was found on the command line (otherwise
+     * false).
+     */    
+    bool found_help;
+
     /**
      * True if the parameter file name was found on the command line
      * (otherwise false). @note The short-hand <code>prm</code> is a

@@ -71,6 +71,19 @@ namespace nil
     while (args.size ())
       {
 
+	// See if help is needed.
+	if ((!found_help) && 
+	    (args.front () == std::string ("--help")))
+	  {
+	    // Get rid of the command...
+	    args.pop_front ();
+	    
+	    // and read in the data.
+	    runtime_parameters.prm_file = args.front ();
+	    args.pop_front ();
+	    found_help = true;
+	  }
+
 	// See if there is a parameter file to use.
 	if ((!found_prm_file)                       && 
 	    ((args.front () == std::string ("-pf")) ||
@@ -92,15 +105,19 @@ namespace nil
 	  }
       }
 
-    if (!found_prm_file)
+    if ((!found_prm_file) 
+	||
+	(found_help))
       {
 	// write a usage message to terminal.
 	std::cout << std::endl << std::endl
 		  << "Usage: step-0 [option]... [file]..."
 		  << std::endl << std::endl
+		  << "       --help           write this message and exit. "
+		  << std::endl
 		  << "  -pf, --parameter-file name of the parameter file. "
 		  << std::endl << std::endl;
-
+	
 	// and exit nicely.
 	exit (0);
       }
