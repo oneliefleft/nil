@@ -62,24 +62,26 @@ namespace nil
 
   template <int rank, typename ValueType>
   unsigned int 
-  order ()
+  PiezoelectricTensorBase<rank, ValueType>::order () const
+
   {
-    // return this->order_;
+    return this->order_;
   }
 
 
   template <int rank, typename ValueType>
   unsigned int 
-  dim ()
+  PiezoelectricTensorBase<rank, ValueType>::dim () const
   {
     return 3;
   }
 
   template <int rank, typename ValueType>
   void 
-  reinit (GroupSymmetry &group_symmetry)
+  PiezoelectricTensorBase<rank, ValueType>::reinit (GroupSymmetry &group_symmetry)
   {
-    // this->group_symmetry_ = group_symmetry;
+    tensor = 0;
+    this->group_symmetry_ = group_symmetry;
   }
    
 
