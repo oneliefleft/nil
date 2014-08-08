@@ -73,6 +73,7 @@ namespace nil
   unsigned int 
   PiezoelectricTensorBase<rank, ValueType>::dim () const
   {
+    // These tensors are always defined in 3d.
     return 3;
   }
 
@@ -80,6 +81,7 @@ namespace nil
   void 
   PiezoelectricTensorBase<rank, ValueType>::reinit (GroupSymmetry &group_symmetry)
   {
+    // Wipe out the tensor and re assign group symmetry.
     tensor = 0;
     this->group_symmetry_ = group_symmetry;
   }
