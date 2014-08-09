@@ -75,13 +75,10 @@ private:
   
   // Following that we have a list of the tensors that will be used in
   // this calculation. They are, first- and second-order piezoelectric
-  // tensors, a first-order strain tensor, and a tensor of first-order
-  // displacement
+  // tensors, and a Green strain tensor.
   nil::PiezoelectricTensor<1, ValueType> first_order_piezoelectric_tensor;
   nil::PiezoelectricTensor<2, ValueType> second_order_piezoelectric_tensor;
-  
-  dealii::Tensor<1, dim> first_order_displacement;
-  dealii::Tensor<1, dim> first_order_strain;
+  dealii::Tensor<1, dim> green_strain;
   
   // Additionally, lists of coefficients are needed for those tensors
   // that are tensors of empirical moduli.
@@ -103,7 +100,8 @@ template <int dim, typename ValueType>
 Step0<dim, ValueType>::~Step0 ()
 {}
 
-
+// The first step is to initialise all of the objects we are goinf to
+// use. This is done in a single function.
 template <int dim, typename ValueType>
 void 
 Step0<dim, ValueType>::setup_problem ()
@@ -113,7 +111,7 @@ Step0<dim, ValueType>::setup_problem ()
   second_order_piezoelectric_tensor.reinit (nil::GroupSymmetry::Wurtzite);
 
   // and then the strain tensor.
-  first_order_strain.reinit ();
+  green_strain.reinit ();
 }
 
 
