@@ -73,6 +73,8 @@ namespace nil
   unsigned int 
   PiezoelectricTensorBase<rank, ValueType>::dim () const
   {
+    // Recall that these tensors are independent of changes in dim,
+    // since they re only properly defined in 3d. Return 3.
     return 3;
   }
 
