@@ -89,8 +89,7 @@ namespace nil
     std::list<std::string> args;
 
     /**
-     * True if the help was found on the command line (otherwise
-     * false).
+     * True if help was found on the command line (otherwise false).
      */    
     bool found_help;
 

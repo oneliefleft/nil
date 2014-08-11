@@ -106,9 +106,7 @@ namespace nil
 	  }
       }
 
-    if ((!found_prm_file) 
-	||
-	(found_help))
+    if (found_help)
       {
 	// write a usage message to terminal.
 	std::cout << std::endl << std::endl

@@ -163,7 +163,7 @@ namespace nil
     // elements and second insert those elements that are non-zero.
     //
     // In Voight notation these are: e_114 = e_124 = e_156, and
-    // additionally, cyclic permutations x->y->z->. In total there are
+    // additionally, cyclic permutations x->y->z. In total there are
     // 24 non-zero elements.
     
     // e_114 = e_225 = e_336 \mapsto:

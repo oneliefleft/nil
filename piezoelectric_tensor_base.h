@@ -105,8 +105,8 @@ namespace nil
 
     /**
      * Make the dimension of this tensor public. @note This function
-     * just returns the number three, since these tensors are defined
-     * for three-dimensions only.
+     * just returns the integer three, since these tensors are defined
+     * in three-dimensions only.
      */
     unsigned int dim () const;
 

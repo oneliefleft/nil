@@ -1,3 +1,39 @@
+// -------------------------------------------------------------------
+// @author Toby D. Young
+//
+// Copyright 2014 nil authors. All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+//
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above
+//    copyright notice, this list of conditions and the following
+//    disclaimer in the documentation and/or other materials provided
+//    with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE NAMEPSACE EWALENA AUTHORS ``AS
+// IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+// FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+// NAMESPACE EWALENA AUTHORS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+// INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+// HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+// OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// The views and conclusions contained in the software and
+// documentation are those of the authors and should not be
+// interpreted as representing official policies, either expressed or
+// implied, of the namespace ewalena authors.
+// -------------------------------------------------------------------
+
 
 // deal.II headers
 #include <deal.II/base/logstream.h>
@@ -39,13 +75,10 @@ private:
   
   // Following that we have a list of the tensors that will be used in
   // this calculation. They are, first- and second-order piezoelectric
-  // tensors, a first-order strain tensor, and a tensor of first-order
-  // displacement
+  // tensors, and a Green strain tensor.
   nil::PiezoelectricTensor<1, ValueType> first_order_piezoelectric_tensor;
   nil::PiezoelectricTensor<2, ValueType> second_order_piezoelectric_tensor;
-  
-  dealii::Tensor<1, dim> first_order_displacement;
-  dealii::Tensor<1, dim> first_order_strain;
+  dealii::Tensor<1, dim> green_strain;
   
   // Additionally, lists of coefficients are needed for those tensors
   // that are tensors of empirical moduli.
@@ -67,7 +100,8 @@ template <int dim, typename ValueType>
 Step0<dim, ValueType>::~Step0 ()
 {}
 
-
+// The first step is to initialise all of the objects we are goinf to
+// use. This is done in a single function.
 template <int dim, typename ValueType>
 void 
 Step0<dim, ValueType>::setup_problem ()
@@ -77,7 +111,7 @@ Step0<dim, ValueType>::setup_problem ()
   second_order_piezoelectric_tensor.reinit (nil::GroupSymmetry::Wurtzite);
 
   // and then the strain tensor.
-  first_order_strain.reinit ();
+  green_strain.reinit ();
 }
 
 
