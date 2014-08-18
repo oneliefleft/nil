@@ -84,7 +84,8 @@ namespace nil
     
     /**
      * Constructor. Initialise a piezoelectric tensor with a specific
-     * group symmetry.
+     * group symmetry. @note The default symmetry group is
+     * <code>None</code>.
      */
     PiezoelectricTensorBase (GroupSymmetry &group_symmetry = None);
     
@@ -114,9 +115,10 @@ namespace nil
      * Make the group symmetry of this tensor public.
      */
     GroupSymmetry group_symmetry () const;
+
     
     protected:
-        
+    
     /**
      * Make the order of this tensor known to all derived classes.
      */
