@@ -110,8 +110,15 @@ Step0<dim, ValueType>::setup_problem ()
   first_order_piezoelectric_tensor.reinit (nil::GroupSymmetry::ZincBlende);
   second_order_piezoelectric_tensor.reinit (nil::GroupSymmetry::ZincBlende);
 
-  // and then the strain tensor.
-  green_strain.reinit ();
+  // and distribute the coefficients
+  distribute_first_order_coefficients (first_order_piezoelectric_tensor, 
+				       first_order_piezoelectric_coefficients);
+
+  distribute_second_order_coefficients (second_order_piezoelectric_tensor, 
+					second_order_piezoelectric_coefficients);
+
+  // and then initialise Green's strain tensor.
+  // green_strain.reinit ();
 }
 
 
@@ -157,31 +164,18 @@ Step0<dim, ValueType>::run ()
   // First find the parameters need for this calculation
   get_parameters ();
 
+  // and then setup the tensors required for this calculation
   setup_problem ();
-
-  // First up, fill the piezoelectric tensors with coefficent
-  // values. Starting with first-order coefficients...  
-  // first_order_piezoelectric_tensor
-  //   .distribute_coefficients (first_order_piezoelectric_coefficients);
-
-  
-  distribute_first_order_coefficients (first_order_piezoelectric_tensor, 
-				       first_order_piezoelectric_coefficients);
-  
-  // and then second-order coefficients.
-  
-  distribute_second_order_coefficients (second_order_piezoelectric_tensor, 
-					second_order_piezoelectric_coefficients);
 
   // output some data, to see what we have.  
   std::cout << "Piezoelectric tensor order:    "
 	    << first_order_piezoelectric_tensor.order ()
 	    << std::endl
-	    << "   Group symmetry:             "
-	    << first_order_piezoelectric_tensor.group_symmetry ()
-	    << std::endl
 	    << "   Number of space dimensions: "
 	    << first_order_piezoelectric_tensor.dim ()
+	    << std::endl
+	    << "   Group symmetry:             "
+	    << first_order_piezoelectric_tensor.group_symmetry ()
 	    << std::endl
 	    << "   Number of coefficients:     "
 	    << first_order_piezoelectric_coefficients.size ()
@@ -191,6 +185,9 @@ Step0<dim, ValueType>::run ()
 	    << std::endl
 	    << "   Number of space dimensions: "
 	    << second_order_piezoelectric_tensor.dim ()
+	    << std::endl
+	    << "   Group symmetry:             "
+	    << first_order_piezoelectric_tensor.group_symmetry ()
 	    << std::endl
 	    << "   Number of coefficients:     "
 	    << second_order_piezoelectric_coefficients.size ()
