@@ -70,12 +70,6 @@ namespace nil
     PiezoelectricTensor ();
     
 
-    /**
-     * Virtual destructor. 
-     */
-    virtual ~PiezoelectricTensor (); 
-    
-
     /* /\** */
     /*  * Distribute <code>coefficients</code> on to the first-order */
     /*  * piezoelectric tensor. */

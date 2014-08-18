@@ -43,11 +43,6 @@ namespace nil
   template <int order, typename ValueType>
   PiezoelectricTensor<order, ValueType>::PiezoelectricTensor ()
   {}
-
-
-  template <int order, typename ValueType>
-  PiezoelectricTensor<order, ValueType>::~PiezoelectricTensor ()
-  {}
    
 } // namespace nil
 
