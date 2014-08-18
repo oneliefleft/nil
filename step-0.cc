@@ -79,6 +79,7 @@ private:
   nil::PiezoelectricTensor<1, ValueType> first_order_piezoelectric_tensor;
   nil::PiezoelectricTensor<2, ValueType> second_order_piezoelectric_tensor;
   dealii::Tensor<1, dim> green_strain;
+  // nil::StrainTensor<1, dim> green_strain;
   
   // Additionally, lists of coefficients are needed for those tensors
   // that are tensors of empirical moduli.
@@ -195,7 +196,6 @@ Step0<dim, ValueType>::run ()
 	    // << "   Number of non-zero entries: "
     	    // << second_order_piezoelectric_tensor.n_nonzero_elements ()
 	    << std::endl;
-
 
   // Having done that now we want to start applying an incremental
   // strain pattern. This is done 

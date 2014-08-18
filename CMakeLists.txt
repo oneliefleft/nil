@@ -9,6 +9,8 @@ SET(TARGET_SRC
   command_line.cc
   piezoelectric_tensor.cc
   piezoelectric_tensor_base.cc
+  strain_tensor.cc
+  strain_tensor_base.cc
   ${TARGET}.cc
   )
 
