@@ -69,7 +69,7 @@ namespace nil
     
     // Keep reading command line arguements until the number of
     // command line arguements reduces to zero.
-    while (args.size ())
+    while ((args.size ()) && (found_help==false))
       {
 
 	// See if help is needed.
@@ -77,11 +77,6 @@ namespace nil
 	    (args.front () == std::string ("--help")))
 	  {
 	    // Get rid of the command...
-	    args.pop_front ();
-	    
-	    // and read in the data.
-	    runtime_parameters.prm_file = args.front ();
-	    args.pop_front ();
 	    found_help = true;
 	  }
 
