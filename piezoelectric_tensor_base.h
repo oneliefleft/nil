@@ -99,7 +99,7 @@ namespace nil
     /**
      * Reinitialise (zero out) this tensor with this symmetry.
      */
-    void reinit (GroupSymmetry &group_symmetry = None);
+    void reinit (GroupSymmetry group_symmetry);
 
 
     /**

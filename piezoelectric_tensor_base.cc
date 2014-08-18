@@ -98,7 +98,7 @@ namespace nil
 
   template <int rank, typename ValueType>
   void 
-  PiezoelectricTensorBase<rank, ValueType>::reinit (GroupSymmetry &group_symmetry)
+  PiezoelectricTensorBase<rank, ValueType>::reinit (GroupSymmetry group_symmetry)
   {
     // Wipe out the tensor and reassign group symmetry.
     this->group_symmetry_ = group_symmetry;
