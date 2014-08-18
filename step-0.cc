@@ -170,7 +170,34 @@ Step0<dim, ValueType>::run ()
   
   distribute_second_order_coefficients (second_order_piezoelectric_tensor, 
 					second_order_piezoelectric_coefficients);
-  
+
+  // output some data, to see what we have.  
+  std::cout << "Piezoelectric tensor order:    "
+	    << first_order_piezoelectric_tensor.order ()
+	    << std::endl
+	    // << "   Group symmetry:             "
+	    // << first_order_piezoelectric_coefficients.group_symmetry ()
+	    // << std::endl
+	    << "   Number of space dimensions: "
+	    << first_order_piezoelectric_tensor.dim ()
+	    << std::endl
+	    << "   Number of coefficients:     "
+	    << first_order_piezoelectric_coefficients.size ()
+	    << std::endl
+	    << "Piezoelectric tensor order:    "
+	    << second_order_piezoelectric_tensor.order ()
+	    << std::endl
+	    << "   Number of space dimensions: "
+	    << second_order_piezoelectric_tensor.dim ()
+	    << std::endl
+	    << "   Number of coefficients:     "
+	    << second_order_piezoelectric_coefficients.size ()
+	    // << std::endl
+	    // << "   Number of non-zero entries: "
+    	    // << second_order_piezoelectric_tensor.n_nonzero_elements ()
+	    << std::endl;
+
+
   // Having done that now we want to start applying an incremental
   // strain pattern. This is done 
   
