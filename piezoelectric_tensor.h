@@ -59,43 +59,37 @@ namespace nil
   template <int order, typename ValueType = double>
     class PiezoelectricTensor
     :
-    public dealii::Tensor<2*order+1, 3, ValueType>
-    /* public PiezoelectricTensorBase<2*order+1, ValueType> */
+    public PiezoelectricTensorBase<2*order+1, ValueType>
     {
     public:
     
+
     /**
      * Constructor. 
      */
     PiezoelectricTensor ();
     
+
     /**
      * Virtual destructor. 
      */
     virtual ~PiezoelectricTensor (); 
     
+
     /* /\** */
     /*  * Distribute <code>coefficients</code> on to the first-order */
     /*  * piezoelectric tensor. */
     /*  *\/ */
     /* void distribute_coefficients (const std::vector<ValueType> &coefficients); */
     
+
     private:
     
     /**
      * The underlying tensor.
      */
-    dealii::Tensor<2*order+1, 3, ValueType> tensor;
-    
-    /**
-     * Make the order of this tensor known to the class.
-     */
-    const int order_;
-    
-    /**
-     * Make the group symmetry of this tensor known to the class.
-     */
-    GroupSymmetry group_symmetry_;
+    PiezoelectricTensorBase<2*order+1, ValueType> tensor;
+
 
     /**
      * Zero out a tensor. @note Only zero is allowed as an input to this function

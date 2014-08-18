@@ -77,55 +77,43 @@ namespace nil
     {
     public:
     
+
     /**
      * Constructor. 
      */
     PiezoelectricTensorBase ();
     
+
     /**
-     * Constructor. Initialise a piezoelectric tensor with a specific
-     * group symmetry. @note The default symmetry group is
-     * <code>None</code>.
-     */
-    PiezoelectricTensorBase (GroupSymmetry &group_symmetry = None);
-    
-    /**
-     * Virtual destructor. 
+     * Destructor. 
      */
     ~PiezoelectricTensorBase (); 
+
 
     /**
      * Distribute coefficients on to the tensor.
      */
     void distribute_coefficients ();
     
+
     /**
      * Reinitialise (zero out) this tensor with this symmetry.
      */
     void reinit (GroupSymmetry &group_symmetry = None);
-   
-    protected:
-    
+
+
     /**
-     * Make the order of this tensor known to all derived classes.
+     * Return the number of non-zero elements this tensor has.
      */
-    const int order_; 
-    
-    /**
-     * Make the group symmetry of this tensor known to all derived classes.
-     */
-    GroupSymmetry group_symmetry_; 
-    
-    /**
-     * Zero out a tensor. @note Only zero is allowed as an input to this function
-     */
-    /* operator = ValueType; */
+    /* unsigned int n_nonzero_elements (); */
+
 
     /**
      * Make the order of this tensor public.
      */
     unsigned int order () const;
     
+
     /**
      * Make the dimension of this tensor public. @note This function
      * just returns the integer three, since these tensors are defined
@@ -133,12 +121,36 @@ namespace nil
      */
     unsigned int dim () const;
 
+
     /**
      * Make the group symmetry of this tensor public.
      */
     GroupSymmetry group_symmetry () const;
+   
+
+    protected:
     
+
+    /**
+     * Make the order of this tensor known to all derived classes.
+     */
+    const int order_; 
+    
+
+    /**
+     * Make the group symmetry of this tensor known to all derived classes.
+     */
+    GroupSymmetry group_symmetry_; 
+    
+
+    /**
+     * Zero out a tensor. @note Only zero is allowed as an input to this function
+     */
+    /* operator = ValueType; */
+    
+
     private:
+
 
     /**
      * The underlying tensor.

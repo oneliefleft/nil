@@ -42,16 +42,8 @@ namespace nil
   template <int rank, typename ValueType>
   PiezoelectricTensorBase<rank, ValueType>::PiezoelectricTensorBase ()
     :
-    order_ (2*rank+1),
+    order_ (rank),         /* @note this is a conversion. */
     group_symmetry_ (None)
-  {}
-
-
-  template <int rank, typename ValueType>
-  PiezoelectricTensorBase<rank, ValueType>::PiezoelectricTensorBase (GroupSymmetry &group_symmetry)
-    :
-    order_ (2*rank+1),
-    group_symmetry_ (group_symmetry)
   {}
 
 
@@ -103,15 +95,16 @@ namespace nil
     return 3;
   }
 
+
   template <int rank, typename ValueType>
   void 
   PiezoelectricTensorBase<rank, ValueType>::reinit (GroupSymmetry &group_symmetry)
   {
-    // Wipe out the tensor and re assign group symmetry.
-    tensor = 0;
+    // Wipe out the tensor and reassign group symmetry.
     this->group_symmetry_ = group_symmetry;
+    tensor = 0;
   }
-   
+
 
 } // namespace nil
 
