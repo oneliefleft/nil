@@ -107,8 +107,8 @@ void
 Step0<dim, ValueType>::setup_problem ()
 {
   // Initialise the first- and second-order piezoelectric tensors...
-  first_order_piezoelectric_tensor.reinit (nil::GroupSymmetry::Wurtzite);
-  second_order_piezoelectric_tensor.reinit (nil::GroupSymmetry::Wurtzite);
+  first_order_piezoelectric_tensor.reinit (nil::GroupSymmetry::ZincBlende);
+  second_order_piezoelectric_tensor.reinit (nil::GroupSymmetry::ZincBlende);
 
   // and then the strain tensor.
   green_strain.reinit ();
@@ -157,6 +157,8 @@ Step0<dim, ValueType>::run ()
   // First find the parameters need for this calculation
   get_parameters ();
 
+  setup_problem ();
+
   // First up, fill the piezoelectric tensors with coefficent
   // values. Starting with first-order coefficients...  
   // first_order_piezoelectric_tensor
@@ -175,9 +177,9 @@ Step0<dim, ValueType>::run ()
   std::cout << "Piezoelectric tensor order:    "
 	    << first_order_piezoelectric_tensor.order ()
 	    << std::endl
-	    // << "   Group symmetry:             "
-	    // << first_order_piezoelectric_coefficients.group_symmetry ()
-	    // << std::endl
+	    << "   Group symmetry:             "
+	    << first_order_piezoelectric_tensor.group_symmetry ()
+	    << std::endl
 	    << "   Number of space dimensions: "
 	    << first_order_piezoelectric_tensor.dim ()
 	    << std::endl

@@ -103,7 +103,35 @@ namespace nil
     // Wipe out the tensor and reassign group symmetry.
     this->group_symmetry_ = group_symmetry;
     tensor = 0;
-  }
+  } 
+
+
+  template <int rank, typename ValueType>
+  std::string
+  PiezoelectricTensorBase<rank, ValueType>::group_symmetry () const
+  {
+    switch (group_symmetry_)
+    {
+      case None:
+	return "None";
+	break;
+
+      case ZincBlende:
+	return "ZincBlende";
+	break;
+
+      case Wurtzite:
+	AssertThrow (false, dealii::ExcNotImplemented ());
+	break;
+
+      default:
+	AssertThrow (false, dealii::ExcNotImplemented ());
+	break;
+    };
+
+    // shutup the compiler about no return value.
+    return "";
+  } 
 
 
 } // namespace nil

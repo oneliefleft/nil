@@ -125,7 +125,7 @@ namespace nil
     /**
      * Make the group symmetry of this tensor public.
      */
-    GroupSymmetry group_symmetry () const;
+    std::string group_symmetry () const;
    
 
     protected:
