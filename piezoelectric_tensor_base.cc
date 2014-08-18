@@ -61,6 +61,31 @@ namespace nil
 
 
   template <int rank, typename ValueType>
+  void
+  PiezoelectricTensorBase<rank, ValueType>::distribute_coefficients ()
+  {
+    switch (group_symmetry_)
+      {
+      case None:
+	AssertThrow (false, dealii::ExcNotImplemented ());
+	break;
+
+      case ZincBlende:
+	AssertThrow (false, dealii::ExcNotImplemented ());
+	break;
+
+      case Wurtzite:
+	AssertThrow (false, dealii::ExcNotImplemented ());
+	break;
+
+      default:
+	AssertThrow (false, dealii::ExcNotImplemented ());
+	break;
+      };
+  }
+
+
+  template <int rank, typename ValueType>
   unsigned int 
   PiezoelectricTensorBase<rank, ValueType>::order () const
 

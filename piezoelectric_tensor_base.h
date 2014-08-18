@@ -93,30 +93,17 @@ namespace nil
      * Virtual destructor. 
      */
     ~PiezoelectricTensorBase (); 
+
+    /**
+     * Distribute coefficients on to the tensor.
+     */
+    void distribute_coefficients ();
     
     /**
      * Reinitialise (zero out) this tensor with this symmetry.
      */
     void reinit (GroupSymmetry &group_symmetry = None);
-
-    /**
-     * Make the order of this tensor public.
-     */
-    unsigned int order () const;
-
-    /**
-     * Make the dimension of this tensor public. @note This function
-     * just returns the integer three, since these tensors are defined
-     * in three-dimensions only.
-     */
-    unsigned int dim () const;
-
-    /**
-     * Make the group symmetry of this tensor public.
-     */
-    GroupSymmetry group_symmetry () const;
-
-    
+   
     protected:
     
     /**
@@ -133,6 +120,23 @@ namespace nil
      * Zero out a tensor. @note Only zero is allowed as an input to this function
      */
     /* operator = ValueType; */
+
+    /**
+     * Make the order of this tensor public.
+     */
+    unsigned int order () const;
+    
+    /**
+     * Make the dimension of this tensor public. @note This function
+     * just returns the integer three, since these tensors are defined
+     * in three-dimensions only.
+     */
+    unsigned int dim () const;
+
+    /**
+     * Make the group symmetry of this tensor public.
+     */
+    GroupSymmetry group_symmetry () const;
     
     private:
 
