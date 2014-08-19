@@ -182,7 +182,7 @@ Step0<dim, ValueType>::run ()
   // and then setup the tensors required for this calculation
   setup_problem ();
 
-  // output some data, to see what we have.  
+  // output some data, on the piezoelectric part
   std::cout << "Piezoelectric tensor order:    "
 	    << first_order_piezoelectric_tensor.order ()
 	    << std::endl
@@ -195,6 +195,10 @@ Step0<dim, ValueType>::run ()
 	    << "   Number of coefficients:     "
 	    << first_order_piezoelectric_coefficients.size ()
 	    << std::endl
+	    << "   Values of coefficients:     ";
+  for (unsigned int i=0; i<first_order_piezoelectric_coefficients.size (); ++i)
+    std::cout << first_order_piezoelectric_coefficients[i] << " ";
+  std::cout << std::endl
 	    << "Piezoelectric tensor order:    "
 	    << second_order_piezoelectric_tensor.order ()
 	    << std::endl
@@ -206,10 +210,19 @@ Step0<dim, ValueType>::run ()
 	    << std::endl
 	    << "   Number of coefficients:     "
 	    << second_order_piezoelectric_coefficients.size ()
-	    // << std::endl
-	    // << "   Number of non-zero entries: "
-    	    // << second_order_piezoelectric_tensor.n_nonzero_elements ()
-	    << std::endl;
+	    << std::endl
+	    << "   Values of coefficients:     ";
+  for (unsigned int i=0; i<second_order_piezoelectric_coefficients.size (); ++i)
+    std::cout << second_order_piezoelectric_coefficients[i] << " ";
+  std::cout << std::endl;
+  
+  // and then on the lattice part connected to Green's strain
+  std::cout << "Bravais lattice:               "
+	    << std::endl
+	    << "   Dimensions:                 ";
+  for (unsigned int i=0; i<bravais_lattice_dimensions.size (); ++i)
+    std::cout << bravais_lattice_dimensions[i] << " ";
+  std::cout << std::endl;
 
   // Having done that now we want to start applying an incremental
   // strain pattern. This is done 
