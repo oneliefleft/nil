@@ -52,6 +52,8 @@ namespace nil
    *
    * \f$N\,\f$-order strain tensor. 
    *
+   * Green strain.
+   *
    * @author Toby D. Young  2010, 2011, 2014.
    */  
   template <int order, typename ValueType = double>
@@ -73,12 +75,6 @@ namespace nil
      */
     StrainTensorBase<2*order, ValueType> tensor;
 
-
-    /**
-     * Zero out a tensor. @note Only zero is allowed as an input to this function
-     */
-    /* operator = ValueType; */
-    
     }; /* StrainTensor */
   
   
