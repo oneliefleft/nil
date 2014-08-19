@@ -43,6 +43,7 @@
 // Library-based headers.
 #include "group_symmetry.h"
 #include "piezoelectric_tensor.h"
+#include "strain_tensor.h"
 
 // Application-base headers.
 #include "command_line.h"
@@ -75,16 +76,20 @@ private:
   
   // Following that we have a list of the tensors that will be used in
   // this calculation. They are, first- and second-order piezoelectric
-  // tensors, and a Green strain tensor.
+  // tensors
   nil::PiezoelectricTensor<1, ValueType> first_order_piezoelectric_tensor;
   nil::PiezoelectricTensor<2, ValueType> second_order_piezoelectric_tensor;
-  dealii::Tensor<1, dim> green_strain;
-  // nil::StrainTensor<1, dim> green_strain;
+
+  // and a Green strain tensor.
+  nil::StrainTensor<1, ValueType> green_strain;
   
   // Additionally, lists of coefficients are needed for those tensors
-  // that are tensors of empirical moduli.
+  // that are tensors of empirical moduli
   std::vector<ValueType> first_order_piezoelectric_coefficients;
   std::vector<ValueType> second_order_piezoelectric_coefficients;
+
+  // as well as a list of th4e size of the Bravais lattice.
+  std::vector<ValueType> bravais_lattice_dimensions;
 
   // Then we need an object to hold various run-time parameters that
   // are specified in an "prm file".
@@ -132,29 +137,38 @@ void
 Step0<dim, ValueType>::get_parameters ()
 {
   // First declare the parameters that are expected to be found.
-  parameters.declare_entry ("First-order piezoelectric constants",
+  parameters.declare_entry ("First-order piezoelectric coefficients",
 			    "-0.230",
 			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
-			    "A list of the first-order piezoelectric constants. " 
+			    "A list of the first-order piezoelectric coefficients. " 
 			    "Default is zinc-blende GaAs. "
 			    "See: PRL 96, 187602 (2006). ");
   
-  parameters.declare_entry ("Second-order piezoelectric constants",
+  parameters.declare_entry ("Second-order piezoelectric coefficients",
 			    "-0.439, -3.765, -0.492",
 			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
-			    "A list of the second-order piezoelectric constants. "
+			    "A list of the second-order piezoelectric coefficients. "
 			    "Default is zinc-blende GaAs. "
 			    "See: PRL 96, 187602 (2006). ");
+
+  parameters.declare_entry ("Bravais lattice dimensions",
+			    "1., 1., 1.",
+			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
+			    "A list of the Bravais lattice dimensions. ");
 
   parameters.read_input (command_line.get_prm_file ());
 
   first_order_piezoelectric_coefficients = 
     dealii::Utilities::string_to_double
-    (dealii::Utilities::split_string_list (parameters.get ("First-order piezoelectric constants")));
+    (dealii::Utilities::split_string_list (parameters.get ("First-order piezoelectric coefficients")));
 
   second_order_piezoelectric_coefficients = 
     dealii::Utilities::string_to_double
-    (dealii::Utilities::split_string_list (parameters.get ("Second-order piezoelectric constants")));
+    (dealii::Utilities::split_string_list (parameters.get ("Second-order piezoelectric coefficients")));
+
+  bravais_lattice_dimensions = 
+    dealii::Utilities::string_to_double
+    (dealii::Utilities::split_string_list (parameters.get ("Bravais lattice dimensions")));
 }
 
 
