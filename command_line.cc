@@ -68,7 +68,7 @@ namespace nil
       args.push_back (argv[i]);
     
     // Keep reading command line arguements until the number of
-    // command line arguements reduces to zero.
+    // command line arguements reduces to zero or --help is wanted.
     while ((args.size ()) && (found_help==false))
       {
 
@@ -88,13 +88,14 @@ namespace nil
 	    // Get rid of the command...
 	    args.pop_front ();
 	    
-	    // and read in the data.
+	    // and read in the data and get rid of the command.
 	    runtime_parameters.prm_file = args.front ();
 	    args.pop_front ();
 	    found_prm_file = true;
 	  }
 	
-	// Otherwise, give up.
+	// Otherwise, give up. @todo[TDY] If an unknown command is
+	// found this hould be warned about to terminal.
 	else
 	  {
 	    break;
@@ -103,6 +104,7 @@ namespace nil
 
     if (found_help)
       {
+
 	// write a usage message to terminal.
 	std::cout << std::endl << std::endl
 		  << "Usage: step-0 [option]... [file]..."

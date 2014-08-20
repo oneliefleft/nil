@@ -20,6 +20,9 @@
 *.out
 *.app
 
+# Backups
+*~
+
 # Standard build directory
 build
 
