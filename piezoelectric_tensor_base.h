@@ -40,6 +40,7 @@
 #include <deal.II/base/tensor.h>
 
 #include "group_symmetry.h"
+#include "tensor_base.h"
 
 #include <fstream>
 #include <iostream>
@@ -120,12 +121,6 @@ namespace nil
      * in three-dimensions only.
      */
     unsigned int dim () const;
-
-
-    /* /\** */
-    /*  * Make the group symmetry of this tensor public. */
-    /*  *\/ */
-    /* std::string group_symmetry () const; */
    
 
     protected:
@@ -141,13 +136,7 @@ namespace nil
      * Make the group symmetry of this tensor known to all derived classes.
      */
     GroupSymmetry group_symmetry_; 
-    
 
-    /**
-     * Zero out a tensor. @note Only zero is allowed as an input to this function
-     */
-    /* operator = ValueType; */
-    
 
     private:
 

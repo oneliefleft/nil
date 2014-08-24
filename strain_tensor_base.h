@@ -40,6 +40,7 @@
 #include <deal.II/base/tensor.h>
 
 #include "group_symmetry.h"
+#include "tensor_base.h"
 
 #include <fstream>
 #include <iostream>
