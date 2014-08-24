@@ -48,17 +48,8 @@ namespace nil
 {
 
   /**
-   * \brief Strain Tensor Base.
-   *
-   * This is the base class for an \f$N\,\f$-order strain
+   * \brief This is the base class for an \f$N\,\f$-order strain
    * tensor.
-   *
-   * @note In the inline documentation, Various mappings from Voight
-   * notation to proper tensor notation is taken from:
-   *
-   * J. F. Nye, "Własnosści fizyczne kryształów w Ujęciu tensorowym i
-   * macierzowym" Państwowe Wydawnictwo Naukowa (1962). Tłumaczył z
-   * języka angielskiego J. Rauułuszhiewicz.
    *
    * @author Toby D. Young 2014.
    */  

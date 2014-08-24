@@ -39,99 +39,11 @@
 namespace nil
 {  
 
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  PiezoelectricTensorBase<group_symmetry, rank, ValueType>::PiezoelectricTensorBase ()
+  template <enum GroupSymmetry group_symmetry, int order, typename ValueType>
+  PiezoelectricTensorBase<group_symmetry, order, ValueType>::PiezoelectricTensorBase ()
     :
-    order_ (rank),         /* @note this is a conversion. */
-    group_symmetry_ (None)
+    TensorBase<group_symmetry, order, 2*order+1, ValueType> ()
   {}
-
-
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  PiezoelectricTensorBase<group_symmetry, rank, ValueType>::~PiezoelectricTensorBase ()
-  {}
-
-
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  void
-  PiezoelectricTensorBase<group_symmetry, rank, ValueType>::distribute_coefficients ()
-  {
-    switch (group_symmetry_)
-      {
-      case None:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-
-      case ZincBlende:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-
-      case Wurtzite:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-
-      default:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-      };
-  }
-
-
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  unsigned int 
-  PiezoelectricTensorBase<group_symmetry, rank, ValueType>::order () const
-
-  {
-    return this->order_;
-  }
-
-
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  unsigned int 
-  PiezoelectricTensorBase<group_symmetry, rank, ValueType>::dim () const
-  {
-    // Recall that these tensors are independent of changes in dim,
-    // since they are only properly defined in 3d. Hence, return 3.
-    return 3;
-  }
-
-
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  void 
-  PiezoelectricTensorBase<group_symmetry, rank, ValueType>::reinit ()
-  {
-    // Wipe out the tensor.
-    tensor = 0;
-  } 
-
-
-  // template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  // std::string
-  // PiezoelectricTensorBase<rank, ValueType>::group_symmetry () const
-  // {
-  //   switch (group_symmetry_)
-  //   {
-  //     case None:
-  // 	return "None";
-  // 	break;
-
-  //     case ZincBlende:
-  // 	return "ZincBlende";
-  // 	break;
-
-  //     case Wurtzite:
-  // 	AssertThrow (false, dealii::ExcNotImplemented ());
-  // 	break;
-
-  //     default:
-  // 	AssertThrow (false, dealii::ExcNotImplemented ());
-  // 	break;
-  //   };
-
-  //   // shutup the compiler about no return value.
-  //   return "";
-  // } 
-
 
 } // namespace nil
 

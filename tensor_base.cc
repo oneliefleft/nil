@@ -127,9 +127,15 @@ namespace nil
 template class 
 nil::TensorBase<nil::GroupSymmetry::ZincBlende, 1, 2, double>;
 
+template class 
+nil::TensorBase<nil::GroupSymmetry::ZincBlende, 1, 3, double>;
+
 // Second-order tensors
 template class 
 nil::TensorBase<nil::GroupSymmetry::ZincBlende, 2, 4, double>;
+
+template class 
+nil::TensorBase<nil::GroupSymmetry::ZincBlende, 2, 5, double>;
 
 
 

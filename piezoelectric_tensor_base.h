@@ -48,31 +48,15 @@ namespace nil
 {
 
   /**
-   * \brief Piezoelectric Tensor Base.
-   *
-   * This is the base class for an \f$N\,\f$-order piezoelectric
-   * tensor.
-   *
-   * @note In the inline documentation, mappings of the piezoelectric
-   * constants in Voight notation is taken from:
-   *
-   * H. Grimmer, "The piezoelectric effect of second order in stress
-   * or strain: its form for crystals and quasicrystals of any
-   * symmetry", Acta Cryst. (2007) A36, 441.
-   *
-   * @note In the inline documentation, Various mappings from Voight
-   * notation to proper tensor notation is taken from:
-   *
-   * J. F. Nye, "Własnosści fizyczne kryształów w Ujęciu tensorowym i
-   * macierzowym" Państwowe Wydawnictwo Naukowa (1962). Tłumaczył z
-   * języka angielskiego J. Rauułuszhiewicz.
+   * \brief This is the base class for an \f$N\,\f$-order
+   * piezoelectric tensor.
    *
    * @author Toby D. Young 2014.
    */  
-  template <nil::GroupSymmetry group_symmetry, int rank, typename ValueType = double>
+  template <nil::GroupSymmetry group_symmetry, int order, typename ValueType = double>
     class PiezoelectricTensorBase
     :
-    public dealii::Tensor<rank, 3, ValueType>
+    public nil::TensorBase<group_symmetry, order, 2*order+1, ValueType>
     {
     public:
     
@@ -84,57 +68,13 @@ namespace nil
     
 
     /**
-     * Destructor. 
-     */
-    ~PiezoelectricTensorBase (); 
-
-
-    /**
      * Distribute coefficients on to the tensor.
      */
     void distribute_coefficients ();
     
 
-    /**
-     * Reinitialise (zero out) this tensor with this symmetry.
-     */
-    void reinit ();
-
-
-    /**
-     * Return the number of non-zero elements this tensor has.
-     */
-    /* unsigned int n_nonzero_elements (); */
-
-
-    /**
-     * Make the order of this tensor public.
-     */
-    unsigned int order () const;
-    
-
-    /**
-     * Make the dimension of this tensor public. @note This function
-     * just returns the integer three, since these tensors are defined
-     * in three-dimensions only.
-     */
-    unsigned int dim () const;
-   
-
     protected:
     
-
-    /**
-     * Make the order of this tensor known to all derived classes.
-     */
-    const int order_; 
-    
-
-    /**
-     * Make the group symmetry of this tensor known to all derived classes.
-     */
-    GroupSymmetry group_symmetry_; 
-
 
     private:
 
@@ -142,7 +82,7 @@ namespace nil
     /**
      * The underlying tensor.
      */
-    dealii::Tensor<rank, 3, ValueType> tensor; 
+    nil::TensorBase<group_symmetry, order, 2*order+1, ValueType> tensor;
 
     }; /* PiezoelectricTensorBase */
 

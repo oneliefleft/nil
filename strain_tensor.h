@@ -76,7 +76,7 @@ namespace nil
     /**
      * The underlying tensor.
      */
-    StrainTensorBase<group_symmetry, 2*order, ValueType> tensor;
+    StrainTensorBase<group_symmetry, order, ValueType> tensor;
     
     }; /* StrainTensor */
   
