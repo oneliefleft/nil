@@ -49,9 +49,7 @@ namespace nil
 {
 
   /**
-   * \brief Tensor Base.
-   *
-   * This is the base class for an \f$N\,\f$-order tensors.
+   * \brief This is the base class for an \f$N\,\f$-order tensors.
    *
    * @note In the inline documentation, Various mappings from Voight
    * notation to proper tensor notation is taken from:
@@ -120,6 +118,12 @@ namespace nil
     
 
     /**
+     * Make the group symmetry of this tensor known to all derived classes.
+     */
+    GroupSymmetry group_symmetry_; 
+
+
+    /**
      * Make the order of this tensor known to all derived classes.
      */
     const int order_; 
@@ -129,18 +133,6 @@ namespace nil
      * Make the rank of this tensor known to all derived classes.
      */
     const int rank_; 
-
-
-    /**
-     * Make the group symmetry of this tensor known to all derived classes.
-     */
-    GroupSymmetry group_symmetry_; 
-    
-
-    /**
-     * Zero out a tensor. @note Only zero is allowed as an input to this function
-     */
-    /* operator = ValueType; */
     
 
     private:

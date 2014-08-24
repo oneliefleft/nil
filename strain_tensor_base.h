@@ -62,10 +62,10 @@ namespace nil
    *
    * @author Toby D. Young 2014.
    */  
-  template <enum GroupSymmetry, int rank, typename ValueType = double>
+  template <enum GroupSymmetry group_symmetry, int order, typename ValueType = double>
     class StrainTensorBase
     :
-    public dealii::Tensor<rank, 3, ValueType>
+    public nil::TensorBase<group_symmetry, order, 2*order, ValueType>
     {
     public:
     
@@ -76,63 +76,7 @@ namespace nil
     StrainTensorBase ();
     
 
-    /**
-     * Destructor. 
-     */
-    ~StrainTensorBase (); 
-
-
-    /**
-     * Distribute coefficients on to the tensor.
-     */
-    void distribute_coefficients ();
-    
-
-    /**
-     * Reinitialise (zero out) this tensor.
-     */
-    void reinit ();
-
-
-    /**
-     * Make the order of this tensor public.
-     */
-    unsigned int order () const;
-    
-
-    /**
-     * Make the dimension of this tensor public. @note This function
-     * just returns the integer three, since these tensors are defined
-     * in three-dimensions only.
-     */
-    unsigned int dim () const;
-
-
-    /* /\** */
-    /*  * Make the group symmetry of this tensor public. */
-    /*  *\/ */
-    /* std::string group_symmetry () const; */
-   
-
     protected:
-    
-
-    /**
-     * Make the order of this tensor known to all derived classes.
-     */
-    const int order_; 
-    
-
-    /**
-     * Make the group symmetry of this tensor known to all derived classes.
-     */
-    GroupSymmetry group_symmetry_; 
-    
-
-    /**
-     * Zero out a tensor. @note Only zero is allowed as an input to this function
-     */
-    /* operator = ValueType; */
     
 
     private:
@@ -141,7 +85,7 @@ namespace nil
     /**
      * The underlying tensor.
      */
-    dealii::Tensor<rank, 3, ValueType> tensor; 
+    nil::TensorBase<group_symmetry, order, 2*order, ValueType> tensor;
 
     }; /* StrainTensorBase */
 

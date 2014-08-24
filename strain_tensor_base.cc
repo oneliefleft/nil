@@ -40,98 +40,11 @@
 namespace nil
 {  
 
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  StrainTensorBase<group_symmetry, rank, ValueType>::StrainTensorBase ()
+  template <enum GroupSymmetry group_symmetry, int order, typename ValueType>
+  StrainTensorBase<group_symmetry, order, ValueType>::StrainTensorBase ()
     :
-    order_ (rank),         /* @note this is a conversion. */
-    group_symmetry_ (group_symmetry)
+    TensorBase<group_symmetry, order, 2*order, ValueType> ()
   {}
-
-
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  StrainTensorBase<group_symmetry, rank, ValueType>::~StrainTensorBase ()
-  {}
-
-
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  void
-  StrainTensorBase<group_symmetry, rank, ValueType>::distribute_coefficients ()
-  {
-    switch (group_symmetry_)
-      {
-      case None:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-
-      case ZincBlende:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-
-      case Wurtzite:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-
-      default:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-      };
-  }
-
-
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  unsigned int 
-  StrainTensorBase<group_symmetry, rank, ValueType>::order () const
-
-  {
-    return this->order_;
-  }
-
-
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  unsigned int 
-  StrainTensorBase<group_symmetry, rank, ValueType>::dim () const
-  {
-    // Recall that these tensors are independent of changes in dim,
-    // since they are only properly defined in 3d. Hence, return 3.
-    return 3;
-  }
-
-
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  void 
-  StrainTensorBase<group_symmetry, rank, ValueType>::reinit ()
-  {
-    // Wipe out the tensor 
-    tensor = 0;
-  } 
-
-
-  // template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  // std::string
-  // StrainTensorBase<group_symmetry, rank, ValueType>::group_symmetry () const
-  // {
-  //   switch (group_symmetry_)
-  //   {
-  //     case None:
-  // 	return "None";
-  // 	break;
-
-  //     case ZincBlende:
-  // 	return "ZincBlende";
-  // 	break;
-
-  //     case Wurtzite:
-  // 	AssertThrow (false, dealii::ExcNotImplemented ());
-  // 	break;
-
-  //     default:
-  // 	AssertThrow (false, dealii::ExcNotImplemented ());
-  // 	break;
-  //   };
-
-  //   // shutup the compiler about no return value.
-  //   return "";
-  // } 
 
 
 } // namespace nil
@@ -141,6 +54,11 @@ namespace nil
 
 // First-order tensors
 template class 
+nil::StrainTensorBase<nil::GroupSymmetry::ZincBlende, 1, double>;
+
+// Second-order tensors
+template class 
 nil::StrainTensorBase<nil::GroupSymmetry::ZincBlende, 2, double>;
+
 
 

@@ -37,8 +37,6 @@
 #ifndef __nil_piezoelectric_tensor_h
 #define __nil_piezoelectric_tensor_h
 
-#include <deal.II/base/tensor.h>
-
 #include "group_symmetry.h"
 #include "piezoelectric_tensor_base.h"
 

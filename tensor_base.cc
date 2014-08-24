@@ -42,9 +42,9 @@ namespace nil
   template <enum GroupSymmetry group_symmetry, int order, int rank, typename ValueType>
   TensorBase<group_symmetry, order, rank, ValueType>::TensorBase ()
     :
+    group_symmetry_ (group_symmetry),
     order_          (order), 
-    rank_           (rank), 
-    group_symmetry_ (group_symmetry)
+    rank_           (rank)
   {}
 
 
@@ -127,9 +127,9 @@ namespace nil
 template class 
 nil::TensorBase<nil::GroupSymmetry::ZincBlende, 1, 2, double>;
 
-// First-order tensors
+// Second-order tensors
 template class 
-nil::TensorBase<nil::GroupSymmetry::ZincBlende, 1, 3, double>;
+nil::TensorBase<nil::GroupSymmetry::ZincBlende, 2, 4, double>;
 
 
 

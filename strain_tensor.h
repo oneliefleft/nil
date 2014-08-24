@@ -59,7 +59,7 @@ namespace nil
   template <enum GroupSymmetry group_symmetry, int order, typename ValueType = double>
     class StrainTensor
     :
-    public StrainTensorBase<group_symmetry, 2*order, ValueType>
+    public StrainTensorBase<group_symmetry, order, ValueType>
     {
     public:
 
