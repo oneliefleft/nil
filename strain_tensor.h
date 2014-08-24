@@ -56,7 +56,7 @@ namespace nil
    *
    * @author Toby D. Young  2010, 2011, 2014.
    */  
-  template <int order, typename ValueType = double>
+  template <enum GroupSymmetry group_symmetry, int order, typename ValueType = double>
     class StrainTensor
     :
     public StrainTensorBase<2*order, ValueType>
