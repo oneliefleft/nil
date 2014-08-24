@@ -37,8 +37,6 @@
 #ifndef __nil_strain_tensor_base_h
 #define __nil_strain_tensor_base_h
 
-#include <deal.II/base/tensor.h>
-
 #include "group_symmetry.h"
 #include "tensor_base.h"
 
