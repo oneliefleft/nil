@@ -77,11 +77,11 @@ private:
   // Following that we have a list of the tensors that will be used in
   // this calculation. They are, first- and second-order piezoelectric
   // tensors
-  nil::PiezoelectricTensor<1, ValueType> first_order_piezoelectric_tensor;
-  nil::PiezoelectricTensor<2, ValueType> second_order_piezoelectric_tensor;
+  nil::PiezoelectricTensor<nil::GroupSymmetry::ZincBlende, 1, ValueType> first_order_piezoelectric_tensor;
+  nil::PiezoelectricTensor<nil::GroupSymmetry::ZincBlende, 2, ValueType> second_order_piezoelectric_tensor;
 
   // and a Green strain tensor.
-  nil::StrainTensor<1, ValueType> green_strain;
+  nil::StrainTensor<nil::GroupSymmetry::ZincBlende, 1, ValueType> green_strain;
   
   // Additionally, lists of coefficients are needed for those tensors
   // that are tensors of empirical moduli
@@ -113,8 +113,8 @@ void
 Step0<dim, ValueType>::setup_problem ()
 {
   // Initialise the first- and second-order piezoelectric tensors...
-  first_order_piezoelectric_tensor.reinit (nil::GroupSymmetry::ZincBlende);
-  second_order_piezoelectric_tensor.reinit (nil::GroupSymmetry::ZincBlende);
+  first_order_piezoelectric_tensor.reinit ();
+  second_order_piezoelectric_tensor.reinit ();
 
   // and distribute the coefficients
   distribute_first_order_coefficients (first_order_piezoelectric_tensor, 
@@ -189,9 +189,9 @@ Step0<dim, ValueType>::run ()
 	    << "   Number of space dimensions: "
 	    << first_order_piezoelectric_tensor.dim ()
 	    << std::endl
-	    << "   Group symmetry:             "
-	    << first_order_piezoelectric_tensor.group_symmetry ()
-	    << std::endl
+	    // << "   Group symmetry:             "
+	    // << first_order_piezoelectric_tensor.group_symmetry ()
+	    // << std::endl
 	    << "   Number of coefficients:     "
 	    << first_order_piezoelectric_coefficients.size ()
 	    << std::endl
@@ -201,9 +201,9 @@ Step0<dim, ValueType>::run ()
 	    << "   Number of space dimensions: "
 	    << second_order_piezoelectric_tensor.dim ()
 	    << std::endl
-	    << "   Group symmetry:             "
-	    << first_order_piezoelectric_tensor.group_symmetry ()
-	    << std::endl
+	    // << "   Group symmetry:             "
+	    // << first_order_piezoelectric_tensor.group_symmetry ()
+	    // << std::endl
 	    << "   Number of coefficients:     "
 	    << second_order_piezoelectric_coefficients.size ()
 	    // << std::endl
