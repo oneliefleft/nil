@@ -184,7 +184,7 @@ Step0<dim, ValueType>::run ()
 
   // output some data, to see what we have.  
   std::cout << "Piezoelectric tensor order:    "
-	    << first_order_piezoelectric_tensor.order ()
+	    // << first_order_piezoelectric_tensor.order ()
 	    << std::endl
 	    << "   Number of space dimensions: "
 	    << first_order_piezoelectric_tensor.dim ()
@@ -196,7 +196,7 @@ Step0<dim, ValueType>::run ()
 	    << first_order_piezoelectric_coefficients.size ()
 	    << std::endl
 	    << "Piezoelectric tensor order:    "
-	    << second_order_piezoelectric_tensor.order ()
+	    // << second_order_piezoelectric_tensor.order ()
 	    << std::endl
 	    << "   Number of space dimensions: "
 	    << second_order_piezoelectric_tensor.dim ()
