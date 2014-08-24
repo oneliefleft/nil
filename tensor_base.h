@@ -77,14 +77,16 @@ namespace nil
     
 
     /**
-     * Destructor. 
+     * Virtual destructor. 
      */
+    virtual
     ~TensorBase (); 
 
 
     /**
      * Distribute coefficients on to the tensor.
      */
+    virtual
     void distribute_coefficients ();
     
 

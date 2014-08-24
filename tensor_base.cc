@@ -56,24 +56,8 @@ namespace nil
   void
   TensorBase<group_symmetry, rank, ValueType>::distribute_coefficients ()
   {
-    switch (group_symmetry_)
-      {
-      case None:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-
-      case ZincBlende:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-
-      case Wurtzite:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-
-      default:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-      };
+    // virtual function called!
+    AssertThrow (false, dealii::ExcInternalError ());
   }
 
 
