@@ -39,40 +39,41 @@
 namespace nil
 {  
 
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  TensorBase<group_symmetry, rank, ValueType>::TensorBase ()
+  template <enum GroupSymmetry group_symmetry, int order, int rank, typename ValueType>
+  TensorBase<group_symmetry, order, rank, ValueType>::TensorBase ()
     :
-    order_ (rank),         /* @note this is a conversion. */
+    order_          (order), 
+    rank_           (rank), 
     group_symmetry_ (group_symmetry)
   {}
 
 
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  TensorBase<group_symmetry, rank, ValueType>::~TensorBase ()
+  template <enum GroupSymmetry group_symmetry, int order, int rank, typename ValueType>
+  TensorBase<group_symmetry, order, rank, ValueType>::~TensorBase ()
   {}
 
 
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
+  template <enum GroupSymmetry group_symmetry, int order, int rank, typename ValueType>
   void
-  TensorBase<group_symmetry, rank, ValueType>::distribute_coefficients ()
+  TensorBase<group_symmetry, order, rank, ValueType>::distribute_coefficients ()
   {
     // virtual function called!
     AssertThrow (false, dealii::ExcInternalError ());
   }
 
 
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
+  template <enum GroupSymmetry group_symmetry, int order, int rank, typename ValueType>
   unsigned int 
-  TensorBase<group_symmetry, rank, ValueType>::order () const
+  TensorBase<group_symmetry, order, rank, ValueType>::this_order () const
 
   {
     return this->order_;
   }
 
 
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
+  template <enum GroupSymmetry group_symmetry, int order, int rank, typename ValueType>
   unsigned int 
-  TensorBase<group_symmetry, rank, ValueType>::dim () const
+  TensorBase<group_symmetry, order, rank, ValueType>::dim () const
   {
     // Recall that these tensors are independent of changes in dim,
     // since they are only properly defined in 3d. Hence, return 3.
@@ -80,43 +81,43 @@ namespace nil
   }
 
 
-  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
+  template <enum GroupSymmetry group_symmetry, int order, int rank, typename ValueType>
   void 
-  TensorBase<group_symmetry, rank, ValueType>::reinit ()
+  TensorBase<group_symmetry, order, rank, ValueType>::reinit ()
   {
     // Wipe out the tensor 
     tensor = 0;
   } 
 
 
-  // template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
-  // std::string
-  // TensorBase<group_symmetry, rank, ValueType>::group_symmetry () const
-  // {
-  //   switch (group_symmetry_)
-  //   {
-  //     case None:
-  // 	return "None";
-  // 	break;
-
-  //     case ZincBlende:
-  // 	return "ZincBlende";
-  // 	break;
-
-  //     case Wurtzite:
-  // 	AssertThrow (false, dealii::ExcNotImplemented ());
-  // 	break;
-
-  //     default:
-  // 	AssertThrow (false, dealii::ExcNotImplemented ());
-  // 	break;
-  //   };
-
-  //   // shutup the compiler about no return value.
-  //   return "";
-  // } 
-
-
+  template <enum GroupSymmetry group_symmetry, int order, int rank, typename ValueType>
+  std::string
+  TensorBase<group_symmetry, order, rank, ValueType>::this_group_symmetry () const
+  {
+    switch (group_symmetry_)
+      {
+      case None:
+   	return "None";
+   	break;
+	
+      case ZincBlende:
+   	return "ZincBlende";
+   	break;
+	
+      case Wurtzite:
+   	AssertThrow (false, dealii::ExcNotImplemented ());
+   	break;
+	
+      default:
+   	AssertThrow (false, dealii::ExcNotImplemented ());
+  	break;
+      };
+    
+    // shutup the compiler about no return value.
+     return "";
+  } 
+  
+  
 } // namespace nil
 
 
@@ -124,7 +125,11 @@ namespace nil
 
 // First-order tensors
 template class 
-nil::TensorBase<nil::GroupSymmetry::ZincBlende, 2, double>;
+nil::TensorBase<nil::GroupSymmetry::ZincBlende, 1, 2, double>;
+
+// First-order tensors
+template class 
+nil::TensorBase<nil::GroupSymmetry::ZincBlende, 1, 3, double>;
 
 
 

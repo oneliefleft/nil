@@ -62,7 +62,7 @@ namespace nil
    *
    * @author Toby D. Young 2014.
    */  
-  template <enum GroupSymmetry, int rank, typename ValueType = double>
+  template <enum GroupSymmetry, int order, int rank, typename ValueType = double>
     class TensorBase
     :
     public dealii::Tensor<rank, 3, ValueType>
@@ -99,7 +99,7 @@ namespace nil
     /**
      * Make the order of this tensor public.
      */
-    unsigned int order () const;
+    unsigned int this_order () const;
     
 
     /**
@@ -110,10 +110,10 @@ namespace nil
     unsigned int dim () const;
 
 
-    /* /\** */
-    /*  * Make the group symmetry of this tensor public. */
-    /*  *\/ */
-    /* std::string group_symmetry () const; */
+    /**
+     * Make the group symmetry of this tensor public. 
+     */
+    std::string this_group_symmetry () const; 
    
 
     protected:
@@ -124,6 +124,12 @@ namespace nil
      */
     const int order_; 
     
+
+    /**
+     * Make the rank of this tensor known to all derived classes.
+     */
+    const int rank_; 
+
 
     /**
      * Make the group symmetry of this tensor known to all derived classes.
