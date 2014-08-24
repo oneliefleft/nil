@@ -189,6 +189,9 @@ Step0<dim, ValueType>::run ()
 	    << "   Number of space dimensions: "
 	    << first_order_piezoelectric_tensor.dim ()
 	    << std::endl
+	    << "   Rank:                       "
+	    << first_order_piezoelectric_tensor.rank ()
+	    << std::endl
 	    << "   Group symmetry:             "
 	    << first_order_piezoelectric_tensor.group_symmetry ()
 	    << std::endl
@@ -200,6 +203,9 @@ Step0<dim, ValueType>::run ()
 	    << std::endl
 	    << "   Number of space dimensions: "
 	    << second_order_piezoelectric_tensor.dim ()
+	    << std::endl
+	    << "   Rank:                       "
+	    << second_order_piezoelectric_tensor.rank ()
 	    << std::endl
 	    << "   Group symmetry:             "
 	    << first_order_piezoelectric_tensor.group_symmetry ()

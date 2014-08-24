@@ -95,15 +95,21 @@ namespace nil
 
 
     /**
-     * Make the order of this tensor public.
+     * Return the order of this tensor.
      */
     unsigned int order () const;
+
+
+    /**
+     * Return the rank of this tensor.
+     */
+    unsigned int rank () const;
     
 
     /**
-     * Make the dimension of this tensor public. @note This function
-     * just returns the integer three, since these tensors are defined
-     * in three-dimensions only.
+     * Return the dimension of this tensor. @note This function just
+     * returns the integer three, since these tensors are properly
+     * defined in three-dimensions only.
      */
     unsigned int dim () const;
 

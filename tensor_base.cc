@@ -73,6 +73,14 @@ namespace nil
 
   template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
   unsigned int 
+  TensorBase<GroupSymm, Order, Rank, ValueType>::rank () const
+  {
+    return this->rank_;
+  }
+
+
+  template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
+  unsigned int 
   TensorBase<GroupSymm, Order, Rank, ValueType>::dim () const
   {
     // Recall that these tensors are independent of changes in dim,
