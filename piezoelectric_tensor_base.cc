@@ -50,6 +50,8 @@ namespace nil
   void 
   PiezoelectricTensorBase<GroupSymm, Order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)
   {
+
+    // Check group symmetry
     switch (this->group_symmetry_)
       {
       case None:
