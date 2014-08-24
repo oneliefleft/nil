@@ -67,10 +67,10 @@ namespace nil
     PiezoelectricTensorBase ();
     
 
-    /**
-     * Distribute coefficients on to the tensor.
-     */
-    void distribute_coefficients ();
+    /* /\** */
+    /*  * Distribute coefficients on to the tensor. */
+    /*  *\/ */
+    /* void distribute_coefficients (); */
     
 
     protected:

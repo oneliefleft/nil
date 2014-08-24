@@ -52,9 +52,9 @@ namespace nil
 
 // First-order tensors
 template class 
-nil::PiezoelectricTensorBase<nil::GroupSymmetry::ZincBlende, 3, double>;
+nil::PiezoelectricTensorBase<nil::GroupSymmetry::ZincBlende, 1, double>;
 
 // second-order tensors
 template class 
-nil::PiezoelectricTensorBase<nil::GroupSymmetry::ZincBlende, 5, double>;
+nil::PiezoelectricTensorBase<nil::GroupSymmetry::ZincBlende, 2, double>;
 
