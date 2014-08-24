@@ -59,22 +59,25 @@ namespace nil
   template <enum GroupSymmetry group_symmetry, int order, typename ValueType = double>
     class StrainTensor
     :
-    public StrainTensorBase<2*order, ValueType>
+    public StrainTensorBase<group_symmetry, 2*order, ValueType>
     {
     public:
+
 
     /**
      * Constructor. 
      */
     StrainTensor ();
 
+
     private:
     
+
     /**
      * The underlying tensor.
      */
-    StrainTensorBase<2*order, ValueType> tensor;
-
+    StrainTensorBase<group_symmetry, 2*order, ValueType> tensor;
+    
     }; /* StrainTensor */
   
   

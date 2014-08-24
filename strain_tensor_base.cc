@@ -39,22 +39,22 @@
 namespace nil
 {  
 
-  template <int rank, typename ValueType>
-  StrainTensorBase<rank, ValueType>::StrainTensorBase ()
+  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
+  StrainTensorBase<group_symmetry, rank, ValueType>::StrainTensorBase ()
     :
     order_ (rank),         /* @note this is a conversion. */
-    group_symmetry_ (None)
+    group_symmetry_ (group_symmetry)
   {}
 
 
-  template <int rank, typename ValueType>
-  StrainTensorBase<rank, ValueType>::~StrainTensorBase ()
+  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
+  StrainTensorBase<group_symmetry, rank, ValueType>::~StrainTensorBase ()
   {}
 
 
-  template <int rank, typename ValueType>
+  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
   void
-  StrainTensorBase<rank, ValueType>::distribute_coefficients ()
+  StrainTensorBase<group_symmetry, rank, ValueType>::distribute_coefficients ()
   {
     switch (group_symmetry_)
       {
@@ -77,18 +77,18 @@ namespace nil
   }
 
 
-  template <int rank, typename ValueType>
+  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
   unsigned int 
-  StrainTensorBase<rank, ValueType>::order () const
+  StrainTensorBase<group_symmetry, rank, ValueType>::order () const
 
   {
     return this->order_;
   }
 
 
-  template <int rank, typename ValueType>
+  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
   unsigned int 
-  StrainTensorBase<rank, ValueType>::dim () const
+  StrainTensorBase<group_symmetry, rank, ValueType>::dim () const
   {
     // Recall that these tensors are independent of changes in dim,
     // since they are only properly defined in 3d. Hence, return 3.
@@ -96,42 +96,41 @@ namespace nil
   }
 
 
-  template <int rank, typename ValueType>
+  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
   void 
-  StrainTensorBase<rank, ValueType>::reinit (GroupSymmetry group_symmetry)
+  StrainTensorBase<group_symmetry, rank, ValueType>::reinit ()
   {
-    // Wipe out the tensor and reassign group symmetry.
-    this->group_symmetry_ = group_symmetry;
+    // Wipe out the tensor 
     tensor = 0;
   } 
 
 
-  template <int rank, typename ValueType>
-  std::string
-  StrainTensorBase<rank, ValueType>::group_symmetry () const
-  {
-    switch (group_symmetry_)
-    {
-      case None:
-	return "None";
-	break;
+  // template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
+  // std::string
+  // StrainTensorBase<group_symmetry, rank, ValueType>::group_symmetry () const
+  // {
+  //   switch (group_symmetry_)
+  //   {
+  //     case None:
+  // 	return "None";
+  // 	break;
 
-      case ZincBlende:
-	return "ZincBlende";
-	break;
+  //     case ZincBlende:
+  // 	return "ZincBlende";
+  // 	break;
 
-      case Wurtzite:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
+  //     case Wurtzite:
+  // 	AssertThrow (false, dealii::ExcNotImplemented ());
+  // 	break;
 
-      default:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-    };
+  //     default:
+  // 	AssertThrow (false, dealii::ExcNotImplemented ());
+  // 	break;
+  //   };
 
-    // shutup the compiler about no return value.
-    return "";
-  } 
+  //   // shutup the compiler about no return value.
+  //   return "";
+  // } 
 
 
 } // namespace nil
@@ -141,6 +140,6 @@ namespace nil
 
 // First-order tensors
 template class 
-nil::StrainTensorBase<2, double>;
+nil::StrainTensorBase<nil::GroupSymmetry::ZincBlende, 2, double>;
 
 
