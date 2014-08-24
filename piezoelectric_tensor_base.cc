@@ -39,16 +39,16 @@
 namespace nil
 {  
 
-  template <enum GroupSymmetry group_symmetry, int order, typename ValueType>
-  PiezoelectricTensorBase<group_symmetry, order, ValueType>::PiezoelectricTensorBase ()
+  template <enum GroupSymmetry GroupSymm, int Order, typename ValueType>
+  PiezoelectricTensorBase<GroupSymm, Order, ValueType>::PiezoelectricTensorBase ()
     :
-    TensorBase<group_symmetry, order, 2*order+1, ValueType> ()
+    TensorBase<GroupSymm, Order, 2*Order+1, ValueType> ()
   {}
 
 
-  template <enum GroupSymmetry group_symmetry, int order, typename ValueType>
+  template <enum GroupSymmetry GroupSymm, int Order, typename ValueType>
   void 
-  PiezoelectricTensorBase<group_symmetry, order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)
+  PiezoelectricTensorBase<GroupSymm, Order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)
   {
     switch (this->group_symmetry_)
       {
@@ -72,7 +72,7 @@ namespace nil
   }
 
 
-  /* ----------------- Non-member functions operating on tensors. ------------ */
+  // ----------------- Non-member functions operating on tensors. ------------ 
 
 
 } // namespace nil

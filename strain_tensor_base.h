@@ -53,10 +53,10 @@ namespace nil
    *
    * @author Toby D. Young 2014.
    */  
-  template <enum GroupSymmetry group_symmetry, int order, typename ValueType = double>
+  template <enum GroupSymmetry group_symmetry, int Order, typename ValueType = double>
     class StrainTensorBase
     :
-    public nil::TensorBase<group_symmetry, order, 2*order, ValueType>
+    public nil::TensorBase<group_symmetry, Order, 2*Order, ValueType>
     {
     public:
     
@@ -73,7 +73,7 @@ namespace nil
     /**
      * The underlying tensor.
      */
-    nil::TensorBase<group_symmetry, order, 2*order, ValueType> tensor;
+    nil::TensorBase<group_symmetry, Order, 2*Order, ValueType> tensor;
     
     }; /* StrainTensorBase */
 

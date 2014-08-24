@@ -53,10 +53,10 @@ namespace nil
    *
    * @author Toby D. Young 2014.
    */  
-  template <nil::GroupSymmetry group_symmetry, int order, typename ValueType = double>
+  template <nil::GroupSymmetry GroupSymm, int Order, typename ValueType = double>
     class PiezoelectricTensorBase
     :
-    public nil::TensorBase<group_symmetry, order, 2*order+1, ValueType>
+    public nil::TensorBase<GroupSymm, Order, 2*Order+1, ValueType>
     {
     public:
     
@@ -79,7 +79,7 @@ namespace nil
     /**
      * The underlying tensor.
      */
-    nil::TensorBase<group_symmetry, order, 2*order+1, ValueType> tensor;
+    nil::TensorBase<GroupSymm, Order, 2*Order+1, ValueType> tensor;
 
     }; /* PiezoelectricTensorBase */
 

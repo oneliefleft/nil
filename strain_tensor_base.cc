@@ -40,10 +40,10 @@
 namespace nil
 {  
 
-  template <enum GroupSymmetry group_symmetry, int order, typename ValueType>
-  StrainTensorBase<group_symmetry, order, ValueType>::StrainTensorBase ()
+  template <enum GroupSymmetry GroupSymm, int Order, typename ValueType>
+  StrainTensorBase<GroupSymm, Order, ValueType>::StrainTensorBase ()
     :
-    TensorBase<group_symmetry, order, 2*order, ValueType> ()
+    TensorBase<GroupSymm, Order, 2*Order, ValueType> ()
   {}
 
 
