@@ -56,7 +56,7 @@ namespace nil
    *
    * @author Toby D. Young  2010, 2011, 2014.
    */  
-  template <int order, typename ValueType = double>
+  template <enum GroupSymmetry, int order, typename ValueType = double>
     class PiezoelectricTensor
     :
     public PiezoelectricTensorBase<2*order+1, ValueType>
@@ -136,8 +136,8 @@ namespace nil
   /* template <typename ValueType> */
   inline 
   void 
-    distribute_second_order_coefficients (PiezoelectricTensor<2, double> &tensor,
-					  const std::vector<double>      &coefficients)
+    distribute_second_order_coefficients (PiezoelectricTensor<GroupSymmetry::ZincBlende, 2, double> &tensor,
+					  const std::vector<double>                                 &coefficients)
   {
     Assert (tensor.rank==5, dealii::ExcInternalError ());
     

@@ -40,8 +40,8 @@
 namespace nil
 {  
 
-  template <int order, typename ValueType>
-  PiezoelectricTensor<order, ValueType>::PiezoelectricTensor ()
+  template <enum GroupSymmetry group_symmetry, int order, typename ValueType>
+  PiezoelectricTensor<group_symmetry, order, ValueType>::PiezoelectricTensor ()
   {}
    
 } // namespace nil
@@ -51,10 +51,10 @@ namespace nil
 
 // First-order tensors
 template class 
-nil::PiezoelectricTensor<1, double>;
+nil::PiezoelectricTensor<nil::GroupSymmetry::ZincBlende, 1, double>;
 
 // second-order tensors
 template class 
-nil::PiezoelectricTensor<2, double>;
+nil::PiezoelectricTensor<nil::GroupSymmetry::ZincBlende, 2, double>;
 
 // extern template return-type name < argument-list > ( parameter-list ) ;  (since C++11)
