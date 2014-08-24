@@ -81,52 +81,13 @@ namespace nil
      * The underlying tensor.
      */
     PiezoelectricTensorBase<group_symmetry, order, ValueType> tensor;
-
-
-    /**
-     * Zero out a tensor. @note Only zero is allowed as an input to this function
-     */
-    /* operator = ValueType; */
     
     }; /* PiezoelectricTensor */
   
   
   /* ----------------- Non-member functions operating on tensors. ------------ */
   
-  
-  /**
-   * Distribute <code>coefficients</code> on to the first-order
-   * piezoelectric tensor.
-   */
-  /* template <typename ValueType> */
-  inline
-  void 
-    distribute_first_order_coefficients (dealii::Tensor<3, 3, double> &tensor,
-					 const std::vector<double>    &coefficients)
-  {
-    Assert (tensor.rank==3, dealii::ExcInternalError ());
     
-    // At this point we are interested in zinc-blende structure only,
-    // hence the number of independent coefficients is one.
-    AssertThrow (coefficients.size ()==1,
-		 dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
-    
-    // Then distribute the coefficients on to the tensor. It seems
-    // there is no automagic way to do this, so first zero out all the
-    // elemtns and second insert those elements that are non-zero.
-    //
-    // In Voight notation these are:  e_14 = e_26 = e_36.
-    
-    // e_14 \mapsto e_123 = e_132
-    tensor[0][1][2] = tensor[0][2][1] = coefficients[0];
-    
-    // e_26 \mapsto e_212 = e_221
-    tensor[1][0][1] = tensor[1][1][0] = coefficients[0];
-    
-    // e_36 \mapsto e_312 = e_321
-    tensor[2][0][1] = tensor[2][1][0] = coefficients[0];
-  }
-  
   /**
    * Distribute <code>coefficients</code> on to the second-order
    * piezoelectric tensor.

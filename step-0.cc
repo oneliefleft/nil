@@ -117,8 +117,7 @@ Step0<dim, ValueType>::setup_problem ()
   second_order_piezoelectric_tensor.reinit ();
 
   // and distribute the coefficients
-  distribute_first_order_coefficients (first_order_piezoelectric_tensor, 
-				       first_order_piezoelectric_coefficients);
+  first_order_piezoelectric_tensor.distribute_coefficients (first_order_piezoelectric_coefficients);
 
   distribute_second_order_coefficients (second_order_piezoelectric_tensor, 
 					second_order_piezoelectric_coefficients);
