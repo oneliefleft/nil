@@ -67,17 +67,14 @@ namespace nil
     StrainTensorBase ();
     
 
-    protected:
-    
-
     private:
-
-
+    
+    
     /**
      * The underlying tensor.
      */
     nil::TensorBase<group_symmetry, order, 2*order, ValueType> tensor;
-
+    
     }; /* StrainTensorBase */
 
   

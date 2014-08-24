@@ -73,9 +73,6 @@ namespace nil
     /* void distribute_coefficients (); */
     
 
-    protected:
-    
-
     private:
 
 

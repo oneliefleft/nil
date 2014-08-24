@@ -39,41 +39,41 @@
 namespace nil
 {  
 
-  template <enum GroupSymmetry group_symmetry, int order, int rank, typename ValueType>
-  TensorBase<group_symmetry, order, rank, ValueType>::TensorBase ()
+  template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
+  TensorBase<GroupSymm, Order, Rank, ValueType>::TensorBase ()
     :
-    group_symmetry_ (group_symmetry),
-    order_          (order), 
-    rank_           (rank)
+    group_symmetry_ (GroupSymm),
+    order_          (Order), 
+    rank_           (Rank)
   {}
 
 
-  template <enum GroupSymmetry group_symmetry, int order, int rank, typename ValueType>
-  TensorBase<group_symmetry, order, rank, ValueType>::~TensorBase ()
+  template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
+  TensorBase<GroupSymm, Order, Rank, ValueType>::~TensorBase ()
   {}
 
 
-  template <enum GroupSymmetry group_symmetry, int order, int rank, typename ValueType>
+  template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
   void
-  TensorBase<group_symmetry, order, rank, ValueType>::distribute_coefficients ()
+  TensorBase<GroupSymm, Order, Rank, ValueType>::distribute_coefficients ()
   {
     // virtual function called!
     AssertThrow (false, dealii::ExcInternalError ());
   }
 
 
-  template <enum GroupSymmetry group_symmetry, int order, int rank, typename ValueType>
+  template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
   unsigned int 
-  TensorBase<group_symmetry, order, rank, ValueType>::this_order () const
+  TensorBase<GroupSymm, Order, Rank, ValueType>::order () const
 
   {
     return this->order_;
   }
 
 
-  template <enum GroupSymmetry group_symmetry, int order, int rank, typename ValueType>
+  template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
   unsigned int 
-  TensorBase<group_symmetry, order, rank, ValueType>::dim () const
+  TensorBase<GroupSymm, Order, Rank, ValueType>::dim () const
   {
     // Recall that these tensors are independent of changes in dim,
     // since they are only properly defined in 3d. Hence, return 3.
@@ -81,18 +81,18 @@ namespace nil
   }
 
 
-  template <enum GroupSymmetry group_symmetry, int order, int rank, typename ValueType>
+  template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
   void 
-  TensorBase<group_symmetry, order, rank, ValueType>::reinit ()
+  TensorBase<GroupSymm, Order, Rank, ValueType>::reinit ()
   {
     // Wipe out the tensor 
     tensor = 0;
   } 
 
 
-  template <enum GroupSymmetry group_symmetry, int order, int rank, typename ValueType>
+  template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
   std::string
-  TensorBase<group_symmetry, order, rank, ValueType>::this_group_symmetry () const
+  TensorBase<GroupSymm, Order, Rank, ValueType>::group_symmetry () const
   {
     switch (group_symmetry_)
       {
