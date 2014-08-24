@@ -39,22 +39,22 @@
 namespace nil
 {  
 
-  template <int rank, typename ValueType>
-  PiezoelectricTensorBase<rank, ValueType>::PiezoelectricTensorBase ()
+  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
+  PiezoelectricTensorBase<group_symmetry, rank, ValueType>::PiezoelectricTensorBase ()
     :
     order_ (rank),         /* @note this is a conversion. */
     group_symmetry_ (None)
   {}
 
 
-  template <int rank, typename ValueType>
-  PiezoelectricTensorBase<rank, ValueType>::~PiezoelectricTensorBase ()
+  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
+  PiezoelectricTensorBase<group_symmetry, rank, ValueType>::~PiezoelectricTensorBase ()
   {}
 
 
-  template <int rank, typename ValueType>
+  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
   void
-  PiezoelectricTensorBase<rank, ValueType>::distribute_coefficients ()
+  PiezoelectricTensorBase<group_symmetry, rank, ValueType>::distribute_coefficients ()
   {
     switch (group_symmetry_)
       {
@@ -77,18 +77,18 @@ namespace nil
   }
 
 
-  template <int rank, typename ValueType>
+  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
   unsigned int 
-  PiezoelectricTensorBase<rank, ValueType>::order () const
+  PiezoelectricTensorBase<group_symmetry, rank, ValueType>::order () const
 
   {
     return this->order_;
   }
 
 
-  template <int rank, typename ValueType>
+  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
   unsigned int 
-  PiezoelectricTensorBase<rank, ValueType>::dim () const
+  PiezoelectricTensorBase<group_symmetry, rank, ValueType>::dim () const
   {
     // Recall that these tensors are independent of changes in dim,
     // since they are only properly defined in 3d. Hence, return 3.
@@ -96,42 +96,41 @@ namespace nil
   }
 
 
-  template <int rank, typename ValueType>
+  template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
   void 
-  PiezoelectricTensorBase<rank, ValueType>::reinit (GroupSymmetry group_symmetry)
+  PiezoelectricTensorBase<group_symmetry, rank, ValueType>::reinit ()
   {
-    // Wipe out the tensor and reassign group symmetry.
-    this->group_symmetry_ = group_symmetry;
+    // Wipe out the tensor.
     tensor = 0;
   } 
 
 
-  template <int rank, typename ValueType>
-  std::string
-  PiezoelectricTensorBase<rank, ValueType>::group_symmetry () const
-  {
-    switch (group_symmetry_)
-    {
-      case None:
-	return "None";
-	break;
+  // template <enum GroupSymmetry group_symmetry, int rank, typename ValueType>
+  // std::string
+  // PiezoelectricTensorBase<rank, ValueType>::group_symmetry () const
+  // {
+  //   switch (group_symmetry_)
+  //   {
+  //     case None:
+  // 	return "None";
+  // 	break;
 
-      case ZincBlende:
-	return "ZincBlende";
-	break;
+  //     case ZincBlende:
+  // 	return "ZincBlende";
+  // 	break;
 
-      case Wurtzite:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
+  //     case Wurtzite:
+  // 	AssertThrow (false, dealii::ExcNotImplemented ());
+  // 	break;
 
-      default:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-    };
+  //     default:
+  // 	AssertThrow (false, dealii::ExcNotImplemented ());
+  // 	break;
+  //   };
 
-    // shutup the compiler about no return value.
-    return "";
-  } 
+  //   // shutup the compiler about no return value.
+  //   return "";
+  // } 
 
 
 } // namespace nil
@@ -141,9 +140,9 @@ namespace nil
 
 // First-order tensors
 template class 
-nil::PiezoelectricTensorBase<3, double>;
+nil::PiezoelectricTensorBase<nil::GroupSymmetry::ZincBlende, 3, double>;
 
 // second-order tensors
 template class 
-nil::PiezoelectricTensorBase<5, double>;
+nil::PiezoelectricTensorBase<nil::GroupSymmetry::ZincBlende, 5, double>;
 

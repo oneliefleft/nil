@@ -56,10 +56,10 @@ namespace nil
    *
    * @author Toby D. Young  2010, 2011, 2014.
    */  
-  template <enum GroupSymmetry, int order, typename ValueType = double>
+  template <enum GroupSymmetry group_symmetry, int order, typename ValueType = double>
     class PiezoelectricTensor
     :
-    public PiezoelectricTensorBase<2*order+1, ValueType>
+    public PiezoelectricTensorBase<group_symmetry, 2*order+1, ValueType>
     {
     public:
     
@@ -82,7 +82,7 @@ namespace nil
     /**
      * The underlying tensor.
      */
-    PiezoelectricTensorBase<2*order+1, ValueType> tensor;
+    PiezoelectricTensorBase<group_symmetry, 2*order+1, ValueType> tensor;
 
 
     /**

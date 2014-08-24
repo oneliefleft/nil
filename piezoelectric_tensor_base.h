@@ -70,7 +70,7 @@ namespace nil
    *
    * @author Toby D. Young 2014.
    */  
-  template <int rank, typename ValueType = double>
+  template <nil::GroupSymmetry group_symmetry, int rank, typename ValueType = double>
     class PiezoelectricTensorBase
     :
     public dealii::Tensor<rank, 3, ValueType>
@@ -99,7 +99,7 @@ namespace nil
     /**
      * Reinitialise (zero out) this tensor with this symmetry.
      */
-    void reinit (GroupSymmetry group_symmetry);
+    void reinit ();
 
 
     /**
@@ -122,10 +122,10 @@ namespace nil
     unsigned int dim () const;
 
 
-    /**
-     * Make the group symmetry of this tensor public.
-     */
-    std::string group_symmetry () const;
+    /* /\** */
+    /*  * Make the group symmetry of this tensor public. */
+    /*  *\/ */
+    /* std::string group_symmetry () const; */
    
 
     protected:
