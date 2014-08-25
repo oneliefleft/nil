@@ -79,13 +79,6 @@ namespace nil
      */
     virtual
     ~TensorBase (); 
-
-
-    /**
-     * Distribute coefficients on to the tensor.
-     */
-    virtual
-    void distribute_coefficients ();
     
 
     /**

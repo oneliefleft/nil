@@ -54,15 +54,6 @@ namespace nil
 
 
   template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
-  void
-  TensorBase<GroupSymm, Order, Rank, ValueType>::distribute_coefficients ()
-  {
-    // virtual function called!
-    AssertThrow (false, dealii::ExcInternalError ());
-  }
-
-
-  template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
   unsigned int 
   TensorBase<GroupSymm, Order, Rank, ValueType>::order () const
 
@@ -113,7 +104,7 @@ namespace nil
    	break;
 	
       case Wurtzite:
-   	AssertThrow (false, dealii::ExcNotImplemented ());
+   	return "Wurtzite";
    	break;
 	
       default:
@@ -131,19 +122,7 @@ namespace nil
 
 // -------------- Explicit Instantiations -------------------------------
 
-// First-order tensors
-template class 
-nil::TensorBase<nil::GroupSymmetry::ZincBlende, 1, 2, double>;
-
-template class 
-nil::TensorBase<nil::GroupSymmetry::ZincBlende, 1, 3, double>;
-
-// Second-order tensors
-template class 
-nil::TensorBase<nil::GroupSymmetry::ZincBlende, 2, 4, double>;
-
-template class 
-nil::TensorBase<nil::GroupSymmetry::ZincBlende, 2, 5, double>;
+#include "tensor_base.inst"
 
 
 

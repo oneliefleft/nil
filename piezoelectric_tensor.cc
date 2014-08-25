@@ -54,7 +54,7 @@ namespace nil
     // non-member function in piezoelectric_tensor_base.h.
 
     // first zero out the tensor
-    tensor = 0;
+    this->reinit ();
 
     // and then distribute the coefficients.
     distribute_coefficients_ (tensor, coefficients);
