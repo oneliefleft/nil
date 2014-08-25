@@ -66,6 +66,14 @@ namespace nil
      * Constructor. 
      */
     PiezoelectricTensor ();
+
+
+    /**
+     * Distribute coefficients onto the matrix according to group
+     * symmetry and order of the tensor.
+     */
+    void 
+    distribute_coefficients (std::vector<ValueType> &coefficients);
     
 
     private:
@@ -80,100 +88,6 @@ namespace nil
   
   /* ----------------- Non-member functions operating on tensors. ------------ */
 
-
-  /**
-   * Distribute <code>coefficients</code> on to the first-order
-   * piezoelectric tensor. 
-   */
-  inline
-  void
-    distribute_first_order_coefficients (PiezoelectricTensor<GroupSymmetry::ZincBlende, 1, double> &tensor,
-                                         const std::vector<double>                                 &coefficients)
-  {
-    Assert (tensor.rank ()==3, dealii::ExcInternalError ());
-
-    // At this point we are interested in zinc-blende structure only,
-    // hence the number of independent coefficients is one.
-    AssertThrow (coefficients.size ()==1,
-                 dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
-
-    // Then distribute the coefficients on to the tensor. It seems
-    // there is no automagic way to do this, so first zero out all the
-    // elemtns and second insert those elements that are non-zero.
-    // 
-    // In Voight notation these are:  e_14 = e_26 = e_36.
-
-    // e_14 \mapsto e_123 = e_132
-    tensor[0][1][2] = tensor[0][2][1] = coefficients[0];
-
-    // e_26 \mapsto e_212 = e_221
-    tensor[1][0][1] = tensor[1][1][0] = coefficients[0];
-
-    // e_36 \mapsto e_312 = e_321
-    tensor[2][0][1] = tensor[2][1][0] = coefficients[0];
-  }
-  
-    
-  /**
-   * Distribute <code>coefficients</code> on to the second-order
-   * piezoelectric tensor.
-   */
-  inline 
-  void 
-    distribute_second_order_coefficients (PiezoelectricTensor<GroupSymmetry::ZincBlende, 2, double> &tensor,
-					  const std::vector<double>                                 &coefficients)
-  {
-    Assert (tensor.rank ()==5, dealii::ExcInternalError ()); 
-    
-    // At this point we are interested in zinc-blende structure only,
-    // hence the default number of independent coefficients is three.
-    AssertThrow (coefficients.size ()==3,
-		 dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
-    
-    // Then distribute the coefficients on to the tensor. It seems
-    // there is no automagic way to do this, so first zero out all the
-    // elements and second insert those elements that are non-zero.
-    //
-    // In Voight notation these are: e_114 = e_124 = e_156, and
-    // additionally, cyclic permutations x->y->z. In total there are
-    // 24 non-zero elements.
-    
-    // e_114 = e_225 = e_336 \mapsto:
-    tensor[0][0][0][1][2] = tensor[0][0][0][2][1] = tensor[0][1][2][0][0] = tensor[0][2][1][0][0] 
-      = 
-      tensor[1][1][1][0][2] = tensor[1][1][1][2][0] = tensor[1][0][2][1][1] = tensor[1][2][0][1][1] 
-      = 
-      tensor[2][2][2][0][1] = tensor[2][2][2][1][0] = tensor[2][0][1][2][2] = tensor[2][1][0][2][2] 
-      =
-      coefficients[0];
-
-    // e_124 = e_134 = e_215 = e_235 = e_316 = e_326 \mapsto:
-    tensor[0][1][1][1][2] = tensor[0][1][1][2][1] = tensor[0][1][2][1][1] = tensor[0][2][1][1][1] 
-      = 
-      tensor[0][1][2][2][2] = tensor[0][2][1][2][2] = tensor[0][2][2][2][1] = tensor[0][2][2][1][2] 
-      = 
-      tensor[1][2][0][0][0] = tensor[1][0][2][0][0] = tensor[1][0][0][2][0] = tensor[1][0][0][0][2] 
-      =
-      tensor[1][2][2][2][0] = tensor[1][2][2][0][2] = tensor[1][2][0][2][2] = tensor[1][0][2][2][2] 
-      =
-      tensor[2][0][1][0][0] = tensor[2][1][0][0][0] = tensor[2][0][0][0][1] = tensor[2][0][0][1][0] 
-      =
-      tensor[2][0][1][1][1] = tensor[2][1][0][1][1] = tensor[2][1][1][0][1] = tensor[2][1][1][1][0] 
-      =
-      coefficients[1];
-
-    // e_345 = e_246 = e_156 \mapsto:
-    tensor[0][2][0][0][1] = tensor[0][0][2][0][1] = tensor[0][2][0][1][0] = tensor[0][2][0][0][1] = 
-      tensor[0][0][1][2][0] = tensor[0][1][0][2][0] = tensor[0][0][1][2][0] = tensor[0][0][1][0][2] 
-      = 
-      tensor[1][1][2][0][1] = tensor[1][2][1][0][1] = tensor[1][1][2][1][0] = tensor[1][2][1][1][0] = 
-      tensor[1][0][1][1][2] = tensor[1][1][0][1][2] = tensor[1][0][1][2][1] = tensor[1][1][0][2][1] 
-      =
-      tensor[2][1][2][2][0] = tensor[2][2][1][2][0] = tensor[2][1][2][0][2] = tensor[2][2][1][0][2] = 
-      tensor[2][2][0][1][2] = tensor[2][0][2][1][2] = tensor[2][2][0][2][1] = tensor[2][0][2][2][1] 
-      =  
-      coefficients[2];
-  }
   
 } /* namespace nil */
 

@@ -45,63 +45,7 @@ namespace nil
     TensorBase<GroupSymm, Order, 2*Order+1, ValueType> ()
   {}
 
-
-  template <enum GroupSymmetry GroupSymm, int Order, typename ValueType>
-  void 
-  PiezoelectricTensorBase<GroupSymm, Order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)
-  {
-
-    switch (Order)
-      {
-	// first order tensors:
-      case 1:
-	
-	// Check group symmetry
-	switch (this->group_symmetry_)
-	  {
-	  case None:
-	    AssertThrow (false, dealii::ExcNotImplemented ());
-	    break;
-	    
-	  case ZincBlende:
-	    std::cout << "   Distributing coefficients... "
-		      << std::endl;
-	    break;
-	    
-	  case Wurtzite:
-	    AssertThrow (false, dealii::ExcNotImplemented ());
-	    break;
-	    
-	  default:
-	    AssertThrow (false, dealii::ExcNotImplemented ());
-	    break;
-	  };
-	
-	break;
-	
-	// second order tensors:
-      case 2:
-
-	// Check group symmetry
-	switch (this->group_symmetry_)
-	  {
-	  default: 
-	    AssertThrow (false, dealii::ExcNotImplemented ());
-	    break;
-	  }
-	
-	// default order unknown
-      default:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-	
-      }; // switch (Order)
-
-  }
-
-
   // ----------------- Non-member functions operating on tensors. ------------ 
-
 
 } // namespace nil
 
