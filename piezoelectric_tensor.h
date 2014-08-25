@@ -68,13 +68,6 @@ namespace nil
     PiezoelectricTensor ();
     
 
-    /* /\** */
-    /*  * Distribute <code>coefficients</code> on to the first-order */
-    /*  * piezoelectric tensor. */
-    /*  *\/ */
-    /* void distribute_coefficients (const std::vector<ValueType> &coefficients); */
-    
-
     private:
     
     /**
@@ -92,13 +85,12 @@ namespace nil
    * Distribute <code>coefficients</code> on to the second-order
    * piezoelectric tensor.
    */
-  /* template <typename ValueType> */
   inline 
   void 
     distribute_second_order_coefficients (PiezoelectricTensor<GroupSymmetry::ZincBlende, 2, double> &tensor,
 					  const std::vector<double>                                 &coefficients)
   {
-    Assert (tensor.rank==5, dealii::ExcInternalError ());
+    Assert (tensor.rank ()==5, dealii::ExcInternalError ()); 
     
     // At this point we are interested in zinc-blende structure only,
     // hence the default number of independent coefficients is three.
