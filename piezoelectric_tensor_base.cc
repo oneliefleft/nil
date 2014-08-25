@@ -51,26 +51,52 @@ namespace nil
   PiezoelectricTensorBase<GroupSymm, Order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)
   {
 
-    // Check group symmetry
-    switch (this->group_symmetry_)
+    switch (Order)
       {
-      case None:
-   	AssertThrow (false, dealii::ExcNotImplemented ());
-   	break;
+	// first order tensors:
+      case 1:
 	
-      case ZincBlende:
-	std::cout << "   Distributing coefficients... "
-		  << std::endl;
-   	break;
+	// Check group symmetry
+	switch (this->group_symmetry_)
+	  {
+	  case None:
+	    AssertThrow (false, dealii::ExcNotImplemented ());
+	    break;
+	    
+	  case ZincBlende:
+	    std::cout << "   Distributing coefficients... "
+		      << std::endl;
+	    break;
+	    
+	  case Wurtzite:
+	    AssertThrow (false, dealii::ExcNotImplemented ());
+	    break;
+	    
+	  default:
+	    AssertThrow (false, dealii::ExcNotImplemented ());
+	    break;
+	  };
 	
-      case Wurtzite:
-   	AssertThrow (false, dealii::ExcNotImplemented ());
-   	break;
+	break;
 	
+	// second order tensors:
+      case 2:
+
+	// Check group symmetry
+	switch (this->group_symmetry_)
+	  {
+	  default: 
+	    AssertThrow (false, dealii::ExcNotImplemented ());
+	    break;
+	  }
+	
+	// default order unknown
       default:
-   	AssertThrow (false, dealii::ExcNotImplemented ());
-  	break;
-      };
+	AssertThrow (false, dealii::ExcNotImplemented ());
+	break;
+	
+      }; // switch (Order)
+
   }
 
 

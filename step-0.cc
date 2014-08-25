@@ -96,15 +96,18 @@ private:
   dealii::ParameterHandler parameters;
 };
 
+
 // The constructor is typically borning...
 template <int dim, typename ValueType>
 Step0<dim, ValueType>::Step0 ()
 {}
 
+
 // as is the destructor.
 template <int dim, typename ValueType>
 Step0<dim, ValueType>::~Step0 ()
 {}
+
 
 // The first step is to initialise all of the objects we are goinf to
 // use. This is done in a single function.
@@ -118,9 +121,7 @@ Step0<dim, ValueType>::setup_problem ()
 
   // and distribute the coefficients
   first_order_piezoelectric_tensor.distribute_coefficients (first_order_piezoelectric_coefficients);
-
-  distribute_second_order_coefficients (second_order_piezoelectric_tensor, 
-					second_order_piezoelectric_coefficients);
+  second_order_piezoelectric_tensor.  distribute_coefficients (second_order_piezoelectric_coefficients);
 
   // and then initialise Green's strain tensor.
   // green_strain.reinit ();
