@@ -87,8 +87,8 @@ namespace nil
    */
   inline
   void
-    distribute_first_order_coefficients (dealii::Tensor<3, 3, double> &tensor,
-                                         const std::vector<double>    &coefficients)
+    distribute_first_order_coefficients (PiezoelectricTensor<GroupSymmetry::ZincBlende, 1, double> &tensor,
+                                         const std::vector<double>                                 &coefficients)
   {
     Assert (tensor.rank ()==3, dealii::ExcInternalError ());
 
