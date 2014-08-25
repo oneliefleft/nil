@@ -67,12 +67,6 @@ namespace nil
     PiezoelectricTensorBase ();
     
 
-    /* /\** */
-    /*  * Distribute coefficients on to the tensor.  */
-    /*  *\/  */
-    /*  void distribute_coefficients (std::vector<ValueType> &coefficients);  */
-    
-
     private:
 
 
@@ -99,18 +93,15 @@ namespace nil
     distribute_coefficients_ (PiezoelectricTensorBase<GroupSymmetry::ZincBlende, 1, ValueType> &tensor, 
 			      std::vector<ValueType>                                           &coefficients)
     {
-
+      
       Assert (tensor.rank ()==3, dealii::ExcInternalError ());
       
-      // At this point we are interested in zinc-blende structure
-      // only, hence the number of independent coefficients is one.
       AssertThrow (coefficients.size ()==1,
 		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
       
       // Then distribute the coefficients on to the tensor. It seems
-      // there is no automagic way to do this, so first zero out all
-      // the elemtns and second insert those elements that are
-      // non-zero.
+      // there is no automagic way to do this, so just insert those
+      // elements that are non-zero.
       // 
       // In Voight notation these are:  e_14 = e_26 = e_36.
       
@@ -136,12 +127,15 @@ namespace nil
 			      std::vector<ValueType>                                         &coefficients)
     {
       Assert (tensor.rank ()==3, dealii::ExcInternalError ()); 
+      
+      AssertThrow (coefficients.size ()==3,
+		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
     }
   
   
   /* -------------------------- Second-order tensors. ------------------------ */
-
-
+  
+  
   /**
    * Distribute <code>coefficients</code> on to a second-order
    * piezoelectric tensor of zinc-blende symmetry.
@@ -154,16 +148,12 @@ namespace nil
     {
       Assert (tensor.rank ()==5, dealii::ExcInternalError ()); 
       
-      // At this point we are interested in zinc-blende structure
-      // only, hence the default number of independent coefficients is
-      // three.
       AssertThrow (coefficients.size ()==3,
 		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
       
       // Then distribute the coefficients on to the tensor. It seems
-      // there is no automagic way to do this, so first zero out all
-      // the elements and second insert those elements that are
-      // non-zero.
+      // there is no automagic way to do this, so just insert those
+      // elements that are non-zero.
       //
       // In Voight notation these are: e_114 = e_124 = e_156, and
       // additionally, cyclic permutations x->y->z. In total there are
@@ -218,6 +208,9 @@ namespace nil
 			      std::vector<ValueType>                                         &coefficients)
     {
       Assert (tensor.rank ()==5, dealii::ExcInternalError ()); 
+
+      AssertThrow (coefficients.size ()==8,
+		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
     }
   
 } /* namespace nil */
