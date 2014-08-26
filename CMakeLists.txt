@@ -12,6 +12,7 @@ SET(TARGET_SRC
   piezoelectric_tensor_base.cc
   strain_tensor.cc
   strain_tensor_base.cc
+  tensor_base.cc
   ${TARGET}.cc
   )
 

@@ -34,31 +34,95 @@
 // implied, of the namespace ewalena authors.
 // -------------------------------------------------------------------
 
-#include "strain_tensor_base.h"
-
+#include "tensor_base.h"
 
 namespace nil
 {  
 
-  template <enum GroupSymmetry GroupSymm, int Order, typename ValueType>
-  StrainTensorBase<GroupSymm, Order, ValueType>::StrainTensorBase ()
+  template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
+  TensorBase<GroupSymm, Order, Rank, ValueType>::TensorBase ()
     :
-    TensorBase<GroupSymm, Order, 2*Order, ValueType> ()
+    group_symmetry_ (GroupSymm),
+    order_          (Order), 
+    rank_           (Rank)
   {}
 
 
+  template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
+  TensorBase<GroupSymm, Order, Rank, ValueType>::~TensorBase ()
+  {}
+
+
+  template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
+  unsigned int 
+  TensorBase<GroupSymm, Order, Rank, ValueType>::order () const
+
+  {
+    return this->order_;
+  }
+
+
+  template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
+  unsigned int 
+  TensorBase<GroupSymm, Order, Rank, ValueType>::rank () const
+  {
+    return this->rank_;
+  }
+
+
+  template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
+  unsigned int 
+  TensorBase<GroupSymm, Order, Rank, ValueType>::dim () const
+  {
+    // Recall that these tensors are independent of changes in dim,
+    // since they are only properly defined in 3d. Hence, return 3.
+    return 3;
+  }
+
+
+  template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
+  void 
+  TensorBase<GroupSymm, Order, Rank, ValueType>::reinit ()
+  {
+    // Wipe out the tensor 
+    tensor = 0;
+  } 
+
+
+  template <enum GroupSymmetry GroupSymm, int Order, int Rank, typename ValueType>
+  std::string
+  TensorBase<GroupSymm, Order, Rank, ValueType>::group_symmetry () const
+  {
+    switch (group_symmetry_)
+      {
+      case None:
+   	return "None";
+   	break;
+	
+      case ZincBlende:
+   	return "ZincBlende";
+   	break;
+	
+      case Wurtzite:
+   	return "Wurtzite";
+   	break;
+	
+      default:
+   	AssertThrow (false, dealii::ExcNotImplemented ());
+  	break;
+      };
+    
+    // shutup the compiler about no return value.
+     return "";
+  } 
+  
+  
 } // namespace nil
 
 
 // -------------- Explicit Instantiations -------------------------------
 
-// First-order tensors
-template class 
-nil::StrainTensorBase<nil::GroupSymmetry::ZincBlende, 1, double>;
-
-// Second-order tensors
-template class 
-nil::StrainTensorBase<nil::GroupSymmetry::ZincBlende, 2, double>;
+#include "tensor_base.inst"
 
 
 

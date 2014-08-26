@@ -39,100 +39,13 @@
 namespace nil
 {  
 
-  template <int rank, typename ValueType>
-  PiezoelectricTensorBase<rank, ValueType>::PiezoelectricTensorBase ()
+  template <enum GroupSymmetry GroupSymm, int Order, typename ValueType>
+  PiezoelectricTensorBase<GroupSymm, Order, ValueType>::PiezoelectricTensorBase ()
     :
-    order_ (rank),         /* @note this is a conversion. */
-    group_symmetry_ (None)
+    TensorBase<GroupSymm, Order, 2*Order+1, ValueType> ()
   {}
 
-
-  template <int rank, typename ValueType>
-  PiezoelectricTensorBase<rank, ValueType>::~PiezoelectricTensorBase ()
-  {}
-
-
-  template <int rank, typename ValueType>
-  void
-  PiezoelectricTensorBase<rank, ValueType>::distribute_coefficients ()
-  {
-    switch (group_symmetry_)
-      {
-      case None:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-
-      case ZincBlende:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-
-      case Wurtzite:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-
-      default:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-      };
-  }
-
-
-  template <int rank, typename ValueType>
-  unsigned int 
-  PiezoelectricTensorBase<rank, ValueType>::order () const
-
-  {
-    return this->order_;
-  }
-
-
-  template <int rank, typename ValueType>
-  unsigned int 
-  PiezoelectricTensorBase<rank, ValueType>::dim () const
-  {
-    // Recall that these tensors are independent of changes in dim,
-    // since they are only properly defined in 3d. Hence, return 3.
-    return 3;
-  }
-
-
-  template <int rank, typename ValueType>
-  void 
-  PiezoelectricTensorBase<rank, ValueType>::reinit (GroupSymmetry group_symmetry)
-  {
-    // Wipe out the tensor and reassign group symmetry.
-    this->group_symmetry_ = group_symmetry;
-    tensor = 0;
-  } 
-
-
-  template <int rank, typename ValueType>
-  std::string
-  PiezoelectricTensorBase<rank, ValueType>::group_symmetry () const
-  {
-    switch (group_symmetry_)
-    {
-      case None:
-	return "None";
-	break;
-
-      case ZincBlende:
-	return "ZincBlende";
-	break;
-
-      case Wurtzite:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-
-      default:
-	AssertThrow (false, dealii::ExcNotImplemented ());
-	break;
-    };
-
-    // shutup the compiler about no return value.
-    return "";
-  } 
-
+  // ----------------- Non-member functions operating on tensors. ------------ 
 
 } // namespace nil
 
@@ -141,9 +54,9 @@ namespace nil
 
 // First-order tensors
 template class 
-nil::PiezoelectricTensorBase<3, double>;
+nil::PiezoelectricTensorBase<nil::GroupSymmetry::ZincBlende, 1, double>;
 
 // second-order tensors
 template class 
-nil::PiezoelectricTensorBase<5, double>;
+nil::PiezoelectricTensorBase<nil::GroupSymmetry::ZincBlende, 2, double>;
 

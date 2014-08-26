@@ -37,8 +37,6 @@
 #ifndef __nil_piezoelectric_tensor_h
 #define __nil_piezoelectric_tensor_h
 
-#include <deal.II/base/tensor.h>
-
 #include "group_symmetry.h"
 #include "piezoelectric_tensor_base.h"
 
@@ -56,10 +54,10 @@ namespace nil
    *
    * @author Toby D. Young  2010, 2011, 2014.
    */  
-  template <int order, typename ValueType = double>
+  template <enum GroupSymmetry group_symmetry, int order, typename ValueType = double>
     class PiezoelectricTensor
     :
-    public PiezoelectricTensorBase<2*order+1, ValueType>
+    public PiezoelectricTensorBase<group_symmetry, order, ValueType>
     {
     public:
     
@@ -68,13 +66,14 @@ namespace nil
      * Constructor. 
      */
     PiezoelectricTensor ();
-    
 
-    /* /\** */
-    /*  * Distribute <code>coefficients</code> on to the first-order */
-    /*  * piezoelectric tensor. */
-    /*  *\/ */
-    /* void distribute_coefficients (const std::vector<ValueType> &coefficients); */
+
+    /**
+     * Distribute coefficients onto the matrix according to group
+     * symmetry and order of the tensor.
+     */
+    void 
+    distribute_coefficients (std::vector<ValueType> &coefficients);
     
 
     private:
@@ -82,114 +81,13 @@ namespace nil
     /**
      * The underlying tensor.
      */
-    PiezoelectricTensorBase<2*order+1, ValueType> tensor;
-
-
-    /**
-     * Zero out a tensor. @note Only zero is allowed as an input to this function
-     */
-    /* operator = ValueType; */
+    PiezoelectricTensorBase<group_symmetry, order, ValueType> tensor;
     
     }; /* PiezoelectricTensor */
   
   
   /* ----------------- Non-member functions operating on tensors. ------------ */
-  
-  
-  /**
-   * Distribute <code>coefficients</code> on to the first-order
-   * piezoelectric tensor.
-   */
-  /* template <typename ValueType> */
-  inline
-  void 
-    distribute_first_order_coefficients (dealii::Tensor<3, 3, double> &tensor,
-					 const std::vector<double>    &coefficients)
-  {
-    Assert (tensor.rank==3, dealii::ExcInternalError ());
-    
-    // At this point we are interested in zinc-blende structure only,
-    // hence the number of independent coefficients is one.
-    AssertThrow (coefficients.size ()==1,
-		 dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
-    
-    // Then distribute the coefficients on to the tensor. It seems
-    // there is no automagic way to do this, so first zero out all the
-    // elemtns and second insert those elements that are non-zero.
-    //
-    // In Voight notation these are:  e_14 = e_26 = e_36.
-    
-    // e_14 \mapsto e_123 = e_132
-    tensor[0][1][2] = tensor[0][2][1] = coefficients[0];
-    
-    // e_26 \mapsto e_212 = e_221
-    tensor[1][0][1] = tensor[1][1][0] = coefficients[0];
-    
-    // e_36 \mapsto e_312 = e_321
-    tensor[2][0][1] = tensor[2][1][0] = coefficients[0];
-  }
-  
-  /**
-   * Distribute <code>coefficients</code> on to the second-order
-   * piezoelectric tensor.
-   */
-  /* template <typename ValueType> */
-  inline 
-  void 
-    distribute_second_order_coefficients (PiezoelectricTensor<2, double> &tensor,
-					  const std::vector<double>      &coefficients)
-  {
-    Assert (tensor.rank==5, dealii::ExcInternalError ());
-    
-    // At this point we are interested in zinc-blende structure only,
-    // hence the default number of independent coefficients is three.
-    AssertThrow (coefficients.size ()==3,
-		 dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
-    
-    // Then distribute the coefficients on to the tensor. It seems
-    // there is no automagic way to do this, so first zero out all the
-    // elements and second insert those elements that are non-zero.
-    //
-    // In Voight notation these are: e_114 = e_124 = e_156, and
-    // additionally, cyclic permutations x->y->z. In total there are
-    // 24 non-zero elements.
-    
-    // e_114 = e_225 = e_336 \mapsto:
-    tensor[0][0][0][1][2] = tensor[0][0][0][2][1] = tensor[0][1][2][0][0] = tensor[0][2][1][0][0] 
-      = 
-      tensor[1][1][1][0][2] = tensor[1][1][1][2][0] = tensor[1][0][2][1][1] = tensor[1][2][0][1][1] 
-      = 
-      tensor[2][2][2][0][1] = tensor[2][2][2][1][0] = tensor[2][0][1][2][2] = tensor[2][1][0][2][2] 
-      =
-      coefficients[0];
 
-    // e_124 = e_134 = e_215 = e_235 = e_316 = e_326 \mapsto:
-    tensor[0][1][1][1][2] = tensor[0][1][1][2][1] = tensor[0][1][2][1][1] = tensor[0][2][1][1][1] 
-      = 
-      tensor[0][1][2][2][2] = tensor[0][2][1][2][2] = tensor[0][2][2][2][1] = tensor[0][2][2][1][2] 
-      = 
-      tensor[1][2][0][0][0] = tensor[1][0][2][0][0] = tensor[1][0][0][2][0] = tensor[1][0][0][0][2] 
-      =
-      tensor[1][2][2][2][0] = tensor[1][2][2][0][2] = tensor[1][2][0][2][2] = tensor[1][0][2][2][2] 
-      =
-      tensor[2][0][1][0][0] = tensor[2][1][0][0][0] = tensor[2][0][0][0][1] = tensor[2][0][0][1][0] 
-      =
-      tensor[2][0][1][1][1] = tensor[2][1][0][1][1] = tensor[2][1][1][0][1] = tensor[2][1][1][1][0] 
-      =
-      coefficients[1];
-
-    // e_345 = e_246 = e_156 \mapsto:
-    tensor[0][2][0][0][1] = tensor[0][0][2][0][1] = tensor[0][2][0][1][0] = tensor[0][2][0][0][1] = 
-      tensor[0][0][1][2][0] = tensor[0][1][0][2][0] = tensor[0][0][1][2][0] = tensor[0][0][1][0][2] 
-      = 
-      tensor[1][1][2][0][1] = tensor[1][2][1][0][1] = tensor[1][1][2][1][0] = tensor[1][2][1][1][0] = 
-      tensor[1][0][1][1][2] = tensor[1][1][0][1][2] = tensor[1][0][1][2][1] = tensor[1][1][0][2][1] 
-      =
-      tensor[2][1][2][2][0] = tensor[2][2][1][2][0] = tensor[2][1][2][0][2] = tensor[2][2][1][0][2] = 
-      tensor[2][2][0][1][2] = tensor[2][0][2][1][2] = tensor[2][2][0][2][1] = tensor[2][0][2][2][1] 
-      =  
-      coefficients[2];
-  }
   
 } /* namespace nil */
 

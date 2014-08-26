@@ -1,7 +1,7 @@
 // -------------------------------------------------------------------
 // @author Toby D. Young
 //
-// Copyright 2010 nil authors. All rights reserved.
+// Copyright 2014 nil authors. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -34,11 +34,12 @@
 // implied, of the namespace ewalena authors.
 // -------------------------------------------------------------------
 
-#ifndef __nil_strain_tensor_h
-#define __nil_strain_tensor_h
+#ifndef __nil_tensor_base_h
+#define __nil_tensor_base_h
+
+#include <deal.II/base/tensor.h>
 
 #include "group_symmetry.h"
-#include "strain_tensor_base.h"
 
 #include <fstream>
 #include <iostream>
@@ -46,47 +47,110 @@
 
 namespace nil
 {
-  
+
   /**
-   * \brief Strain Tensor.
+   * \brief This is the base class for an \f$N\,\f$-order tensors.
    *
-   * \f$N\,\f$-order strain tensor. 
+   * @note In the inline documentation, Various mappings from Voight
+   * notation to proper tensor notation is taken from:
    *
-   * Green strain.
+   * J. F. Nye, "Własnosści fizyczne kryształów w Ujęciu tensorowym i
+   * macierzowym" Państwowe Wydawnictwo Naukowa (1962). Tłumaczył z
+   * języka angielskiego J. Rauułuszhiewicz.
    *
-   * @author Toby D. Young  2010, 2011, 2014.
+   * @author Toby D. Young 2014.
    */  
-  template <enum GroupSymmetry group_symmetry, int order, typename ValueType = double>
-    class StrainTensor
+  template <enum GroupSymmetry, int Order, int Rank, typename ValueType = double>
+    class TensorBase
     :
-    public StrainTensorBase<group_symmetry, order, ValueType>
+    public dealii::Tensor<Rank, 3, ValueType>
     {
     public:
-
+    
 
     /**
      * Constructor. 
      */
-    StrainTensor ();
+    TensorBase ();
+    
 
+    /**
+     * Virtual destructor. 
+     */
+    virtual
+    ~TensorBase (); 
+    
+
+    /**
+     * Reinitialise (zero out) this tensor.
+     */
+    void reinit ();
+
+
+    /**
+     * Return the order of this tensor.
+     */
+    unsigned int order () const;
+
+
+    /**
+     * Return the rank of this tensor.
+     */
+    unsigned int rank () const;
+    
+
+    /**
+     * Return the dimension of this tensor. @note This function just
+     * returns the integer three, since these tensors are properly
+     * defined in three-dimensions only.
+     */
+    unsigned int dim () const;
+
+
+    /**
+     * Make the group symmetry of this tensor public. 
+     */
+    std::string group_symmetry () const; 
+   
+
+    protected:
+    
+
+    /**
+     * Make the group symmetry of this tensor known to all derived classes.
+     */
+    const GroupSymmetry group_symmetry_; 
+
+
+    /**
+     * Make the order of this tensor known to all derived classes.
+     */
+    const int order_; 
+    
+
+    /**
+     * Make the rank of this tensor known to all derived classes.
+     */
+    const int rank_; 
+    
 
     private:
-    
+
 
     /**
      * The underlying tensor.
      */
-    StrainTensorBase<group_symmetry, order, ValueType> tensor;
-    
-    }; /* StrainTensor */
-  
+    dealii::Tensor<Rank, 3, ValueType> tensor; 
+
+    }; /* TensorBase */
+
   
   /* ----------------- Non-member functions operating on tensors. ------------ */
   
-    
+  
 } /* namespace nil */
 
 
-#endif /* __nil_strain_tensor_h */
+#endif /* __nil_tensor_base_h */
 
 

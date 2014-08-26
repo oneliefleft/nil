@@ -37,9 +37,8 @@
 #ifndef __nil_strain_tensor_base_h
 #define __nil_strain_tensor_base_h
 
-#include <deal.II/base/tensor.h>
-
 #include "group_symmetry.h"
+#include "tensor_base.h"
 
 #include <fstream>
 #include <iostream>
@@ -49,24 +48,15 @@ namespace nil
 {
 
   /**
-   * \brief Strain Tensor Base.
-   *
-   * This is the base class for an \f$N\,\f$-order strain
+   * \brief This is the base class for an \f$N\,\f$-order strain
    * tensor.
-   *
-   * @note In the inline documentation, Various mappings from Voight
-   * notation to proper tensor notation is taken from:
-   *
-   * J. F. Nye, "Własnosści fizyczne kryształów w Ujęciu tensorowym i
-   * macierzowym" Państwowe Wydawnictwo Naukowa (1962). Tłumaczył z
-   * języka angielskiego J. Rauułuszhiewicz.
    *
    * @author Toby D. Young 2014.
    */  
-  template <int rank, typename ValueType = double>
+  template <enum GroupSymmetry group_symmetry, int Order, typename ValueType = double>
     class StrainTensorBase
     :
-    public dealii::Tensor<rank, 3, ValueType>
+    public nil::TensorBase<group_symmetry, Order, 2*Order, ValueType>
     {
     public:
     
@@ -77,73 +67,14 @@ namespace nil
     StrainTensorBase ();
     
 
-    /**
-     * Destructor. 
-     */
-    ~StrainTensorBase (); 
-
-
-    /**
-     * Distribute coefficients on to the tensor.
-     */
-    void distribute_coefficients ();
-    
-
-    /**
-     * Reinitialise (zero out) this tensor with this symmetry.
-     */
-    void reinit (GroupSymmetry group_symmetry);
-
-
-    /**
-     * Make the order of this tensor public.
-     */
-    unsigned int order () const;
-    
-
-    /**
-     * Make the dimension of this tensor public. @note This function
-     * just returns the integer three, since these tensors are defined
-     * in three-dimensions only.
-     */
-    unsigned int dim () const;
-
-
-    /**
-     * Make the group symmetry of this tensor public.
-     */
-    std::string group_symmetry () const;
-   
-
-    protected:
-    
-
-    /**
-     * Make the order of this tensor known to all derived classes.
-     */
-    const int order_; 
-    
-
-    /**
-     * Make the group symmetry of this tensor known to all derived classes.
-     */
-    GroupSymmetry group_symmetry_; 
-    
-
-    /**
-     * Zero out a tensor. @note Only zero is allowed as an input to this function
-     */
-    /* operator = ValueType; */
-    
-
     private:
-
-
+    
+    
     /**
      * The underlying tensor.
      */
-    dealii::Tensor<rank, 3, ValueType> tensor; 
-
+    nil::TensorBase<group_symmetry, Order, 2*Order, ValueType> tensor;
+    
     }; /* StrainTensorBase */
 
   

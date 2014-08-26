@@ -37,9 +37,8 @@
 #ifndef __nil_piezoelectric_tensor_base_h
 #define __nil_piezoelectric_tensor_base_h
 
-#include <deal.II/base/tensor.h>
-
 #include "group_symmetry.h"
+#include "tensor_base.h"
 
 #include <fstream>
 #include <iostream>
@@ -49,31 +48,15 @@ namespace nil
 {
 
   /**
-   * \brief Piezoelectric Tensor Base.
-   *
-   * This is the base class for an \f$N\,\f$-order piezoelectric
-   * tensor.
-   *
-   * @note In the inline documentation, mappings of the piezoelectric
-   * constants in Voight notation is taken from:
-   *
-   * H. Grimmer, "The piezoelectric effect of second order in stress
-   * or strain: its form for crystals and quasicrystals of any
-   * symmetry", Acta Cryst. (2007) A36, 441.
-   *
-   * @note In the inline documentation, Various mappings from Voight
-   * notation to proper tensor notation is taken from:
-   *
-   * J. F. Nye, "Własnosści fizyczne kryształów w Ujęciu tensorowym i
-   * macierzowym" Państwowe Wydawnictwo Naukowa (1962). Tłumaczył z
-   * języka angielskiego J. Rauułuszhiewicz.
+   * \brief This is the base class for an \f$N\,\f$-order
+   * piezoelectric tensor.
    *
    * @author Toby D. Young 2014.
    */  
-  template <int rank, typename ValueType = double>
+  template <nil::GroupSymmetry GroupSymm, int Order, typename ValueType = double>
     class PiezoelectricTensorBase
     :
-    public dealii::Tensor<rank, 3, ValueType>
+    public nil::TensorBase<GroupSymm, Order, 2*Order+1, ValueType>
     {
     public:
     
@@ -84,84 +67,227 @@ namespace nil
     PiezoelectricTensorBase ();
     
 
-    /**
-     * Destructor. 
-     */
-    ~PiezoelectricTensorBase (); 
-
-
-    /**
-     * Distribute coefficients on to the tensor.
-     */
-    void distribute_coefficients ();
-    
-
-    /**
-     * Reinitialise (zero out) this tensor with this symmetry.
-     */
-    void reinit (GroupSymmetry group_symmetry);
-
-
-    /**
-     * Return the number of non-zero elements this tensor has.
-     */
-    /* unsigned int n_nonzero_elements (); */
-
-
-    /**
-     * Make the order of this tensor public.
-     */
-    unsigned int order () const;
-    
-
-    /**
-     * Make the dimension of this tensor public. @note This function
-     * just returns the integer three, since these tensors are defined
-     * in three-dimensions only.
-     */
-    unsigned int dim () const;
-
-
-    /**
-     * Make the group symmetry of this tensor public.
-     */
-    std::string group_symmetry () const;
-   
-
-    protected:
-    
-
-    /**
-     * Make the order of this tensor known to all derived classes.
-     */
-    const int order_; 
-    
-
-    /**
-     * Make the group symmetry of this tensor known to all derived classes.
-     */
-    GroupSymmetry group_symmetry_; 
-    
-
-    /**
-     * Zero out a tensor. @note Only zero is allowed as an input to this function
-     */
-    /* operator = ValueType; */
-    
-
     private:
 
 
     /**
      * The underlying tensor.
      */
-    dealii::Tensor<rank, 3, ValueType> tensor; 
+    nil::TensorBase<GroupSymm, Order, 2*Order+1, ValueType> tensor;
 
     }; /* PiezoelectricTensorBase */
 
   
-  /* ----------------- Non-member functions operating on tensors. ------------ */
+
+
+  /* -------------------------- First-order tensors. ------------------------- */
+
+
+  /**
+   * Distribute <code>coefficients</code> on to a first-order
+   * piezoelectric tensor of zinc-blende symmetry. @note Order of the
+   * coefficients is important and should be passed to this function
+   * as: \f$e_14\f$\,.
+   */
+  template <typename ValueType> 
+    inline
+    void 
+    distribute_coefficients_ (PiezoelectricTensorBase<GroupSymmetry::ZincBlende, 1, ValueType> &tensor, 
+			      std::vector<ValueType>                                           &coefficients)
+    {
+      
+      Assert (tensor.rank ()==3, dealii::ExcInternalError ());
+      
+      AssertThrow (coefficients.size ()==1,
+		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
+      
+      // Then distribute the coefficients on to the tensor. It seems
+      // there is no automagic way to do this, so just insert those
+      // elements that are non-zero.
+      // 
+      // In Voight notation these are:  e_14 = e_26 = e_36.
+      
+      // e_14 \mapsto e_123 = e_132
+      tensor[0][1][2] = tensor[0][2][1] = coefficients[0];
+      
+      // e_26 \mapsto e_212 = e_221
+      tensor[1][0][1] = tensor[1][1][0] = coefficients[0];
+      
+      // e_36 \mapsto e_312 = e_321
+      tensor[2][0][1] = tensor[2][1][0] = coefficients[0];
+    }
+
   
+  /**
+   * Distribute <code>coefficients</code> on to a first-order
+   * piezoelectric tensor of wurtzite symmetry. @note Order of the
+   * coefficients is important and should be passed to this function
+   * as: \f$e_13, e_15, e_33\f$\,.
+   */
+  template <typename ValueType> 
+    inline
+    void 
+    distribute_coefficients_ (PiezoelectricTensorBase<GroupSymmetry::Wurtzite, 1, ValueType> &tensor, 
+			      std::vector<ValueType>                                         &coefficients)
+    {
+      Assert (tensor.rank ()==3, dealii::ExcInternalError ()); 
+      
+      AssertThrow (coefficients.size ()==3,
+		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
+
+      // Then distribute the coefficients on to the tensor. It seems
+      // there is no automagic way to do this, so just insert those
+      // elements that are non-zero.
+      // 
+      // In Voight notation these are: e_13 = e_23, e_15 = e_24, e_33.
+
+      // e_13 = e_23 \mapsto e_133 = e_233
+      tensor[0][2][2] = tensor[1][2][2] = coefficients[0];
+
+      // e_15 = e_24 \mapsto e_131 = e_113 = e_223 = e_232
+      tensor[0][2][0] = tensor[0][0][2] = tensor[1][1][2] = tensor[1][2][1] = coefficients[1];
+
+      // e_33 \mapsto e_333
+      tensor[2][2][2] = coefficients[2];
+    }
+  
+  
+  /* -------------------------- Second-order tensors. ------------------------ */
+  
+  
+  /**
+   * Distribute <code>coefficients</code> on to a second-order
+   * piezoelectric tensor of zinc-blende symmetry. @note Order of the
+   * coefficients is important and should be passed to this
+   * function as: \f$e_114, e_124, e_345\f$\,.
+   */  
+  template <typename ValueType> 
+    inline
+    void 
+    distribute_coefficients_ (PiezoelectricTensorBase<GroupSymmetry::ZincBlende, 2, ValueType> &tensor, 
+			      std::vector<ValueType>                                           &coefficients)
+    {
+      Assert (tensor.rank ()==5, dealii::ExcInternalError ()); 
+      
+      AssertThrow (coefficients.size ()==3,
+		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
+      
+      // Then distribute the coefficients on to the tensor. It seems
+      // there is no automagic way to do this, so just insert those
+      // elements that are non-zero.
+      //
+      // In Voight notation these are: e_114 = e_124 = e_156, and
+      // additionally, cyclic permutations x->y->z. In total there are
+      // 24 non-zero elements.
+      
+      // e_114 = e_225 = e_336 \mapsto:
+      tensor[0][0][0][1][2] = tensor[0][0][0][2][1] = tensor[0][1][2][0][0] = tensor[0][2][1][0][0] 
+	= 
+	tensor[1][1][1][0][2] = tensor[1][1][1][2][0] = tensor[1][0][2][1][1] = tensor[1][2][0][1][1] 
+	= 
+	tensor[2][2][2][0][1] = tensor[2][2][2][1][0] = tensor[2][0][1][2][2] = tensor[2][1][0][2][2] 
+	=
+	coefficients[0];
+      
+      // e_124 = e_134 = e_215 = e_235 = e_316 = e_326 \mapsto:
+      tensor[0][1][1][1][2] = tensor[0][1][1][2][1] = tensor[0][1][2][1][1] = tensor[0][2][1][1][1] 
+	= 
+	tensor[0][1][2][2][2] = tensor[0][2][1][2][2] = tensor[0][2][2][2][1] = tensor[0][2][2][1][2] 
+	= 
+	tensor[1][2][0][0][0] = tensor[1][0][2][0][0] = tensor[1][0][0][2][0] = tensor[1][0][0][0][2] 
+	=
+	tensor[1][2][2][2][0] = tensor[1][2][2][0][2] = tensor[1][2][0][2][2] = tensor[1][0][2][2][2] 
+	=
+	tensor[2][0][1][0][0] = tensor[2][1][0][0][0] = tensor[2][0][0][0][1] = tensor[2][0][0][1][0] 
+	=
+	tensor[2][0][1][1][1] = tensor[2][1][0][1][1] = tensor[2][1][1][0][1] = tensor[2][1][1][1][0] 
+	=
+	coefficients[1];
+      
+      // e_345 = e_246 = e_156 \mapsto:
+      tensor[0][2][0][0][1] = tensor[0][0][2][0][1] = tensor[0][2][0][1][0] = tensor[0][2][0][0][1] = 
+	tensor[0][0][1][2][0] = tensor[0][1][0][2][0] = tensor[0][0][1][2][0] = tensor[0][0][1][0][2] 
+	= 
+	tensor[1][1][2][0][1] = tensor[1][2][1][0][1] = tensor[1][1][2][1][0] = tensor[1][2][1][1][0] = 
+	tensor[1][0][1][1][2] = tensor[1][1][0][1][2] = tensor[1][0][1][2][1] = tensor[1][1][0][2][1] 
+	=
+	tensor[2][1][2][2][0] = tensor[2][2][1][2][0] = tensor[2][1][2][0][2] = tensor[2][2][1][0][2] = 
+	tensor[2][2][0][1][2] = tensor[2][0][2][1][2] = tensor[2][2][0][2][1] = tensor[2][0][2][2][1] 
+	=  
+	coefficients[2];
+    }
+
+
+  /**
+   * Distribute <code>coefficients</code> on to a second-order
+   * piezoelectric tensor of wurtzite symmetry. @note Order of the
+   * coefficients is important and should be passed to this
+   * function as: \f$e_115, e_125, e_135, e_311, e_312, e_313, e_333,
+   * e_344\f$\,.
+   */  
+  template <typename ValueType> 
+    inline
+    void 
+    distribute_coefficients_ (PiezoelectricTensorBase<GroupSymmetry::Wurtzite, 2, ValueType> &tensor, 
+			      std::vector<ValueType>                                         &coefficients)
+    {
+      Assert (tensor.rank ()==5, dealii::ExcInternalError ()); 
+
+      AssertThrow (coefficients.size ()==8,
+		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
+
+      // Then distribute the coefficients on to the tensor. It seems
+      // there is no automagic way to do this, so just insert those
+      // elements that are non-zero.
+      // 
+      // In Voight notation these are: 
+
+      // e_115 = e_224 \mapsto:
+      tensor[0][0][0][2][0] = tensor[0][0][0][0][2] = tensor[1][1][1][1][2] = tensor[1][1][1][2][1] 
+	= 
+	coefficients[0];
+
+      // e_125 = e_214 \mapsto:
+      tensor[0][1][1][2][1] = tensor[0][1][1][0][2] = tensor[1][0][0][1][2] = tensor[1][0][0][2][1] 
+  	= 
+	coefficients[1];
+
+      // e_135 = e_234 \mapsto:
+      tensor[0][2][2][2][0] = tensor[0][2][2][0][2] = tensor[1][2][2][1][2] = tensor[1][2][2][2][1] 
+	= 
+	coefficients[2];
+
+      // e_311 = e_322 \mapsto:
+      tensor[2][0][0][0][0] = tensor[2][1][1][1][1] = coefficients[3];
+
+      // e_312 \mapsto:
+      tensor[2][0][0][1][1] = coefficients[4];
+
+      // e_313 = e_323 \mapsto:
+      tensor[2][0][0][2][2] = tensor[2][1][1][2][2] = coefficients[5];
+
+      // e_333 \mapsto:
+      tensor[2][2][2][2][2] = coefficients[6];
+
+      // e_344 = e_355 \mapsto:
+      tensor[2][1][2][1][2] = tensor[2][2][1][1][2] = tensor[2][2][1][2][1] = tensor[2][1][2][2][1] 
+	=
+	tensor[2][2][0][2][0] = tensor[2][0][2][2][0] = tensor[2][0][2][0][2] = tensor[2][2][0][0][2] 
+	=
+	coefficients[7];
+
+      // e_146 = e_256 = (e_115 - e_125) \mapsto:
+      tensor[0][1][2][0][1] = tensor[0][2][1][0][1] = tensor[0][2][1][1][0] = tensor[0][1][2][1][0] 
+	= 
+	tensor[1][2][0][0][1] = tensor[1][0][2][0][1] = tensor[1][0][2][1][0] = tensor[1][2][0][1][0] 
+	= 
+	(tensor[0][2][2][2][0] - tensor[0][1][1][2][0]);
+
+      // e_366 = 2(e_311 - e_312) \mapsto:
+      tensor[2][0][1][0][1] = tensor[2][1][0][0][1] = tensor[2][1][0][1][0] = tensor[2][0][1][1][0] 
+	= 
+	2*(tensor[2][0][0][0][0] - tensor[2][0][0][1][1]);
+    }
   
 } /* namespace nil */
 

@@ -40,9 +40,25 @@
 namespace nil
 {  
 
-  template <int order, typename ValueType>
-  PiezoelectricTensor<order, ValueType>::PiezoelectricTensor ()
+  template <enum GroupSymmetry group_symmetry, int order, typename ValueType>
+  PiezoelectricTensor<group_symmetry, order, ValueType>::PiezoelectricTensor ()
   {}
+
+  template <enum GroupSymmetry GroupSymm, int Order, typename ValueType>
+  void 
+  PiezoelectricTensor<GroupSymm, Order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)
+  {
+    // Since template specialisations are used by this function there
+    // is no need for sorting group symmetry or order of the tensor.
+    // Hence, simply call the correct specialisation for the
+    // non-member function in piezoelectric_tensor_base.h.
+
+    // first zero out the tensor
+    this->reinit ();
+
+    // and then distribute the coefficients.
+    distribute_coefficients_ (tensor, coefficients);
+  }
    
 } // namespace nil
 
@@ -51,10 +67,10 @@ namespace nil
 
 // First-order tensors
 template class 
-nil::PiezoelectricTensor<1, double>;
+nil::PiezoelectricTensor<nil::GroupSymmetry::ZincBlende, 1, double>;
 
 // second-order tensors
 template class 
-nil::PiezoelectricTensor<2, double>;
+nil::PiezoelectricTensor<nil::GroupSymmetry::ZincBlende, 2, double>;
 
-// extern template return-type name < argument-list > ( parameter-list ) ;  (since C++11)
+
