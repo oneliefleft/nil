@@ -85,7 +85,9 @@ namespace nil
 
   /**
    * Distribute <code>coefficients</code> on to a first-order
-   * piezoelectric tensor of zinc-blende symmetry.
+   * piezoelectric tensor of zinc-blende symmetry. @note Order of the
+   * coefficients is important and should be passed to this function
+   * as: \f$e_14\f$\,.
    */
   template <typename ValueType> 
     inline
@@ -118,7 +120,9 @@ namespace nil
   
   /**
    * Distribute <code>coefficients</code> on to a first-order
-   * piezoelectric tensor of wurtzite symmetry.
+   * piezoelectric tensor of wurtzite symmetry. @note Order of the
+   * coefficients is important and should be passed to this function
+   * as: \f$e_13, e_15, e_33\f$\,.
    */
   template <typename ValueType> 
     inline
@@ -153,7 +157,9 @@ namespace nil
   
   /**
    * Distribute <code>coefficients</code> on to a second-order
-   * piezoelectric tensor of zinc-blende symmetry.
+   * piezoelectric tensor of zinc-blende symmetry. @note Order of the
+   * coefficients is important and should be passed to this
+   * function as: \f$e_114, e_124, e_345\f$\,.
    */  
   template <typename ValueType> 
     inline
@@ -214,7 +220,10 @@ namespace nil
 
   /**
    * Distribute <code>coefficients</code> on to a second-order
-   * piezoelectric tensor of wurtzite symmetry.
+   * piezoelectric tensor of wurtzite symmetry. @note Order of the
+   * coefficients is important and should be passed to this
+   * function as: \f$e_115, e_125, e_135, e_311, e_312, e_313, e_333,
+   * e_344\f$\,.
    */  
   template <typename ValueType> 
     inline
@@ -226,12 +235,61 @@ namespace nil
 
       AssertThrow (coefficients.size ()==8,
 		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
+
+      // Then distribute the coefficients on to the tensor. It seems
+      // there is no automagic way to do this, so just insert those
+      // elements that are non-zero.
+      // 
+      // In Voight notation these are: 
+
+      // e_115 = e_224 \mapsto:
+      tensor[0][0][0][2][0] = tensor[0][0][0][0][2] = tensor[1][1][1][1][2] = tensor[1][1][1][2][1] 
+	= 
+	coefficients[0];
+
+      // e_125 = e_214 \mapsto:
+      tensor[0][1][1][2][1] = tensor[0][1][1][0][2] = tensor[1][0][0][1][2] = tensor[1][0][0][2][1] 
+  	= 
+	coefficients[1];
+
+      // e_135 = e_234 \mapsto:
+      tensor[0][2][2][2][0] = tensor[0][2][2][0][2] = tensor[1][2][2][1][2] = tensor[1][2][2][2][1] 
+	= 
+	coefficients[2];
+
+      // e_311 = e_322 \mapsto:
+      tensor[2][0][0][0][0] = tensor[2][1][1][1][1] = coefficients[3];
+
+      // e_312 \mapsto:
+      tensor[2][0][0][1][1] = coefficients[4];
+
+      // e_313 = e_323 \mapsto:
+      tensor[2][0][0][2][2] = tensor[2][1][1][2][2] = coefficients[5];
+
+      // e_333 \mapsto:
+      tensor[2][2][2][2][2] = coefficients[6];
+
+      // e_344 = e_355 \mapsto:
+      tensor[2][1][2][1][2] = tensor[2][2][1][1][2] = tensor[2][2][1][2][1] = tensor[2][1][2][2][1] 
+	=
+	tensor[2][2][0][2][0] = tensor[2][0][2][2][0] = tensor[2][0][2][0][2] = tensor[2][2][0][0][2] 
+	=
+	coefficients[7];
+
+      // e_146 = e_256 = (e_115 - e_125) \mapsto:
+      tensor[0][1][2][0][1] = tensor[0][2][1][0][1] = tensor[0][2][1][1][0] = tensor[0][1][2][1][0] 
+	= 
+	tensor[1][2][0][0][1] = tensor[1][0][2][0][1] = tensor[1][0][2][1][0] = tensor[1][2][0][1][0] 
+	= 
+	(tensor[0][2][2][2][0] - tensor[0][1][1][2][0]);
+
+      // e_366 = 2(e_311 - e_312) \mapsto:
+      tensor[2][0][1][0][1] = tensor[2][1][0][0][1] = tensor[2][1][0][1][0] = tensor[2][0][1][1][0] 
+	= 
+	2*(tensor[2][0][0][0][0] - tensor[2][0][0][1][1]);
     }
   
 } /* namespace nil */
-
-
-
 
 
 #endif /* __nil_piezoelectric_tensor_base_h */
