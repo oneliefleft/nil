@@ -130,6 +130,21 @@ namespace nil
       
       AssertThrow (coefficients.size ()==3,
 		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
+
+      // Then distribute the coefficients on to the tensor. It seems
+      // there is no automagic way to do this, so just insert those
+      // elements that are non-zero.
+      // 
+      // In Voight notation these are: e_13 = e_23, e_15 = e_24, e_33.
+
+      // e_13 = e_23 \mapsto e_133 = e_233
+      tensor[0][2][2] = tensor[1][2][2] = coefficients[0];
+
+      // e_15 = e_24 \mapsto e_131 = e_113 = e_223 = e_232
+      tensor[0][2][0] = tensor[0][0][2] = tensor[1][1][2] = tensor[1][2][1] = coefficients[1];
+
+      // e_33 \mapsto e_333
+      tensor[2][2][2] = coefficients[2];
     }
   
   
