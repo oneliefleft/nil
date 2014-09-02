@@ -71,9 +71,10 @@ private:
   
   // First is a list of functions that belong to this class (they are
   // explained later on).
-  void setup_problem ();
   void get_parameters ();
-  
+  void setup_system ();
+  void solve ();
+
   // Following that we have a list of the tensors that will be used in
   // this calculation. They are, first- and second-order piezoelectric
   // tensors
@@ -90,6 +91,13 @@ private:
 
   // as well as a list of th4e size of the Bravais lattice.
   std::vector<ValueType> bravais_lattice_dimensions;
+
+  // Specific to this calculation, we need a list of the stretches
+  // that will be applied to the primitive cell
+  std::vector<ValueType> stretch_tensor_range;
+
+  // and the step-size (or increment)
+  double increment;
 
   // Then we need an object to hold various run-time parameters that
   // are specified in an "prm file".
@@ -109,26 +117,7 @@ Step0<dim, ValueType>::~Step0 ()
 {}
 
 
-// The first step is to initialise all of the objects we are goinf to
-// use. This is done in a single function.
-template <int dim, typename ValueType>
-void 
-Step0<dim, ValueType>::setup_problem ()
-{
-  // Initialise the first- and second-order piezoelectric tensors...
-  first_order_piezoelectric_tensor.reinit ();
-  second_order_piezoelectric_tensor.reinit ();
-
-  // and distribute the coefficients
-  first_order_piezoelectric_tensor.distribute_coefficients (first_order_piezoelectric_coefficients);
-  second_order_piezoelectric_tensor.  distribute_coefficients (second_order_piezoelectric_coefficients);
-
-  // and then initialise Green's strain tensor.
-  // green_strain.reinit ();
-}
-
-
-// The next step is to obtain a complete list of the coefficients
+// The first step is to obtain a complete list of the coefficients
 // needed for this calculation. First comes a declaration of the
 // entries expected to be find in the parameter file and then they are
 // read into the object parameters.
@@ -156,6 +145,17 @@ Step0<dim, ValueType>::get_parameters ()
 			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
 			    "A list of the Bravais lattice dimensions. ");
 
+  parameters.declare_entry ("Stretch tensor range",
+			    "-1., 1., 0., 0., 0., 0.",
+			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
+			    "A list of diagonal stretch tensor increments. "
+			    "These come in the order -x, +x, -y, +y, -z, +z");
+
+  parameters.declare_entry ("Stretch tensor increment",
+			    "0.05",
+			    dealii::Patterns::Double (),
+			    "The size of diagonal stretch tensor increment.");
+
   parameters.read_input (command_line.get_prm_file ());
 
   first_order_piezoelectric_coefficients = 
@@ -169,9 +169,47 @@ Step0<dim, ValueType>::get_parameters ()
   bravais_lattice_dimensions = 
     dealii::Utilities::string_to_double
     (dealii::Utilities::split_string_list (parameters.get ("Bravais lattice dimensions")));
+
+  stretch_tensor_range = 
+    dealii::Utilities::string_to_double
+    (dealii::Utilities::split_string_list (parameters.get ("Stretch tensor range")));
+
+  increment = 
+    dealii::Utilities::string_to_double (parameters.get ("Stretch tensor increment"));
+
+  // Some checks
+  AssertThrow (stretch_tensor_range.size ()==6,
+	       dealii::ExcMessage ("The stretch tensor range is required to have six components."));
 }
 
 
+// Next initialise all of the objects we are going to use. 
+template <int dim, typename ValueType>
+void 
+Step0<dim, ValueType>::setup_system ()
+{
+  // Initialise the first- and second-order piezoelectric tensors...
+  first_order_piezoelectric_tensor.reinit ();
+  second_order_piezoelectric_tensor.reinit ();
+
+  // and distribute the coefficients
+  first_order_piezoelectric_tensor.distribute_coefficients (first_order_piezoelectric_coefficients);
+  second_order_piezoelectric_tensor.distribute_coefficients (second_order_piezoelectric_coefficients);
+}
+
+
+// This routine calculates the quantities of interest for a given
+// system.
+template <int dim, typename ValueType>
+void 
+Step0<dim, ValueType>::solve ()
+{
+  
+}
+
+
+// This is the run function, which wraps all of the above into a
+// single logical routine.
 template <int dim, typename ValueType>
 void 
 Step0<dim, ValueType>::run ()
@@ -179,10 +217,7 @@ Step0<dim, ValueType>::run ()
   // First find the parameters need for this calculation
   get_parameters ();
 
-  // and then setup the tensors required for this calculation
-  setup_problem ();
-
-  // output some data, on the piezoelectric part
+  // and output some data, on the piezoelectric part
   std::cout << "Piezoelectric tensor order:    "
 	    << first_order_piezoelectric_tensor.order ()
 	    << std::endl
@@ -231,7 +266,20 @@ Step0<dim, ValueType>::run ()
   std::cout << std::endl;
 
   // Having done that now we want to start applying an incremental
-  // strain pattern. This is done 
+  // strain pattern. This is done by taking the ratio of the
+  // equilibrium crystal parameters over the `actual' crystal
+  // parameters.
+
+  // First, setup the tensors of piezoelectric coefficients
+  setup_system ();
+
+  // Then run over all requested stretches.
+  {
+    // Solve for the wanted output
+    solve ();
+    
+    // and push back the results into a table.
+  }
   
 }
 
