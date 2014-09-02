@@ -77,14 +77,18 @@ private:
   void solve ();
   void output_results () const;
 
+
+  // Record of the number of space dimensions we are using.
+  const int dims = 3;
+
   // Following that we have a list of the tensors that will be used in
   // this calculation. They are, first- and second-order piezoelectric
   // tensors
-  nil::PiezoelectricTensor<nil::GroupSymmetry::ZincBlende, 1, ValueType> first_order_piezoelectric_tensor;
-  nil::PiezoelectricTensor<nil::GroupSymmetry::ZincBlende, 2, ValueType> second_order_piezoelectric_tensor;
+  nil::PiezoelectricTensor<GroupSymm, 1, ValueType> first_order_piezoelectric_tensor;
+  nil::PiezoelectricTensor<GroupSymm, 2, ValueType> second_order_piezoelectric_tensor;
 
   // and a Green strain tensor.
-  nil::StrainTensor<nil::GroupSymmetry::ZincBlende, 1, ValueType> strain_tensor;
+  nil::StrainTensor<GroupSymm, 1, ValueType> strain_tensor;
   
   // Additionally, lists of coefficients are needed for those tensors
   // that are tensors of empirical moduli
@@ -108,10 +112,6 @@ private:
   // Then we need an object to hold various run-time parameters that
   // are specified in an "prm file".
   dealii::ParameterHandler parameters;
-
-  // Finally, store a record of the number of space dimensions we are
-  // using.
-  const int dim = 3;
 };
 
 
