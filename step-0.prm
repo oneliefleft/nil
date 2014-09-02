@@ -12,7 +12,7 @@ set First-order piezoelectric coefficients  = -0.230
 set Second-order piezoelectric coefficients = -0.439, -3.765, -0.492
 
 # The size of diagonal stretch tensor increment.
-set Stretch tensor increment                = 0.05
+set Stretch tensor increment                = 0.025
 
 # A list of diagonal stretch tensor increments. These come in the order -x,
 # +x, -y, +y, -z, +z

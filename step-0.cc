@@ -162,7 +162,7 @@ Step0<GroupSymm, ValueType>::get_parameters ()
 			    "These come in the order -x, +x, -y, +y, -z, +z");
 
   parameters.declare_entry ("Stretch tensor increment",
-			    "0.05",
+			    "0.025",
 			    dealii::Patterns::Double (),
 			    "The size of diagonal stretch tensor increment.");
 
