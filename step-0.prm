@@ -10,3 +10,10 @@ set First-order piezoelectric coefficients  = -0.230
 # A list of the second-order piezoelectric coefficients. Default is
 # zinc-blende GaAs. See: PRL 96, 187602 (2006).
 set Second-order piezoelectric coefficients = -0.439, -3.765, -0.492
+
+# The size of diagonal stretch tensor increment.
+set Stretch tensor increment                = 0.05
+
+# A list of diagonal stretch tensor increments. These come in the order -x,
+# +x, -y, +y, -z, +z
+set Stretch tensor range                    = -1., 1., 0., 0., 0., 0.
