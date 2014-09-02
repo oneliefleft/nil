@@ -52,7 +52,7 @@
 #include <iostream>
 
 
-template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType = double>
+template <enum nil::GroupSymmetry GroupSymm, typename ValueType = double>
 class Step0
 {
 public:
@@ -79,7 +79,7 @@ private:
 
 
   // Record of the number of space dimensions we are using.
-  const int dims = 3;
+  const int dim = 3;
 
   // Following that we have a list of the tensors that will be used in
   // this calculation. They are, first- and second-order piezoelectric
@@ -116,14 +116,14 @@ private:
 
 
 // The constructor is typically borning...
-template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
-Step0<dim, GroupSymm, ValueType>::Step0 ()
+template <enum nil::GroupSymmetry GroupSymm, typename ValueType>
+Step0<GroupSymm, ValueType>::Step0 ()
 {}
 
 
 // as is the destructor.
-template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
-Step0<dim, GroupSymm, ValueType>::~Step0 ()
+template <enum nil::GroupSymmetry GroupSymm, typename ValueType>
+Step0<GroupSymm, ValueType>::~Step0 ()
 {}
 
 
@@ -131,9 +131,9 @@ Step0<dim, GroupSymm, ValueType>::~Step0 ()
 // needed for this calculation. First comes a declaration of the
 // entries expected to be find in the parameter file and then they are
 // read into the object parameters.
-template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+template <enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<dim, GroupSymm, ValueType>::get_parameters ()
+Step0<GroupSymm, ValueType>::get_parameters ()
 {
   // First declare the parameters that are expected to be found.
   parameters.declare_entry ("First-order piezoelectric coefficients",
@@ -200,9 +200,9 @@ Step0<dim, GroupSymm, ValueType>::get_parameters ()
 
 
 // Next initialise all of the objects we are going to use. 
-template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+template <enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<dim, GroupSymm, ValueType>::setup_system ()
+Step0<GroupSymm, ValueType>::setup_system ()
 {
   // Initialise the first- and second-order piezoelectric tensors...
   first_order_piezoelectric_tensor.reinit ();
@@ -229,9 +229,9 @@ Step0<dim, GroupSymm, ValueType>::setup_system ()
 
 // Assemble the strain tensor for this system. @note This currently
 // works for Green's strain only.
-template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+template <enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<dim, GroupSymm, ValueType>::assemble_strain_tensor ()
+Step0<GroupSymm, ValueType>::assemble_strain_tensor ()
 {
   // Reinitialise the green strain tensor 
   strain_tensor.reinit ();
@@ -246,18 +246,18 @@ Step0<dim, GroupSymm, ValueType>::assemble_strain_tensor ()
 
 // This routine calculates the quantities of interest for a given
 // system.
-template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+template <enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<dim, GroupSymm, ValueType>::solve ()
+Step0<GroupSymm, ValueType>::solve ()
 {
   
 }
 
 
 // Simply output the results to file(s).
-template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+template <enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<dim, GroupSymm, ValueType>::output_results () const
+Step0<GroupSymm, ValueType>::output_results () const
 {
   
 }
@@ -265,9 +265,9 @@ Step0<dim, GroupSymm, ValueType>::output_results () const
 
 // This is the run function, which wraps all of the above into a
 // single logical routine.
-template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+template <enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<dim, GroupSymm, ValueType>::run ()
+Step0<GroupSymm, ValueType>::run ()
 {
   // First find the parameters need for this calculation
   get_parameters ();
@@ -379,7 +379,7 @@ int main (int argc, char **argv)
       dealii::deallog.depth_console (0);
 
       // Initialise the problem.
-      Step0<3, nil::GroupSymmetry::ZincBlende> problem;
+      Step0<nil::GroupSymmetry::ZincBlende> problem;
 
       // Parse the command line and input file.
       problem.command_line.parse_command_line (argc, argv); 
