@@ -16,4 +16,4 @@ set Stretch tensor increment                = 0.05
 
 # A list of diagonal stretch tensor increments. These come in the order -x,
 # +x, -y, +y, -z, +z
-set Stretch tensor range                    = -1., 1., 0., 0., 0., 0.
+set Stretch tensor range                    = -0.2, 0.2, 0., 0., 0., 0.
