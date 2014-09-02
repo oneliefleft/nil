@@ -73,7 +73,9 @@ private:
   // explained later on).
   void get_parameters ();
   void setup_system ();
+  void assemble_strain_tensor ();
   void solve ();
+  void output_results () const;
 
   // Following that we have a list of the tensors that will be used in
   // this calculation. They are, first- and second-order piezoelectric
@@ -82,15 +84,19 @@ private:
   nil::PiezoelectricTensor<nil::GroupSymmetry::ZincBlende, 2, ValueType> second_order_piezoelectric_tensor;
 
   // and a Green strain tensor.
-  nil::StrainTensor<nil::GroupSymmetry::ZincBlende, 1, ValueType> green_strain;
+  nil::StrainTensor<nil::GroupSymmetry::ZincBlende, 1, ValueType> strain_tensor;
   
   // Additionally, lists of coefficients are needed for those tensors
   // that are tensors of empirical moduli
   std::vector<ValueType> first_order_piezoelectric_coefficients;
   std::vector<ValueType> second_order_piezoelectric_coefficients;
 
-  // as well as a list of th4e size of the Bravais lattice.
-  std::vector<ValueType> bravais_lattice_dimensions;
+  // as well as a list of the size of the Bravais lattice in the
+  // relaxed configuration
+  std::vector<ValueType> bravais_lattice;
+
+  // and in the `actual' configuration
+  std::vector<ValueType> actual_bravais_lattice;
 
   // Specific to this calculation, we need a list of the stretches
   // that will be applied to the primitive cell
@@ -146,7 +152,7 @@ Step0<dim, ValueType>::get_parameters ()
 			    "A list of the Bravais lattice dimensions. ");
 
   parameters.declare_entry ("Stretch tensor range",
-			    "-1., 1., 0., 0., 0., 0.",
+			    "-0.2, 0.2, 0., 0., 0., 0.",
 			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
 			    "A list of diagonal stretch tensor increments. "
 			    "These come in the order -x, +x, -y, +y, -z, +z");
@@ -166,7 +172,7 @@ Step0<dim, ValueType>::get_parameters ()
     dealii::Utilities::string_to_double
     (dealii::Utilities::split_string_list (parameters.get ("Second-order piezoelectric coefficients")));
 
-  bravais_lattice_dimensions = 
+  bravais_lattice = 
     dealii::Utilities::string_to_double
     (dealii::Utilities::split_string_list (parameters.get ("Bravais lattice dimensions")));
 
@@ -178,8 +184,14 @@ Step0<dim, ValueType>::get_parameters ()
     dealii::Utilities::string_to_double (parameters.get ("Stretch tensor increment"));
 
   // Some checks
+  AssertThrow (bravais_lattice.size ()==3,
+	       dealii::ExcMessage ("The Bravais lattice is required to have three components."));
+
   AssertThrow (stretch_tensor_range.size ()==6,
 	       dealii::ExcMessage ("The stretch tensor range is required to have six components."));
+
+  AssertThrow (increment>=0,
+	       dealii::ExcMessage ("The stretch tensor increment is required to be >= zero."));
 }
 
 
@@ -192,9 +204,39 @@ Step0<dim, ValueType>::setup_system ()
   first_order_piezoelectric_tensor.reinit ();
   second_order_piezoelectric_tensor.reinit ();
 
-  // and distribute the coefficients
+  // and distribute the coefficients.
   first_order_piezoelectric_tensor.distribute_coefficients (first_order_piezoelectric_coefficients);
   second_order_piezoelectric_tensor.distribute_coefficients (second_order_piezoelectric_coefficients);
+
+  // Make sure the `actual' Bravais lattice has the right number of
+  // components (3)
+  actual_bravais_lattice.resize (3);
+
+  // and fill in values for the initial actual bravais lattice
+  // size. @note Because of the way the subroutine assemble_system
+  // works, the initial actual Bravais lattice size is equalt to the
+  // equilibrium lattice size, plus the lower range (often negative)
+  // minus the increment.
+  for (unsigned int i=0; i<dim; ++i)
+    actual_bravais_lattice[i] = 
+      bravais_lattice[i]+stretch_tensor_range[2*i];
+}
+
+
+// Assemble the strain tensor for this system. @note This currently
+// works for Green's strain only.
+template <int dim, typename ValueType>
+void 
+Step0<dim, ValueType>::assemble_strain_tensor ()
+{
+  // Reinitialise the green strain tensor 
+  strain_tensor.reinit ();
+
+  // and fill in the correct values for the diagonal part @note this
+  // runs over x-axis only!
+  for (unsigned int i=0; i<1; ++i)
+    strain_tensor[i][i] = 
+      0.5 * (pow ((bravais_lattice[i]/actual_bravais_lattice[i]), 2) - 1);
 }
 
 
@@ -203,6 +245,15 @@ Step0<dim, ValueType>::setup_system ()
 template <int dim, typename ValueType>
 void 
 Step0<dim, ValueType>::solve ()
+{
+  
+}
+
+
+// Simply output the results to file(s).
+template <int dim, typename ValueType>
+void 
+Step0<dim, ValueType>::output_results () const
 {
   
 }
@@ -260,9 +311,9 @@ Step0<dim, ValueType>::run ()
   // and then on the lattice part connected to Green's strain
   std::cout << "Bravais lattice:               "
 	    << std::endl
-	    << "   Dimensions:                 ";
-  for (unsigned int i=0; i<bravais_lattice_dimensions.size (); ++i)
-    std::cout << bravais_lattice_dimensions[i] << " ";
+	    << "   Reference dimensions:       ";
+  for (unsigned int i=0; i<bravais_lattice.size (); ++i)
+    std::cout << bravais_lattice[i] << " ";
   std::cout << std::endl;
 
   // Having done that now we want to start applying an incremental
@@ -273,13 +324,44 @@ Step0<dim, ValueType>::run ()
   // First, setup the tensors of piezoelectric coefficients
   setup_system ();
 
-  // Then run over all requested stretches.
-  {
-    // Solve for the wanted output
-    solve ();
-    
-    // and push back the results into a table.
-  }
+  std::cout << std::endl
+	    << "----------------------------------------------------"
+	    << std::endl;
+
+  // compute the maximum x-range
+  const double max_x_range = bravais_lattice[0]+stretch_tensor_range[1]+increment;
+
+  // output some usefull data
+  std::cout << "Range x-axis:                  " 
+	    << actual_bravais_lattice[0]
+	    << " to "
+	    << max_x_range-increment
+	    << std::endl;
+
+  // Then run over all requested stretches @note As in the above, only
+  // run over x-axis for now.
+  while (actual_bravais_lattice[0]<max_x_range)
+    {
+      // assemble the strain tensor for the given increment.
+      assemble_strain_tensor ();    
+      
+      std::cout << "   Actual Bravais lattice:     ";
+      for (unsigned int i=0; i<bravais_lattice.size (); ++i)
+	std::cout << actual_bravais_lattice[i] << " ";
+      std::cout << std::endl
+		<< "   Strain tensor:              " << strain_tensor
+		<< std::endl;
+      
+      // Solve for the wanted output
+      solve ();
+      
+      // and push back the results into a table.
+      
+      
+      // Update actual Bravais lattice.
+      for (unsigned int i=0; i<dim; ++i)
+	actual_bravais_lattice[i] += increment;
+    }
   
 }
 
