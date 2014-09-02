@@ -79,7 +79,7 @@ private:
 
 
   // Record of the number of space dimensions we are using.
-  const int dim = 3;
+  const unsigned int dim = 3;
 
   // Following that we have a list of the tensors that will be used in
   // this calculation. They are, first- and second-order piezoelectric
