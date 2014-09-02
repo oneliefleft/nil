@@ -52,7 +52,7 @@
 #include <iostream>
 
 
-template <int dim, typename ValueType = double>
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType = double>
 class Step0
 {
 public:
@@ -108,18 +108,22 @@ private:
   // Then we need an object to hold various run-time parameters that
   // are specified in an "prm file".
   dealii::ParameterHandler parameters;
+
+  // Finally, store a record of the number of space dimensions we are
+  // using.
+  const int dim = 3;
 };
 
 
 // The constructor is typically borning...
-template <int dim, typename ValueType>
-Step0<dim, ValueType>::Step0 ()
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+Step0<dim, GroupSymm, ValueType>::Step0 ()
 {}
 
 
 // as is the destructor.
-template <int dim, typename ValueType>
-Step0<dim, ValueType>::~Step0 ()
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+Step0<dim, GroupSymm, ValueType>::~Step0 ()
 {}
 
 
@@ -127,9 +131,9 @@ Step0<dim, ValueType>::~Step0 ()
 // needed for this calculation. First comes a declaration of the
 // entries expected to be find in the parameter file and then they are
 // read into the object parameters.
-template <int dim, typename ValueType>
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<dim, ValueType>::get_parameters ()
+Step0<dim, GroupSymm, ValueType>::get_parameters ()
 {
   // First declare the parameters that are expected to be found.
   parameters.declare_entry ("First-order piezoelectric coefficients",
@@ -196,9 +200,9 @@ Step0<dim, ValueType>::get_parameters ()
 
 
 // Next initialise all of the objects we are going to use. 
-template <int dim, typename ValueType>
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<dim, ValueType>::setup_system ()
+Step0<dim, GroupSymm, ValueType>::setup_system ()
 {
   // Initialise the first- and second-order piezoelectric tensors...
   first_order_piezoelectric_tensor.reinit ();
@@ -225,9 +229,9 @@ Step0<dim, ValueType>::setup_system ()
 
 // Assemble the strain tensor for this system. @note This currently
 // works for Green's strain only.
-template <int dim, typename ValueType>
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<dim, ValueType>::assemble_strain_tensor ()
+Step0<dim, GroupSymm, ValueType>::assemble_strain_tensor ()
 {
   // Reinitialise the green strain tensor 
   strain_tensor.reinit ();
@@ -242,18 +246,18 @@ Step0<dim, ValueType>::assemble_strain_tensor ()
 
 // This routine calculates the quantities of interest for a given
 // system.
-template <int dim, typename ValueType>
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<dim, ValueType>::solve ()
+Step0<dim, GroupSymm, ValueType>::solve ()
 {
   
 }
 
 
 // Simply output the results to file(s).
-template <int dim, typename ValueType>
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<dim, ValueType>::output_results () const
+Step0<dim, GroupSymm, ValueType>::output_results () const
 {
   
 }
@@ -261,9 +265,9 @@ Step0<dim, ValueType>::output_results () const
 
 // This is the run function, which wraps all of the above into a
 // single logical routine.
-template <int dim, typename ValueType>
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<dim, ValueType>::run ()
+Step0<dim, GroupSymm, ValueType>::run ()
 {
   // First find the parameters need for this calculation
   get_parameters ();
@@ -375,7 +379,7 @@ int main (int argc, char **argv)
       dealii::deallog.depth_console (0);
 
       // Initialise the problem.
-      Step0<3, double> problem;
+      Step0<3, nil::GroupSymmetry::ZincBlende> problem;
 
       // Parse the command line and input file.
       problem.command_line.parse_command_line (argc, argv); 
