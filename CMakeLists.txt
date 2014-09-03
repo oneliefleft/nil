@@ -7,6 +7,8 @@ SET(TARGET "step-0")
 
 SET(TARGET_SRC
   command_line.cc
+  git-version.cc
+#
   group_symmetry.cc
   piezoelectric_tensor.cc
   piezoelectric_tensor_base.cc
