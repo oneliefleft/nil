@@ -45,8 +45,6 @@ namespace nil
     TensorBase<GroupSymm, Order, 2*Order+1, ValueType> ()
   {}
 
-  // ----------------- Non-member functions operating on tensors. ------------ 
-
 } // namespace nil
 
 

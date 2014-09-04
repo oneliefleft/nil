@@ -44,6 +44,7 @@ namespace nil
   PiezoelectricTensor<group_symmetry, order, ValueType>::PiezoelectricTensor ()
   {}
 
+
   template <enum GroupSymmetry GroupSymm, int Order, typename ValueType>
   void 
   PiezoelectricTensor<GroupSymm, Order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)

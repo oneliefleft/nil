@@ -77,8 +77,6 @@ namespace nil
 
     }; /* PiezoelectricTensorBase */
 
-  
-
 
   /* -------------------------- First-order tensors. ------------------------- */
 
@@ -296,5 +294,3 @@ namespace nil
 
 
 #endif /* __nil_piezoelectric_tensor_base_h */
-
-
