@@ -39,6 +39,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/table_handler.h>
 
 // Library-based headers.
 #include "group_symmetry.h"
@@ -110,12 +111,14 @@ private:
   double increment;
 
   // as well as the main object of interest, the polarisation vector.
-  std::vector<ValueType> polarisation_tensor;
+  dealii::Tensor<1, 3, ValueType> polarisation_tensor;
 
   // Then we need an object to hold various run-time parameters that
   // are specified in an "prm file".
   dealii::ParameterHandler parameters;
 
+  // and finally, a table to handle the results.
+  dealii::TableHandler output_table;
 };
 
 
@@ -249,9 +252,6 @@ template <enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
 Step0<GroupSymm, ValueType>::assemble_polarisation_tensor ()
 {
-  // Resize the polarisation tensor.
-  polarisation_tensor.resize (3);
-
   // The polarisation tensor is simply the contraction of the
   // piezoelectric tensor with the strain tensor.
   for (unsigned int i=0; i<dim; ++i)
@@ -353,9 +353,16 @@ Step0<GroupSymm, ValueType>::run ()
   // First, setup the tensors of piezoelectric coefficients
   setup_system ();
 
+  std::cout << "Piezoelectric tensors: "
+	    << std::endl
+	    << "   First-order tensor:         " << first_order_piezoelectric_tensor
+	    << std::endl
+	    << "   Second-order tensor:        " << second_order_piezoelectric_tensor
+	    << std::endl;
+
   std::cout << std::endl
 	    << "----------------------------------------------------"
-	    << std::endl;
+	    << std::endl << std::endl;
 
   // compute the maximum x-range
   const double max_x_range = bravais_lattice[0]+stretch_tensor_range[1]+increment;
@@ -381,11 +388,14 @@ Step0<GroupSymm, ValueType>::run ()
 		<< "   Strain tensor:              " << strain_tensor
 		<< std::endl;
       
-      // assemble the polarisation tensor.
+      // assemble the polarisation tensor for the given increment.
       assemble_polarisation_tensor ();
       
+      std::cout << "   Polarisation tensor:        " << polarisation_tensor
+		<< std::endl;
+
       // and push back the results into a table.
-      
+      output_table.add_value ("P_x", polarisation_tensor[0]);
       
       // Update actual Bravais lattice.
       for (unsigned int i=0; i<dim; ++i)
