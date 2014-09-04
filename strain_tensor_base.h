@@ -53,10 +53,10 @@ namespace nil
    *
    * @author Toby D. Young 2014.
    */  
-  template <enum GroupSymmetry group_symmetry, int Order, typename ValueType = double>
+  template <int Order, typename ValueType = double>
     class StrainTensorBase
     :
-    public nil::TensorBase<group_symmetry, Order, 2*Order, ValueType>
+    public dealii::Tensor<2*Order, 3, ValueType>
     {
     public:
     
@@ -65,6 +65,12 @@ namespace nil
      * Constructor. 
      */
     StrainTensorBase ();
+
+
+    /**
+     * Reinitialise (zero out) this tensor.
+     */
+    void reinit ();
     
 
     private:
@@ -73,7 +79,7 @@ namespace nil
     /**
      * The underlying tensor.
      */
-    nil::TensorBase<group_symmetry, Order, 2*Order, ValueType> tensor;
+    dealii::Tensor<2*Order, 3, ValueType> tensor;
     
     }; /* StrainTensorBase */
 

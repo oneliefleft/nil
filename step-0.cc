@@ -89,7 +89,7 @@ private:
   nil::PiezoelectricTensor<GroupSymm, 2, ValueType> second_order_piezoelectric_tensor;
 
   // and a Green strain tensor.
-  nil::StrainTensor<GroupSymm, 1, ValueType> strain_tensor;
+  nil::StrainTensor<1, ValueType> strain_tensor;
   
   // Additionally, lists of coefficients are needed for those tensors
   // that are tensors of empirical moduli

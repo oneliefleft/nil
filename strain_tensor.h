@@ -56,10 +56,10 @@ namespace nil
    *
    * @author Toby D. Young  2010, 2011, 2014.
    */  
-  template <enum GroupSymmetry group_symmetry, int order, typename ValueType = double>
+  template <int order, typename ValueType = double>
     class StrainTensor
     :
-    public StrainTensorBase<group_symmetry, order, ValueType>
+    public StrainTensorBase<order, ValueType>
     {
     public:
 
@@ -76,13 +76,10 @@ namespace nil
     /**
      * The underlying tensor.
      */
-    StrainTensorBase<group_symmetry, order, ValueType> tensor;
+    StrainTensorBase<order, ValueType> tensor;
     
-    }; /* StrainTensor */
-  
-  
-  /* ----------------- Non-member functions operating on tensors. ------------ */
-  
+
+   }; /* StrainTensor */
     
 } /* namespace nil */
 

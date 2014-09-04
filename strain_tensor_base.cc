@@ -40,12 +40,18 @@
 namespace nil
 {  
 
-  template <enum GroupSymmetry GroupSymm, int Order, typename ValueType>
-  StrainTensorBase<GroupSymm, Order, ValueType>::StrainTensorBase ()
-    :
-    TensorBase<GroupSymm, Order, 2*Order, ValueType> ()
+  template <int Order, typename ValueType>
+  StrainTensorBase<Order, ValueType>::StrainTensorBase ()
   {}
 
+
+  template <int order, typename ValueType>
+  void 
+  StrainTensorBase<order, ValueType>::reinit ()
+  {
+    // Wipe out the tensor 
+    tensor = 0;
+  } 
 
 } // namespace nil
 
@@ -54,11 +60,11 @@ namespace nil
 
 // First-order tensors
 template class 
-nil::StrainTensorBase<nil::GroupSymmetry::ZincBlende, 1, double>;
+nil::StrainTensorBase<1, double>;
 
 // Second-order tensors
 template class 
-nil::StrainTensorBase<nil::GroupSymmetry::ZincBlende, 2, double>;
+nil::StrainTensorBase<2, double>;
 
 
 
