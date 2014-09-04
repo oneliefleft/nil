@@ -112,6 +112,7 @@ private:
   // Then we need an object to hold various run-time parameters that
   // are specified in an "prm file".
   dealii::ParameterHandler parameters;
+
 };
 
 
@@ -269,6 +270,7 @@ template <enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
 Step0<GroupSymm, ValueType>::run ()
 {
+
   // First find the parameters need for this calculation
   get_parameters ();
 
