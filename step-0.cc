@@ -74,7 +74,7 @@ private:
   void get_parameters ();
   void setup_system ();
   void assemble_strain_tensor ();
-  void solve ();
+  void assemble_polarisation_tensor ();
   void output_results () const;
 
 
@@ -213,18 +213,13 @@ Step0<GroupSymm, ValueType>::setup_system ()
   first_order_piezoelectric_tensor.distribute_coefficients (first_order_piezoelectric_coefficients);
   second_order_piezoelectric_tensor.distribute_coefficients (second_order_piezoelectric_coefficients);
 
-  // Make sure the `actual' Bravais lattice has the right number of
-  // components (3)
-  actual_bravais_lattice.resize (3);
-
   // and fill in values for the initial actual bravais lattice
   // size. @note Because of the way the subroutine assemble_system
   // works, the initial actual Bravais lattice size is equalt to the
   // equilibrium lattice size, plus the lower range (often negative)
   // minus the increment.
   for (unsigned int i=0; i<dim; ++i)
-    actual_bravais_lattice[i] = 
-      bravais_lattice[i]+stretch_tensor_range[2*i];
+    actual_bravais_lattice.push_back (bravais_lattice[i]+stretch_tensor_range[2*i]);
 }
 
 
@@ -249,9 +244,23 @@ Step0<GroupSymm, ValueType>::assemble_strain_tensor ()
 // system.
 template <enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<GroupSymm, ValueType>::solve ()
+Step0<GroupSymm, ValueType>::assemble_polarisation_tensor ()
 {
-  
+  // The polarisation tensor is simply the contraction of the
+  // piezoelectric tensor with the strain tensor.
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+	{
+	  // contract the first-order part
+
+	  for (unsigned int l=0; l<dim; ++l)
+	    for (unsigned int m=0; m<dim; ++m)
+	      {
+		// contract the second-order part
+
+	      }
+	}
 }
 
 
@@ -358,8 +367,8 @@ Step0<GroupSymm, ValueType>::run ()
 		<< "   Strain tensor:              " << strain_tensor
 		<< std::endl;
       
-      // Solve for the wanted output
-      solve ();
+      // assemble the polarisation tensor.
+      assemble_polarisation_tensor ();
       
       // and push back the results into a table.
       
