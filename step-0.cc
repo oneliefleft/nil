@@ -109,6 +109,9 @@ private:
   // and the step-size (or increment)
   double increment;
 
+  // as well as the main object of interest, the polarisation vector.
+  std::vector<ValueType> polarisation_tensor;
+
   // Then we need an object to hold various run-time parameters that
   // are specified in an "prm file".
   dealii::ParameterHandler parameters;
@@ -246,21 +249,32 @@ template <enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
 Step0<GroupSymm, ValueType>::assemble_polarisation_tensor ()
 {
+  // Resize the polarisation tensor.
+  polarisation_tensor.resize (3);
+
   // The polarisation tensor is simply the contraction of the
   // piezoelectric tensor with the strain tensor.
   for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<dim; ++j)
-      for (unsigned int k=0; k<dim; ++k)
-	{
-	  // contract the first-order part
+    {
+      // make sure the initial value is reset.
+      polarisation_tensor[i] = 0.;
 
-	  for (unsigned int l=0; l<dim; ++l)
-	    for (unsigned int m=0; m<dim; ++m)
-	      {
-		// contract the second-order part
-
-	      }
-	}
+      for (unsigned int j=0; j<dim; ++j)
+	for (unsigned int k=0; k<dim; ++k)
+	  {
+	    // contract the first-order part
+	    polarisation_tensor[i] += 
+	      first_order_piezoelectric_tensor[i][j][k] * strain_tensor[j][k];
+	      
+	      for (unsigned int l=0; l<dim; ++l)
+		for (unsigned int m=0; m<dim; ++m)
+		  {
+		    // contract the second-order part
+		    polarisation_tensor[i] += 
+		      second_order_piezoelectric_tensor[i][j][k][l][m] * strain_tensor[l][m];
+		  }
+	  }
+    }
 }
 
 
