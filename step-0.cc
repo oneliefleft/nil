@@ -402,7 +402,7 @@ Step0<GroupSymm, ValueType>::run ()
       for (unsigned int i=0; i<dim; ++i)
 	actual_bravais_lattice[i] += increment;
     }
-  
+ 
 }
 
 
