@@ -270,7 +270,7 @@ Step0<GroupSymm, ValueType>::assemble_polarisation_tensor ()
 		for (unsigned int m=0; m<dim; ++m)
 		  {
 		    // contract the second-order part
-		    polarisation_tensor[i] += 
+		    polarisation_tensor[i] += 0.5 *
 		      second_order_piezoelectric_tensor[i][j][k][l][m] * strain_tensor[l][m];
 		  }
 	  }
@@ -381,13 +381,14 @@ Step0<GroupSymm, ValueType>::run ()
       // assemble the strain tensor for the given increment.
       assemble_strain_tensor ();    
       
-      std::cout << "Strain: ";
-      std::cout << "   Actual Bravais lattice:     ";
+      std::cout << "Strain tensors: "
+		<< std::endl
+		<< "   First-order tensor:         " << strain_tensor
+		<< std::endl
+		<< "   Stretched Bravais lattice:  ";
       for (unsigned int i=0; i<bravais_lattice.size (); ++i)
        	std::cout << actual_bravais_lattice[i] << " ";
-      std::cout << std::endl
-		<< "   Strain tensor:              " << strain_tensor
-		<< std::endl;
+      std::cout << std::endl;
       
       // assemble the polarisation tensor for the given increment.
       assemble_polarisation_tensor ();
