@@ -53,12 +53,7 @@ namespace nil
     // is no need for sorting group symmetry or order of the tensor.
     // Hence, simply call the correct specialisation for the
     // non-member function in piezoelectric_tensor_base.h.
-
-    // first zero out the tensor
-    this->reinit ();
-
-    // and then distribute the coefficients.
-    distribute_coefficients_ (tensor, coefficients);
+    distribute_coefficients_ (*this, coefficients);
   }
    
 } // namespace nil
