@@ -381,9 +381,10 @@ Step0<GroupSymm, ValueType>::run ()
       // assemble the strain tensor for the given increment.
       assemble_strain_tensor ();    
       
+      std::cout << "Strain: ";
       std::cout << "   Actual Bravais lattice:     ";
       for (unsigned int i=0; i<bravais_lattice.size (); ++i)
-	std::cout << actual_bravais_lattice[i] << " ";
+       	std::cout << actual_bravais_lattice[i] << " ";
       std::cout << std::endl
 		<< "   Strain tensor:              " << strain_tensor
 		<< std::endl;
