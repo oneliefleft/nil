@@ -76,8 +76,6 @@ private:
   void setup_system ();
   void assemble_strain_tensor ();
   void assemble_polarisation_tensor ();
-  void output_results () const;
-
 
   // Record of the number of space dimensions we are using.
   const unsigned int dim = 3;
@@ -275,15 +273,6 @@ Step0<GroupSymm, ValueType>::assemble_polarisation_tensor ()
 		  }
 	  }
     }
-}
-
-
-// Simply output the results to file(s).
-template <enum nil::GroupSymmetry GroupSymm, typename ValueType>
-void 
-Step0<GroupSymm, ValueType>::output_results () const
-{
-  
 }
 
 
