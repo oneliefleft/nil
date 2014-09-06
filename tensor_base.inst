@@ -1,10 +1,16 @@
 
 // First-order tensors
 template class 
+nil::TensorBase<nil::GroupSymmetry::ZincBlende, 1, 1, double>;
+
+template class 
 nil::TensorBase<nil::GroupSymmetry::ZincBlende, 1, 2, double>;
 
 template class 
 nil::TensorBase<nil::GroupSymmetry::ZincBlende, 1, 3, double>;
+
+template class 
+nil::TensorBase<nil::GroupSymmetry::Wurtzite, 1, 1, double>;
 
 template class 
 nil::TensorBase<nil::GroupSymmetry::Wurtzite, 1, 3, double>;

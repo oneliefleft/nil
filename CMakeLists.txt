@@ -11,6 +11,7 @@ SET(TARGET_SRC
   group_symmetry.cc
   piezoelectric_tensor.cc
   piezoelectric_tensor_base.cc
+  spontaneous_polarization_tensor_base.cc
   strain_tensor.cc
   strain_tensor_base.cc
   tensor_base.cc
