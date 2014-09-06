@@ -3,7 +3,7 @@
 ##
 
 # Set the name of the project and target:
-SET(TARGET "step-0")
+SET(TARGET "step-1")
 
 SET(TARGET_SRC
   command_line.cc
