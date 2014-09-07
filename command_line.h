@@ -1,6 +1,4 @@
 // -------------------------------------------------------------------
-// @author Toby D. Young
-//
 // Copyright 2014 nil authors. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without

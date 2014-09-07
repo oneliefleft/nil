@@ -1,6 +1,4 @@
 // -------------------------------------------------------------------
-// @author Toby D. Young
-//
 // Copyright 2010 nil authors. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -52,7 +50,7 @@ namespace nil
    *
    * \f$N\,\f$-order spontaneous polarization tensor. 
    *
-   * @author Toby D. Young  2014.
+   * @author Toby D. Young  2011, 2014.
    */  
   template <enum GroupSymmetry group_symmetry, int order, typename ValueType = double>
     class SpontaneousPolarizationTensor
@@ -94,7 +92,8 @@ namespace nil
   /**
    * Distribute <code>coefficients</code> on to a first-order
    * spontaneous polarization tensor of zinc-blende symmetry. @note
-   * Zinc-blende structure has no spontaneous polarization.
+   * Zinc-blende structure has no spontaneous polarization, hence,
+   * this function simply preforms sanity checks and returns.
    */
   template <typename ValueType> 
     inline
@@ -107,6 +106,7 @@ namespace nil
       
       AssertThrow (coefficients.size ()==0,
 		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
+
     }
 
   
