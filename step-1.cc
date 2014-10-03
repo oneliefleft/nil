@@ -130,9 +130,9 @@ private:
   dealii::IndexSet                               locally_owned_dofs;
   dealii::IndexSet                               locally_relevant_dofs;
 
-  dealii::PETScWrappers::MPI::SparseMatrix       matrix;
+  dealii::PETScWrappers::MPI::SparseMatrix       system_matrix;
   dealii::PETScWrappers::MPI::Vector             solution;
-  dealii::PETScWrappers::MPI::Vector             rhs;
+  dealii::PETScWrappers::MPI::Vector             system_rhs;
 
   // Then we need an object to hold various run-time parameters that
   // are specified in an "prm file".
@@ -158,8 +158,8 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem ()
                    (dealii::Triangulation<dim>::smoothing_on_refinement |
 		    dealii::Triangulation<dim>::smoothing_on_coarsening)),
 
-  fe_q (dealii::FE_Q<dim> (2), dim, /* displacement       */
-		      dealii::FE_Q<dim> (1), 1),  /* electric potential */
+  fe_q (dealii::FE_Q<dim> (2), dim), /* displacement       */
+	// dealii::FE_Q<dim> (1), 1),  /* electric potential */
 
   dof_handler (triangulation)
 {}
@@ -253,6 +253,8 @@ template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
 PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_system ()
 {
+  dof_handler.distribute_dofs (fe_q);
+
   locally_owned_dofs = dof_handler.locally_owned_dofs ();
   dealii::DoFTools::extract_locally_relevant_dofs (dof_handler,
 						   locally_relevant_dofs);
@@ -269,12 +271,12 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_system ()
 						      dof_handler.n_locally_owned_dofs_per_processor (),
 						      mpi_communicator,
 						      locally_relevant_dofs);
-  // matrix.reinit (locally_owned_dofs,
-  // 		 locally_owned_dofs,
-  // 		 csp,
-  // 		 mpi_communicator);
+  system_matrix.reinit (locally_owned_dofs,
+			locally_owned_dofs,
+			csp,
+			mpi_communicator);
   
-  rhs.reinit (locally_owned_dofs, mpi_communicator);
+  system_rhs.reinit (locally_owned_dofs, mpi_communicator);
   
   // The solution vector has ghost elements
   solution.reinit (locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
@@ -307,13 +309,13 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
 	    << " levels)"
 	    << std::endl;
       
-      dof_handler.distribute_dofs (fe_q);
+      setup_system ();
       
       pcout << "   Number of degrees of freedom: "
 	    << dof_handler.n_dofs ()
 	    << std::endl;
 
-      setup_system ();
+
     }
 
 }
