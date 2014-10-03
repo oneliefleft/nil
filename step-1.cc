@@ -44,10 +44,23 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/table_handler.h>
 
-#include <deal.II/grid/grid_generator.h>
-
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/grid_refinement.h>
+
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/fe_q.h>
+
+#include <deal.II/grid/grid_generator.h>
+
+#include <deal.II/lac/petsc_parallel_sparse_matrix.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 
 // Library-based headers.
 #include "group_symmetry.h"
@@ -61,13 +74,13 @@
 
 
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType = double>
-class Step0
+class PiezoelectricProblem
 {
 public:
 
   // First, are the usual class constructors and destructors.
-  Step0 ();
-  ~Step0 ();
+  PiezoelectricProblem ();
+  ~PiezoelectricProblem ();
   
   void run ();
   
@@ -81,7 +94,8 @@ private:
   // explained later on).
   void get_parameters ();
 
-  void create_coarse_grid (const unsigned int n_refinement_cycles = 0);
+  void make_coarse_grid (const unsigned int n_refinement_cycles = 0);
+  void make_boundary_constraints ();
 
   void setup_system ();
 
@@ -103,6 +117,15 @@ private:
   // A parallel distributed triangulation
   dealii::parallel::distributed::Triangulation<dim> triangulation;
 
+  // piezoelectric problem
+  // dealii::FE_Q<dim>        piezoelectric_fe_q;
+  dealii::DoFHandler<dim>                  piezoelectric_dof_handler;
+  dealii::ConstraintMatrix                 piezoelectric_constraints;
+
+  dealii::PETScWrappers::MPI::SparseMatrix piezoelectric_matrix;
+  dealii::PETScWrappers::MPI::Vector       piezoelectric_solution;
+  dealii::PETScWrappers::MPI::Vector       piezoelectric_rhs;
+
   // Then we need an object to hold various run-time parameters that
   // are specified in an "prm file".
   dealii::ParameterHandler parameters;
@@ -114,20 +137,24 @@ private:
 
 // The constructor is typically borning...
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
-Step0<dim, GroupSymm, ValueType>::Step0 ()
+PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem ()
   :
   pcout (std::cout, (dealii::Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)),
 
   triangulation (MPI_COMM_WORLD,
                    typename dealii::Triangulation<dim>::MeshSmoothing
                    (dealii::Triangulation<dim>::smoothing_on_refinement |
-		    dealii::Triangulation<dim>::smoothing_on_coarsening))
-{}
+		    dealii::Triangulation<dim>::smoothing_on_coarsening)),
+
+  piezoelectric_dof_handler (triangulation)
+{
+  piezoelectric_dof_handler.clear ();
+}
 
 
 // as is the destructor.
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
-Step0<dim, GroupSymm, ValueType>::~Step0 ()
+PiezoelectricProblem<dim, GroupSymm, ValueType>::~PiezoelectricProblem ()
 {}
 
 
@@ -137,7 +164,7 @@ Step0<dim, GroupSymm, ValueType>::~Step0 ()
 // read into the object parameters.
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<dim, GroupSymm, ValueType>::get_parameters ()
+PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
 {
   // First declare the parameters that are expected to be found.
   parameters.declare_entry ("First-order piezoelectric coefficients",
@@ -182,7 +209,7 @@ Step0<dim, GroupSymm, ValueType>::get_parameters ()
 
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<dim, GroupSymm, ValueType>::create_coarse_grid (const unsigned int n_refinement_levels_cycles)
+PiezoelectricProblem<dim, GroupSymm, ValueType>::make_coarse_grid (const unsigned int n_refinement_cycles)
 {
   dealii::GridGenerator::hyper_rectangle (triangulation,
 					  dealii::Point<dim> (-20,-20,-20),
@@ -195,7 +222,7 @@ Step0<dim, GroupSymm, ValueType>::create_coarse_grid (const unsigned int n_refin
 // Next initialise all of the objects we are going to use. 
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<dim, GroupSymm, ValueType>::setup_system ()
+PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_system ()
 {
   // Initialise the first- and second-order piezoelectric tensors...
   first_order_piezoelectric_tensor.reinit ();
@@ -213,14 +240,14 @@ Step0<dim, GroupSymm, ValueType>::setup_system ()
 // single logical routine.
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-Step0<dim, GroupSymm, ValueType>::run ()
+PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
 {
 
   // First find the parameters need for this calculation
   get_parameters ();
  
   // Then create the coarse grid
-  create_coarse_grid (5);
+  make_coarse_grid (5);
 
   pcout << "Number of active cells: "
 	<< triangulation.n_global_active_cells ()
@@ -235,22 +262,17 @@ int main (int argc, char **argv)
 {
 
   // Initialise MPI as we allways do.
-  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 
-							       dealii::numbers::invalid_unsigned_int);
+  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, dealii::numbers::invalid_unsigned_int);
 
   try
     {
-      // Set deal.II's logger depth.
       dealii::deallog.depth_console (0);
 
-      // Initialise the problem, 3d wurtzite.
-      Step0<3, nil::GroupSymmetry::Wurtzite> problem;
-
-      // Parse the command line and input file.
-      problem.command_line.parse_command_line (argc, argv); 
-      
-      // Run the problem.
-      problem.run ();
+      // Initialise the problem, 3d wurtzite, parse the command
+      // line options and then run the problem.
+      PiezoelectricProblem<3, nil::GroupSymmetry::Wurtzite> piezoelectric_problem;
+      piezoelectric_problem.command_line.parse_command_line (argc, argv); 
+      piezoelectric_problem.run ();
     }
 
   // ...and if this should fail, try to gather as much information as
