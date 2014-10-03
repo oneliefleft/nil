@@ -36,10 +36,18 @@
 
 
 // deal.II headers
+#include <deal.II/base/conditional_ostream.h>
+#include <deal.II/base/index_set.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/table_handler.h>
+
+#include <deal.II/grid/grid_generator.h>
+
+#include <deal.II/distributed/tria.h>
+#include <deal.II/distributed/grid_refinement.h>
 
 // Library-based headers.
 #include "group_symmetry.h"
@@ -72,6 +80,9 @@ private:
   // First is a list of functions that belong to this class (they are
   // explained later on).
   void get_parameters ();
+
+  void create_coarse_grid (const unsigned int n_refinement_cycles = 0);
+
   void setup_system ();
 
   void output_results () const;
@@ -87,12 +98,10 @@ private:
   std::vector<ValueType> first_order_piezoelectric_coefficients;
   std::vector<ValueType> second_order_piezoelectric_coefficients;
 
-  // as well as a list of the size of the Bravais lattice in the
-  // relaxed configuration
-  std::vector<ValueType> bravais_lattice;
+  dealii::ConditionalOStream pcout;
 
-  // as well as the main object of interest, the polarisation vector.
-  dealii::Tensor<1, 3, ValueType> polarisation_tensor;
+  // A parallel distributed triangulation
+  dealii::parallel::distributed::Triangulation<dim> triangulation;
 
   // Then we need an object to hold various run-time parameters that
   // are specified in an "prm file".
@@ -106,6 +115,13 @@ private:
 // The constructor is typically borning...
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 Step0<dim, GroupSymm, ValueType>::Step0 ()
+  :
+  pcout (std::cout, (dealii::Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)),
+
+  triangulation (MPI_COMM_WORLD,
+                   typename dealii::Triangulation<dim>::MeshSmoothing
+                   (dealii::Triangulation<dim>::smoothing_on_refinement |
+		    dealii::Triangulation<dim>::smoothing_on_coarsening))
 {}
 
 
@@ -138,10 +154,10 @@ Step0<dim, GroupSymm, ValueType>::get_parameters ()
 			    "Default is zinc-blende GaAs. "
 			    "See: PRL 96, 187602 (2006). ");
 
-  parameters.declare_entry ("Bravais lattice dimensions",
-			    "1., 1., 1.",
-			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
-			    "A list of the Bravais lattice dimensions. ");
+  // parameters.declare_entry ("Bravais lattice dimensions",
+  // 			    "1., 1., 1.",
+  // 			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
+  // 			    "A list of the Bravais lattice dimensions. ");
 
   parameters.read_input (command_line.get_prm_file ());
 
@@ -153,16 +169,28 @@ Step0<dim, GroupSymm, ValueType>::get_parameters ()
     dealii::Utilities::string_to_double
     (dealii::Utilities::split_string_list (parameters.get ("Second-order piezoelectric coefficients")));
 
-  bravais_lattice = 
-    dealii::Utilities::string_to_double
-    (dealii::Utilities::split_string_list (parameters.get ("Bravais lattice dimensions")));
+  // bravais_lattice = 
+  //   dealii::Utilities::string_to_double
+  //   (dealii::Utilities::split_string_list (parameters.get ("Bravais lattice dimensions")));
 
   // Some checks
-  AssertThrow (bravais_lattice.size ()==3,
-	       dealii::ExcMessage ("The Bravais lattice is required to have three components."));
+  // AssertThrow (bravais_lattice.size ()==3,
+  // 	       dealii::ExcMessage ("The Bravais lattice is required to have three components."));
 
 }
 
+
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+void 
+Step0<dim, GroupSymm, ValueType>::create_coarse_grid (const unsigned int n_refinement_levels_cycles)
+{
+  dealii::GridGenerator::hyper_rectangle (triangulation,
+					  dealii::Point<dim> (-20,-20,-20),
+					  dealii::Point<dim> ( 20, 20, 20),
+					  true);
+
+  triangulation.refine_global (n_refinement_cycles);
+}
 
 // Next initialise all of the objects we are going to use. 
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
@@ -191,11 +219,24 @@ Step0<dim, GroupSymm, ValueType>::run ()
   // First find the parameters need for this calculation
   get_parameters ();
  
+  // Then create the coarse grid
+  create_coarse_grid (5);
+
+  pcout << "Number of active cells: "
+	<< triangulation.n_global_active_cells ()
+	<< " (on "
+	<< triangulation.n_levels ()
+	<< " levels)"
+	<< std::endl;
 }
 
 
 int main (int argc, char **argv)
 {
+
+  // Initialise MPI as we allways do.
+  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, 
+							       dealii::numbers::invalid_unsigned_int);
 
   try
     {
