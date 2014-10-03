@@ -59,8 +59,10 @@
 
 #include <deal.II/grid/grid_generator.h>
 
+#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/sparsity_tools.h>
 
 // Library-based headers.
 #include "group_symmetry.h"
@@ -98,9 +100,11 @@ private:
   void make_boundary_constraints ();
 
   void setup_system ();
-  void setup_piezoelectric_matrix_and_rhs ();
+  void setup_coefficients ();
 
   void output_results () const;
+
+  MPI_Comm mpi_communicator;
 
   // Following that we have a list of the tensors that will be used in
   // this calculation. They are, first- and second-order piezoelectric
@@ -119,16 +123,16 @@ private:
   dealii::parallel::distributed::Triangulation<dim> triangulation;
 
   // piezoelectric problem
-  const dealii::FESystem<dim>                    piezoelectric_fe_q;
-  dealii::DoFHandler<dim>                        piezoelectric_dof_handler;
-  dealii::ConstraintMatrix                       piezoelectric_constraints;
+  const dealii::FESystem<dim>                    fe_q;
+  dealii::DoFHandler<dim>                        dof_handler;
+  dealii::ConstraintMatrix                       constraints;
 
-  dealii::IndexSet                               piezoelectric_locally_owned_dofs;
-  dealii::IndexSet                               piezoelectric_locally_relevant_dofs;
+  dealii::IndexSet                               locally_owned_dofs;
+  dealii::IndexSet                               locally_relevant_dofs;
 
-  dealii::PETScWrappers::MPI::SparseMatrix       piezoelectric_matrix;
-  dealii::PETScWrappers::MPI::Vector             piezoelectric_solution;
-  dealii::PETScWrappers::MPI::Vector             piezoelectric_rhs;
+  dealii::PETScWrappers::MPI::SparseMatrix       matrix;
+  dealii::PETScWrappers::MPI::Vector             solution;
+  dealii::PETScWrappers::MPI::Vector             rhs;
 
   // Then we need an object to hold various run-time parameters that
   // are specified in an "prm file".
@@ -145,6 +149,8 @@ private:
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem ()
   :
+  mpi_communicator (MPI_COMM_WORLD),
+
   pcout (std::cout, (dealii::Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)),
 
   triangulation (MPI_COMM_WORLD,
@@ -152,10 +158,10 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem ()
                    (dealii::Triangulation<dim>::smoothing_on_refinement |
 		    dealii::Triangulation<dim>::smoothing_on_coarsening)),
 
-  piezoelectric_fe_q (dealii::FE_Q<dim> (2), dim, /* displacement       */
+  fe_q (dealii::FE_Q<dim> (2), dim, /* displacement       */
 		      dealii::FE_Q<dim> (1), 1),  /* electric potential */
 
-  piezoelectric_dof_handler (triangulation)
+  dof_handler (triangulation)
 {}
 
 
@@ -163,7 +169,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem ()
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 PiezoelectricProblem<dim, GroupSymm, ValueType>::~PiezoelectricProblem ()
 {
-  piezoelectric_dof_handler.clear ();
+  dof_handler.clear ();
 }
 
 
@@ -231,7 +237,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::make_coarse_grid (const unsigne
 // Next initialise all of the objects we are going to use. 
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_system ()
+PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_coefficients ()
 {
   // Initialise the first- and second-order piezoelectric tensors...
   first_order_piezoelectric_tensor.reinit ();
@@ -245,12 +251,34 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_system ()
 
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_piezoelectric_matrix_and_rhs ()
+PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_system ()
 {
-  piezoelectric_matrix.clear ();
+  locally_owned_dofs = dof_handler.locally_owned_dofs ();
+  dealii::DoFTools::extract_locally_relevant_dofs (dof_handler,
+						   locally_relevant_dofs);
 
-  // piezoelectric_rhs.reinit (const IndexSet &local, const IndexSet &ghost, 
-  // 			    mpi_communicator)
+  constraints.clear ();
+  constraints.reinit (locally_relevant_dofs);
+  dealii::DoFTools::make_hanging_node_constraints (dof_handler, constraints);
+  dealii::DoFTools::make_zero_boundary_constraints (dof_handler, constraints);
+  constraints.close ();
+
+  dealii::CompressedSimpleSparsityPattern csp (locally_relevant_dofs);
+  dealii::DoFTools::make_sparsity_pattern (dof_handler, csp, constraints, false);
+  dealii::SparsityTools::distribute_sparsity_pattern (csp,
+						      dof_handler.n_locally_owned_dofs_per_processor (),
+						      mpi_communicator,
+						      locally_relevant_dofs);
+  // matrix.reinit (locally_owned_dofs,
+  // 		 locally_owned_dofs,
+  // 		 csp,
+  // 		 mpi_communicator);
+  
+  rhs.reinit (locally_owned_dofs, mpi_communicator);
+  
+  // The solution vector has ghost elements
+  solution.reinit (locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+
 }
 
 
@@ -279,17 +307,13 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
 	    << " levels)"
 	    << std::endl;
       
-      piezoelectric_dof_handler.distribute_dofs (piezoelectric_fe_q);
-      piezoelectric_locally_owned_dofs = piezoelectric_dof_handler.locally_owned_dofs ();
-      piezoelectric_locally_relevant_dofs.clear ();
-      dealii::DoFTools::extract_locally_relevant_dofs (piezoelectric_dof_handler,
-						       piezoelectric_locally_relevant_dofs);
+      dof_handler.distribute_dofs (fe_q);
       
       pcout << "   Number of degrees of freedom: "
-	    << piezoelectric_dof_handler.n_dofs ()
+	    << dof_handler.n_dofs ()
 	    << std::endl;
 
-      setup_piezoelectric_matrix_and_rhs ();
+      setup_system ();
     }
 
 }
