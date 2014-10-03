@@ -62,9 +62,13 @@ namespace nil
 // First-order tensors
 template class 
 nil::PiezoelectricTensor<nil::GroupSymmetry::ZincBlende, 1, double>;
+template class 
+nil::PiezoelectricTensor<nil::GroupSymmetry::Wurtzite, 1, double>;
 
 // second-order tensors
 template class 
 nil::PiezoelectricTensor<nil::GroupSymmetry::ZincBlende, 2, double>;
+template class 
+nil::PiezoelectricTensor<nil::GroupSymmetry::Wurtzite, 2, double>;
 
 
