@@ -9,7 +9,7 @@ SET(TARGET_SRC
   command_line.cc
 #
   group_symmetry.cc
-#  dielectric_tensor.cc
+  dielectric_tensor.cc
   dielectric_tensor_base.cc
   elastic_tensor.cc
   elastic_tensor_base.cc
@@ -20,6 +20,7 @@ SET(TARGET_SRC
   strain_tensor.cc
   strain_tensor_base.cc
   tensor_base.cc
+#
   ${TARGET}.cc
   )
 
