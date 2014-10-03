@@ -98,6 +98,7 @@ private:
   void make_boundary_constraints ();
 
   void setup_system ();
+  void setup_piezoelectric_matrix_and_rhs ();
 
   void output_results () const;
 
@@ -118,13 +119,16 @@ private:
   dealii::parallel::distributed::Triangulation<dim> triangulation;
 
   // piezoelectric problem
-  // dealii::FE_Q<dim>        piezoelectric_fe_q;
-  dealii::DoFHandler<dim>                  piezoelectric_dof_handler;
-  dealii::ConstraintMatrix                 piezoelectric_constraints;
+  const dealii::FESystem<dim>                    piezoelectric_fe_q;
+  dealii::DoFHandler<dim>                        piezoelectric_dof_handler;
+  dealii::ConstraintMatrix                       piezoelectric_constraints;
 
-  dealii::PETScWrappers::MPI::SparseMatrix piezoelectric_matrix;
-  dealii::PETScWrappers::MPI::Vector       piezoelectric_solution;
-  dealii::PETScWrappers::MPI::Vector       piezoelectric_rhs;
+  dealii::IndexSet                               piezoelectric_locally_owned_dofs;
+  dealii::IndexSet                               piezoelectric_locally_relevant_dofs;
+
+  dealii::PETScWrappers::MPI::SparseMatrix       piezoelectric_matrix;
+  dealii::PETScWrappers::MPI::Vector             piezoelectric_solution;
+  dealii::PETScWrappers::MPI::Vector             piezoelectric_rhs;
 
   // Then we need an object to hold various run-time parameters that
   // are specified in an "prm file".
@@ -135,7 +139,9 @@ private:
 };
 
 
-// The constructor is typically borning...
+/**
+ * Constructor of the piezoelectric problem
+ */
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem ()
   :
@@ -146,16 +152,19 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem ()
                    (dealii::Triangulation<dim>::smoothing_on_refinement |
 		    dealii::Triangulation<dim>::smoothing_on_coarsening)),
 
+  piezoelectric_fe_q (dealii::FE_Q<dim> (2), dim, /* displacement       */
+		      dealii::FE_Q<dim> (1), 1),  /* electric potential */
+
   piezoelectric_dof_handler (triangulation)
-{
-  piezoelectric_dof_handler.clear ();
-}
+{}
 
 
 // as is the destructor.
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 PiezoelectricProblem<dim, GroupSymm, ValueType>::~PiezoelectricProblem ()
-{}
+{
+  piezoelectric_dof_handler.clear ();
+}
 
 
 // The first step is to obtain a complete list of the coefficients
@@ -234,6 +243,16 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_system ()
 }
 
 
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+void 
+PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_piezoelectric_matrix_and_rhs ()
+{
+  piezoelectric_matrix.clear ();
+
+  // piezoelectric_rhs.reinit (const IndexSet &local, const IndexSet &ghost, 
+  // 			    mpi_communicator)
+}
+
 
 
 // This is the run function, which wraps all of the above into a
@@ -247,14 +266,32 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
   get_parameters ();
  
   // Then create the coarse grid
-  make_coarse_grid (5);
+  make_coarse_grid (3);
 
-  pcout << "Number of active cells: "
-	<< triangulation.n_global_active_cells ()
-	<< " (on "
-	<< triangulation.n_levels ()
-	<< " levels)"
-	<< std::endl;
+  // Here comes the adaptive cycles
+  for (unsigned int cycle=0; cycle<1; ++cycle)
+    {
+      
+      pcout << "   Number of active cells:       "
+	    << triangulation.n_global_active_cells ()
+	    << " (on "
+	    << triangulation.n_levels ()
+	    << " levels)"
+	    << std::endl;
+      
+      piezoelectric_dof_handler.distribute_dofs (piezoelectric_fe_q);
+      piezoelectric_locally_owned_dofs = piezoelectric_dof_handler.locally_owned_dofs ();
+      piezoelectric_locally_relevant_dofs.clear ();
+      dealii::DoFTools::extract_locally_relevant_dofs (piezoelectric_dof_handler,
+						       piezoelectric_locally_relevant_dofs);
+      
+      pcout << "   Number of degrees of freedom: "
+	    << piezoelectric_dof_handler.n_dofs ()
+	    << std::endl;
+
+      setup_piezoelectric_matrix_and_rhs ();
+    }
+
 }
 
 
