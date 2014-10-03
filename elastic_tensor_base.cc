@@ -40,7 +40,7 @@ namespace nil
   template <enum GroupSymmetry GroupSymm, int Order, typename ValueType>
   ElasticTensorBase<GroupSymm, Order, ValueType>::ElasticTensorBase ()
     :
-    TensorBase<GroupSymm, Order, 2*Order, ValueType> ()
+    TensorBase<GroupSymm, Order, 4*Order, ValueType> ()
   {}
 
 } // namespace nil
@@ -50,7 +50,7 @@ namespace nil
 
 // second-order tensors
 template class 
-nil::ElasticTensorBase<nil::GroupSymmetry::ZincBlende, 2, double>;
+nil::ElasticTensorBase<nil::GroupSymmetry::ZincBlende, 1, double>;
 template class 
-nil::ElasticTensorBase<nil::GroupSymmetry::Wurtzite, 2, double>;
+nil::ElasticTensorBase<nil::GroupSymmetry::Wurtzite, 1, double>;
 

@@ -32,20 +32,20 @@
 // implied, of the namespace ewalena authors.
 // -------------------------------------------------------------------
 
-#include "piezoelectric_tensor.h"
+#include "elastic_tensor.h"
 
 
 namespace nil
 {  
 
   template <enum GroupSymmetry group_symmetry, int order, typename ValueType>
-  PiezoelectricTensor<group_symmetry, order, ValueType>::PiezoelectricTensor ()
+  ElasticTensor<group_symmetry, order, ValueType>::ElasticTensor ()
   {}
 
 
   template <enum GroupSymmetry GroupSymm, int Order, typename ValueType>
   void 
-  PiezoelectricTensor<GroupSymm, Order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)
+  ElasticTensor<GroupSymm, Order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)
   {
     // Since template specialisations are used by this function there
     // is no need for sorting group symmetry or order of the tensor.
@@ -61,10 +61,11 @@ namespace nil
 
 // First-order tensors
 template class 
-nil::PiezoelectricTensor<nil::GroupSymmetry::ZincBlende, 1, double>;
+nil::ElasticTensor<nil::GroupSymmetry::ZincBlende, 1, double>;
 
-// second-order tensors
 template class 
-nil::PiezoelectricTensor<nil::GroupSymmetry::ZincBlende, 2, double>;
+nil::ElasticTensor<nil::GroupSymmetry::Wurtzite, 1, double>;
+
+
 
 

@@ -54,7 +54,7 @@ namespace nil
   template <nil::GroupSymmetry GroupSymm, int Order, typename ValueType = double>
     class ElasticTensorBase
     :
-    public nil::TensorBase<GroupSymm, Order, 2*Order, ValueType>
+    public nil::TensorBase<GroupSymm, Order, 4*Order, ValueType>
     {
     public:
     
@@ -71,7 +71,7 @@ namespace nil
     /**
      * The underlying tensor.
      */
-    nil::TensorBase<GroupSymm, Order, 2*Order, ValueType> tensor;
+    nil::TensorBase<GroupSymm, Order, 4*Order, ValueType> tensor;
 
     }; /* ElasticTensorBase */
 

@@ -99,7 +99,7 @@ namespace nil
   template <typename ValueType> 
     inline
     void 
-    distribute_coefficients_ (ElasticTensor<GroupSymmetry::ZincBlende, 2, ValueType> &tensor, 
+    distribute_coefficients_ (ElasticTensor<GroupSymmetry::ZincBlende, 1, ValueType> &tensor, 
 			      std::vector<ValueType>                                 &coefficients)
     {
       AssertThrow (false, dealii::ExcNotImplemented ());
@@ -115,7 +115,7 @@ namespace nil
   template <typename ValueType> 
     inline
     void 
-    distribute_coefficients_ (ElasticTensor<GroupSymmetry::Wurtzite, 2, ValueType> &tensor, 
+    distribute_coefficients_ (ElasticTensor<GroupSymmetry::Wurtzite, 1, ValueType> &tensor, 
 			      std::vector<ValueType>                               &coefficients)
     {
       AssertThrow (false, dealii::ExcNotImplemented ());
@@ -126,6 +126,6 @@ namespace nil
 } /* namespace nil */
 
 
-#endif /* __nil_piezoelectric_tensor_h */
+#endif /* __nil_elastic_tensor_h */
 
 
