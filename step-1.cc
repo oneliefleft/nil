@@ -271,6 +271,8 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_system ()
 						      dof_handler.n_locally_owned_dofs_per_processor (),
 						      mpi_communicator,
 						      locally_relevant_dofs);
+
+  // @todo The system_matrix initialisation screws up with petsc-3.5.x
   system_matrix.reinit (locally_owned_dofs,
 			locally_owned_dofs,
 			csp,
@@ -285,8 +287,10 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_system ()
 
 
 
-// This is the run function, which wraps all of the above into a
-// single logical routine.
+/**
+ * This is the run function, which wraps all of the above into a
+ * single logical routine.
+ */
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
 PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
