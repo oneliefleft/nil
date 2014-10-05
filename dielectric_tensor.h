@@ -102,7 +102,19 @@ namespace nil
     distribute_coefficients_ (DielectricTensor<GroupSymmetry::ZincBlende, 1, ValueType> &tensor, 
 			      std::vector<ValueType>                                    &coefficients)
     {
-      AssertThrow (false, dealii::ExcNotImplemented ());
+      Assert (tensor.rank ()==2, dealii::ExcInternalError ());
+
+      AssertThrow (coefficients.size ()==1,
+		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
+
+      // Then distribute the coefficients on to the tensor. It seems
+      // there is no automagic way to do this, so just insert those
+      // elements that are non-zero.
+      // 
+      // In Voight notation these are: \avrepsilon_11 = \avrepsilon_22
+      // = \avrepsilon_33.
+
+      tensor[0][0] = tensor[1][1] = tensor[2][2] = coefficients[0];
     }
 
 
@@ -118,7 +130,21 @@ namespace nil
     distribute_coefficients_ (DielectricTensor<GroupSymmetry::Wurtzite, 1, ValueType> &tensor, 
 			      std::vector<ValueType>                                  &coefficients)
     {
-      AssertThrow (false, dealii::ExcNotImplemented ());
+      Assert (tensor.rank ()==2, dealii::ExcInternalError ());
+
+      AssertThrow (coefficients.size ()==2,
+		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
+
+      // Then distribute the coefficients on to the tensor. It seems
+      // there is no automagic way to do this, so just insert those
+      // elements that are non-zero.
+      // 
+      // In Voight notation these are: \varepsilon_11 = \varepsilon_22, 
+      // \varepsilon_33.
+
+      tensor[0][0] = tensor[1][1] = coefficients[0];
+
+      tensor[2][2] = coefficients[1];
     }
 
 
