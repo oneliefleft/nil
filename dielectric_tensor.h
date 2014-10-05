@@ -149,8 +149,6 @@ namespace nil
       // \varepsilon_33 \mapsto \varepsilon_333
       tensor[2][2] = coefficients[1];
     }
-
-
   
 } /* namespace nil */
 

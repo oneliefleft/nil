@@ -1,0 +1,12 @@
+# Listing of Parameters
+# ---------------------
+# A list of the Bravais lattice dimensions.
+set Bravais lattice dimensions              = 1., 1., 1.
+
+# A list of the first-order piezoelectric coefficients. Default is zinc-blende
+# GaAs. See: PRL 96, 187602 (2006).
+set First-order piezoelectric coefficients  = -0.230
+
+# A list of the second-order piezoelectric coefficients. Default is
+# zinc-blende GaAs. See: PRL 96, 187602 (2006).
+set Second-order piezoelectric coefficients = -0.439, -3.765, -0.492
