@@ -200,13 +200,13 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem ()
   :
   mpi_communicator (MPI_COMM_WORLD),
 
-  pcout (std::cout, (dealii::Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)),
-
-  triangulation (MPI_COMM_WORLD,
-                   typename dealii::Triangulation<dim>::MeshSmoothing
-                   (dealii::Triangulation<dim>::smoothing_on_refinement |
-		    dealii::Triangulation<dim>::smoothing_on_coarsening)),
-
+  pcout (std::cout, (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0)),
+  
+  triangulation (mpi_communicator,
+		 typename dealii::Triangulation<dim>::MeshSmoothing
+		 (dealii::Triangulation<dim>::smoothing_on_refinement |
+		  dealii::Triangulation<dim>::smoothing_on_coarsening)),
+  
   fe_q (dealii::FE_Q<dim> (2), dim, /* displacement       */
 	dealii::FE_Q<dim> (1), 1),  /* electric potential */
 
