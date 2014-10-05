@@ -75,15 +75,30 @@
 #include <iostream>
 
 
+/**
+ * This class can setup, solve, and output the results of the
+ * piezoelectric problem.
+ *
+ * @author Toby D. Young 2012, 2014
+ */ 
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType = double>
 class PiezoelectricProblem
 {
 public:
 
-  // First, are the usual class constructors and destructors.
+  /**
+   * Constructor.
+   */
   PiezoelectricProblem ();
+
+  /**
+   * destructor.
+   */
   ~PiezoelectricProblem ();
   
+  /**
+   * Run the problem (a basic useage example)
+   */
   void run ();
   
   // Coefficients are held in a parameter file, so it will be
@@ -104,6 +119,9 @@ private:
 
   void output_results () const;
 
+  /**
+   * A local copy of the MPI communicator.
+   */
   MPI_Comm mpi_communicator;
 
   // Following that we have a list of the tensors that will be used in
@@ -119,7 +137,9 @@ private:
 
   dealii::ConditionalOStream pcout;
 
-  // A parallel distributed triangulation
+  /**
+   * A parallel distributed triangulation.
+   */
   dealii::parallel::distributed::Triangulation<dim> triangulation;
 
   // piezoelectric problem
@@ -127,12 +147,35 @@ private:
   dealii::DoFHandler<dim>                        dof_handler;
   dealii::ConstraintMatrix                       constraints;
 
+  /**
+   * An index set of the degrees of freedom locally owned by this
+   * processor.
+   */
   dealii::IndexSet                               locally_owned_dofs;
+
+  /**
+   * An index set of the degrees of freedom?
+   */
   dealii::IndexSet                               locally_relevant_dofs;
 
+  /**
+   * The system matrix. This has a block structure but, since we do
+   * not need the blocks, us a standard MPI sparse matrix.
+   */
   dealii::PETScWrappers::MPI::SparseMatrix       system_matrix;
-  dealii::PETScWrappers::MPI::Vector             solution;
+
+  /**
+   * The system rhs. This has a block structure but, since we do not
+   * need the blocks, us a standard MPI vector.
+   */
   dealii::PETScWrappers::MPI::Vector             system_rhs;
+
+  /**
+   * The solution. This has a block structure but, since we do not
+   * need the blocks, us a standard MPI vector. @note This vector has
+   * hpghost elements.
+   */
+  dealii::PETScWrappers::MPI::Vector             solution;
 
   // Then we need an object to hold various run-time parameters that
   // are specified in an "prm file".
