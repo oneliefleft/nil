@@ -113,8 +113,7 @@ namespace nil
     // shutup the compiler about no return value.
      return "";
   } 
-  
-  
+    
 } // namespace nil
 
 

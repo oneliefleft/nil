@@ -72,12 +72,9 @@ namespace nil
      */
     void 
     distribute_coefficients (std::vector<ValueType> &coefficients);
+    
 
     private:
-
-    unsigned int order_;
-
-    unsigned int rank_;
     
     /**
      * The underlying tensor.
