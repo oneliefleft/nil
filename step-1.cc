@@ -283,21 +283,39 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::make_coarse_grid (const unsigne
   triangulation.refine_global (n_refinement_cycles);
 }
 
-// Next initialise all of the objects we are going to use. 
+
+/**
+ * This function distribute coefficients onto the tensors of
+ * coefficients. Before distribution, the tensors are reinitialised to
+ * a zero state.
+ */
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
 PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_coefficients ()
 {
-  // Initialise the first- and second-order piezoelectric tensors...
+  // Initialise the first- 
+  first_order_elastic_tensor.reinit ();
+  first_order_dielectric_tensor.reinit ();
   first_order_piezoelectric_tensor.reinit ();
+
+  // and second-order coefficient tensors,
   second_order_piezoelectric_tensor.reinit ();
 
-  // and distribute the coefficients.
+  // and then distribute the first-
+  first_order_elastic_tensor.distribute_coefficients (first_order_elastic_coefficients);
+  first_order_dielectric_tensor.distribute_coefficients (first_order_dielectric_coefficients);
   first_order_piezoelectric_tensor.distribute_coefficients (first_order_piezoelectric_coefficients);
+
+  // and second-order coefficients.
   second_order_piezoelectric_tensor.distribute_coefficients (second_order_piezoelectric_coefficients);
 }
 
 
+/**
+ * Setup the linear algebra problem by initialising the boundary
+ * constraints, matrices and vectors required for finding the
+ * solution.
+ */
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
 PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_system ()
