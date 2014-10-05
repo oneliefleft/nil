@@ -66,6 +66,8 @@
 
 // Library-based headers.
 #include "group_symmetry.h"
+#include "dielectric_tensor.h"
+#include "elastic_tensor.h"
 #include "piezoelectric_tensor.h"
 
 // Application-base headers.
@@ -127,11 +129,15 @@ private:
   // Following that we have a list of the tensors that will be used in
   // this calculation. They are, first- and second-order piezoelectric
   // tensors
+  nil::ElasticTensor<GroupSymm, 1, ValueType>       first_order_elastic_tensor;
+  nil::DielectricTensor<GroupSymm, 1, ValueType>    first_order_dielectric_tensor;
   nil::PiezoelectricTensor<GroupSymm, 1, ValueType> first_order_piezoelectric_tensor;
   nil::PiezoelectricTensor<GroupSymm, 2, ValueType> second_order_piezoelectric_tensor;
  
   // Additionally, lists of coefficients are needed for those tensors
   // that are tensors of empirical moduli
+  std::vector<ValueType> first_order_elastic_coefficients;
+  std::vector<ValueType> first_order_dielectric_coefficients;
   std::vector<ValueType> first_order_piezoelectric_coefficients;
   std::vector<ValueType> second_order_piezoelectric_coefficients;
 
