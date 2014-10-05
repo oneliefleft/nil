@@ -141,6 +141,15 @@ private:
   std::vector<ValueType> first_order_piezoelectric_coefficients;
   std::vector<ValueType> second_order_piezoelectric_coefficients;
 
+  /**
+   * The size of the Bravais lattice.
+   */
+  std::vector<double>    bravais_lattice;
+
+  /**
+   * A I<code>deal.II</code> hack tha outputs to the first processor
+   * only (useful for output in parallel ca;culations).
+   */
   dealii::ConditionalOStream pcout;
 
   /**
@@ -183,11 +192,15 @@ private:
    */
   dealii::PETScWrappers::MPI::Vector             solution;
 
-  // Then we need an object to hold various run-time parameters that
-  // are specified in an "prm file".
+  /**
+   * An object to hold various run-time parameters that are specified
+   * in an "prm file".
+   */
   dealii::ParameterHandler parameters;
 
-  // and finally, a table to handle the results.
+  /**
+   * A table to handle a set of commonly intersting results.
+   */
   dealii::TableHandler output_table;
 };
 
@@ -214,7 +227,9 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem ()
 {}
 
 
-// as is the destructor.
+/**
+ * Destructor. This just ensures freeing some memory allocation.
+ */
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 PiezoelectricProblem<dim, GroupSymm, ValueType>::~PiezoelectricProblem ()
 {
@@ -222,10 +237,12 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::~PiezoelectricProblem ()
 }
 
 
-// The first step is to obtain a complete list of the coefficients
-// needed for this calculation. First comes a declaration of the
-// entries expected to be find in the parameter file and then they are
-// read into the object parameters.
+/**
+ * Obtain a complete list of the coefficients needed for this
+ * calculation. First comes a declaration of the entries expected to
+ * be find in the parameter file and then they are read into the
+ * object parameters.
+ */
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
 PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
@@ -245,10 +262,10 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
 			    "Default is zinc-blende GaAs. "
 			    "See: PRL 96, 187602 (2006). ");
 
-  // parameters.declare_entry ("Bravais lattice dimensions",
-  // 			    "1., 1., 1.",
-  // 			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
-  // 			    "A list of the Bravais lattice dimensions. ");
+  parameters.declare_entry ("Bravais lattice dimensions",
+   			    "1., 1., 1.",
+   			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
+   			    "A list of the Bravais lattice dimensions. ");
 
   parameters.read_input (command_line.get_prm_file ());
 
@@ -260,9 +277,9 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
     dealii::Utilities::string_to_double
     (dealii::Utilities::split_string_list (parameters.get ("Second-order piezoelectric coefficients")));
 
-  // bravais_lattice = 
-  //   dealii::Utilities::string_to_double
-  //   (dealii::Utilities::split_string_list (parameters.get ("Bravais lattice dimensions")));
+  bravais_lattice = 
+    dealii::Utilities::string_to_double
+    (dealii::Utilities::split_string_list (parameters.get ("Bravais lattice dimensions")));
 
   // Some checks
   // AssertThrow (bravais_lattice.size ()==3,
@@ -271,6 +288,9 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
 }
 
 
+/**
+ * Generate the coarse grid that will be used for this calculation.
+ */
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
 PiezoelectricProblem<dim, GroupSymm, ValueType>::make_coarse_grid (const unsigned int n_refinement_cycles)
