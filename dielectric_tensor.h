@@ -114,6 +114,7 @@ namespace nil
       // In Voight notation these are: \avrepsilon_11 = \avrepsilon_22
       // = \avrepsilon_33.
 
+      // \varepsilon_11 \mapsto \varepsilon_111 - \varepsilon_222 = \varepsilon_333
       tensor[0][0] = tensor[1][1] = tensor[2][2] = coefficients[0];
     }
 
@@ -142,8 +143,10 @@ namespace nil
       // In Voight notation these are: \varepsilon_11 = \varepsilon_22, 
       // \varepsilon_33.
 
+      // \varepsilon_11 \mapsto \varepsilon_111 - \varepsilon_222
       tensor[0][0] = tensor[1][1] = coefficients[0];
 
+      // \varepsilon_33 \mapsto \varepsilon_333
       tensor[2][2] = coefficients[1];
     }
 
