@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------
-// Copyright 2010 nil authors. All rights reserved.
+// Copyright 2014 nil authors. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -47,8 +47,7 @@ namespace nil
   {
     if (flags == nil::UpdateFlags::first_order_elastic)
       {
-	// FirstOrder::Elastic = true;
-	// FirstOrder::None    = false;
+
       }
 
 
@@ -75,8 +74,6 @@ namespace nil
     // if (this->first_order_elastic)
     //   first_order_elastic_tensor.distribute_coefficients (first_order_elastic_coefficients);
   }
-
-
 
 } // namespace nil
 
