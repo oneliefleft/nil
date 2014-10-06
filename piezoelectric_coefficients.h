@@ -46,10 +46,7 @@ namespace nil
   
   enum UpdateFlags
   {
-    /**
-     * A structure that defines which first-order coefficients are to
-     * be used.
-     */
+
     first_order_elastic,
     first_order_dielectric,
     first_order_piezoelectric,
