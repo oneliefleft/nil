@@ -35,8 +35,8 @@
 #ifndef __nil_elastic_tensor_h
 #define __nil_elastic_tensor_h
 
-#include "group_symmetry.h"
-#include "tensor_base.h"
+#include "../../group_symmetry.h"
+#include "../../tensor_base.h"
 
 #include <fstream>
 #include <iostream>

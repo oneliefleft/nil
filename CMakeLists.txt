@@ -9,10 +9,10 @@ SET(TARGET_SRC
   command_line.cc
 #
   group_symmetry.cc
-  dielectric_tensor.cc
-  elastic_tensor.cc
-  piezoelectric_tensor.cc
-  spontaneous_polarization_tensor.cc
+  src/dielectric_tensor.cc
+  src/elastic_tensor.cc
+  src/piezoelectric_tensor.cc
+  src/spontaneous_polarization_tensor.cc
   tensor_base.cc
 #
   piezoelectric_coefficients.cc

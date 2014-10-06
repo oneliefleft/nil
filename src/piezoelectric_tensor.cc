@@ -32,7 +32,7 @@
 // implied, of the nil authors.
 // -------------------------------------------------------------------
 
-#include "piezoelectric_tensor.h"
+#include "../include/nil/piezoelectric_tensor.h"
 
 
 namespace nil

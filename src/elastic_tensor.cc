@@ -29,23 +29,23 @@
 // The views and conclusions contained in the software and
 // documentation are those of the authors and should not be
 // interpreted as representing official policies, either expressed or
-// implied, of the authors.
+// implied, of the nil authors.
 // -------------------------------------------------------------------
 
-#include "spontaneous_polarization_tensor.h"
+#include "../include/nil/elastic_tensor.h"
 
 
 namespace nil
 {  
 
   template <enum GroupSymmetry group_symmetry, int order, typename ValueType>
-  SpontaneousPolarizationTensor<group_symmetry, order, ValueType>::SpontaneousPolarizationTensor ()
+  ElasticTensor<group_symmetry, order, ValueType>::ElasticTensor ()
   {}
 
 
-  template <enum GroupSymmetry group_symmetry, int Order, typename ValueType>
+  template <enum GroupSymmetry GroupSymm, int Order, typename ValueType>
   void 
-  SpontaneousPolarizationTensor<group_symmetry, Order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)
+  ElasticTensor<GroupSymm, Order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)
   {
     // Since template specialisations are used by this function there
     // is no need for sorting group symmetry or order of the tensor.
@@ -61,9 +61,11 @@ namespace nil
 
 // First-order tensors
 template class 
-nil::SpontaneousPolarizationTensor<nil::GroupSymmetry::ZincBlende, 1, double>;
+nil::ElasticTensor<nil::GroupSymmetry::ZincBlende, 1, double>;
+
 template class 
-nil::SpontaneousPolarizationTensor<nil::GroupSymmetry::Wurtzite, 1, double>;
+nil::ElasticTensor<nil::GroupSymmetry::Wurtzite, 1, double>;
+
 
 
 

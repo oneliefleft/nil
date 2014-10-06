@@ -65,10 +65,10 @@
 
 // Library-based headers.
 #include "group_symmetry.h"
-#include "dielectric_tensor.h"
-#include "elastic_tensor.h"
-#include "piezoelectric_tensor.h"
-#include "spontaneous_polarization_tensor.h"
+#include "include/nil/dielectric_tensor.h"
+#include "include/nil/elastic_tensor.h"
+#include "include/nil/piezoelectric_tensor.h"
+#include "include/nil/spontaneous_polarization_tensor.h"
 
 #include "piezoelectric_coefficients.h"
 

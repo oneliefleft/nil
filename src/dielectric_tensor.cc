@@ -32,20 +32,20 @@
 // implied, of the nil authors.
 // -------------------------------------------------------------------
 
-#include "elastic_tensor.h"
+#include "../include/nil/dielectric_tensor.h"
 
 
 namespace nil
 {  
 
   template <enum GroupSymmetry group_symmetry, int order, typename ValueType>
-  ElasticTensor<group_symmetry, order, ValueType>::ElasticTensor ()
+  DielectricTensor<group_symmetry, order, ValueType>::DielectricTensor ()
   {}
 
 
   template <enum GroupSymmetry GroupSymm, int Order, typename ValueType>
   void 
-  ElasticTensor<GroupSymm, Order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)
+  DielectricTensor<GroupSymm, Order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)
   {
     // Since template specialisations are used by this function there
     // is no need for sorting group symmetry or order of the tensor.
@@ -61,10 +61,10 @@ namespace nil
 
 // First-order tensors
 template class 
-nil::ElasticTensor<nil::GroupSymmetry::ZincBlende, 1, double>;
+nil::DielectricTensor<nil::GroupSymmetry::ZincBlende, 1, double>;
 
 template class 
-nil::ElasticTensor<nil::GroupSymmetry::Wurtzite, 1, double>;
+nil::DielectricTensor<nil::GroupSymmetry::Wurtzite, 1, double>;
 
 
 
