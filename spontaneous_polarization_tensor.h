@@ -121,7 +121,7 @@ namespace nil
       Assert (tensor.rank ()==1, dealii::ExcInternalError ()); 
       
       AssertThrow (coefficients.size ()==1,
-		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
+		   dealii::ExcMessage ("The number of coefficients does not match the default number required for wurtzite structure."));
 
       // Then distribute the coefficients on to the tensor. It seems
       // there is no automagic way to do this, so just insert those
