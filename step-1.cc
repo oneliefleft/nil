@@ -426,16 +426,72 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_system ()
 
 
 /**
- * This function assembles the system matrix and rhight-hand-side
+ * This function assembles the system matrix and right-hand-side
  * vector.
  */
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
 PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 {
- 
-  dealii::QGauss<dim> face_quadrature_formula ();
+  // @todo: The number of quadrature points should be decided
+  // elsewhere.
+  dealii::QGauss<dim> quadrature_formula (3);
   
+  dealii::FEValues<dim> fe_values (fe_q, quadrature_formula,
+				   dealii::update_values    | 
+				   dealii::update_gradients |
+				   dealii::update_JxW_values);
+  
+  const unsigned int n_dofs_per_cell = fe_q.dofs_per_cell;
+  const unsigned int n_q_points      = quadrature_formula.size ();
+  
+  dealii::FullMatrix<ValueType> cell_matrix (n_dofs_per_cell, n_dofs_per_cell);
+  dealii::Vector<ValueType>     cell_rhs    (n_dofs_per_cell);
+
+  std::vector<dealii::types::global_dof_index> local_dof_indices (n_dofs_per_cell);
+
+  typename dealii::DoFHandler<dim>::active_cell_iterator
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
+  
+  for (; cell != endc; ++cell)
+    if (cell->is_locally_owned ())
+      {
+
+	fe_values.reinit (cell);
+	cell_matrix = 0;
+	cell_rhs    = 0;
+
+	// get strain
+
+	for (unsigned int q_point = 0; q_point<n_q_points; ++q_point)
+	  {
+
+	    for (unsigned int i=0; i<n_dofs_per_cell; ++i)
+	      {
+
+		for (unsigned int j=0; i<n_dofs_per_cell; ++i)
+		  {
+
+		  } // dof j
+
+	      } // dof i
+
+	  } // q_point
+
+	cell->get_dof_indices(local_dof_indices);
+
+	constraints.distribute_local_to_global (cell_matrix, local_dof_indices,
+						system_matrix);
+
+	constraints.distribute_local_to_global (cell_rhs, local_dof_indices,
+						system_rhs);
+
+      } // cell
+
+  system_matrix.compress (dealii::VectorOperation::add);
+  system_rhs.compress (dealii::VectorOperation::add);
+
 }
 
 
@@ -477,7 +533,13 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
 	    << dof_handler.n_dofs ()
 	    << std::endl;
 
+      assemble_system ();
 
+      pcout << "Linear algebra system:"
+	    << std::endl
+	    << "   Number of non-zero elements:     "
+	    << system_matrix.n_nonzero_elements ()
+	    << std::endl;
     }
 
 }
