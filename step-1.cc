@@ -129,18 +129,21 @@ private:
   MPI_Comm mpi_communicator;
 
   // Following that we have a list of the tensors that will be used in
-  // this calculation. They are, first- and second-order piezoelectric
-  // tensors
+  // this calculation. They are, first- 
   nil::ElasticTensor<GroupSymm, 1, ValueType>       first_order_elastic_tensor;
   nil::DielectricTensor<GroupSymm, 1, ValueType>    first_order_dielectric_tensor;
   nil::PiezoelectricTensor<GroupSymm, 1, ValueType> first_order_piezoelectric_tensor;
+  nil::PiezoelectricTensor<GroupSymm, 1, ValueType> first_order_spontaneous_polarization_tensor;
+
+  // and second-order piezoelectric tensors
   nil::PiezoelectricTensor<GroupSymm, 2, ValueType> second_order_piezoelectric_tensor;
  
   // Additionally, lists of coefficients are needed for those tensors
-  // that are tensors of empirical moduli
   std::vector<ValueType> first_order_elastic_coefficients;
   std::vector<ValueType> first_order_dielectric_coefficients;
   std::vector<ValueType> first_order_piezoelectric_coefficients;
+  std::vector<ValueType> first_order_spontaneous_polarization_coefficients;
+
   std::vector<ValueType> second_order_piezoelectric_coefficients;
 
   /**
@@ -286,6 +289,12 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
 			    "Default is zinc-blende GaAs. "
 			    "See: PRL 96, 187602 (2006). ");
 
+  parameters.declare_entry ("First-order spontaneous polarization coefficients",
+			    "0.",
+			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
+			    "A list of the first-order spontaneous polarization coefficients. " 
+			    "Default is zinc-blende GaAs. ");
+
   parameters.declare_entry ("Bravais lattice dimensions",
    			    "1., 1., 1.",
    			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
@@ -308,6 +317,10 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
   second_order_piezoelectric_coefficients = 
     dealii::Utilities::string_to_double
     (dealii::Utilities::split_string_list (parameters.get ("Second-order piezoelectric coefficients")));
+
+  first_order_spontaneous_polarization_coefficients = 
+    dealii::Utilities::string_to_double
+    (dealii::Utilities::split_string_list (parameters.get ("First-order spontaneous polarization coefficients")));
 
   bravais_lattice = 
     dealii::Utilities::string_to_double
@@ -357,14 +370,16 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_coefficients ()
   // and second-order coefficients.
   second_order_piezoelectric_tensor.distribute_coefficients (second_order_piezoelectric_coefficients);
 
-  std::cout << "Tensors of coefficients:"
-	    << std::endl
-	    << "   First-order Elastic:             " << first_order_elastic_tensor
-	    << std::endl
-	    << "   First-order dielectric:          " << first_order_dielectric_tensor
-	    << std::endl
-	    << "   First-orfer piezoelectric:       " << first_order_piezoelectric_tensor
-	    << std::endl;
+  pcout << "Tensors of coefficients:"
+	<< std::endl
+	<< "   First-order Elastic:             " << first_order_elastic_tensor
+	<< std::endl
+	<< "   First-order dielectric:          " << first_order_dielectric_tensor
+	<< std::endl
+	<< "   First-orfer piezoelectric:       " << first_order_piezoelectric_tensor
+	<< std::endl
+	<< "   First-orfer spont. polarization: " << first_order_spontaneous_polarization_tensor
+	<< std::endl;
 }
 
 
@@ -447,7 +462,9 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
   for (unsigned int cycle=0; cycle<1; ++cycle)
     {
       
-      pcout << "   Number of active cells:          "
+      pcout << "Grid:"
+	    << std::endl
+	    << "   Number of active cells:          "
 	    << triangulation.n_global_active_cells ()
 	    << " (on "
 	    << triangulation.n_levels ()
