@@ -447,7 +447,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
   for (unsigned int cycle=0; cycle<1; ++cycle)
     {
       
-      pcout << "   Number of active cells:       "
+      pcout << "   Number of active cells:          "
 	    << triangulation.n_global_active_cells ()
 	    << " (on "
 	    << triangulation.n_levels ()
@@ -456,7 +456,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
       
       setup_system ();
       
-      pcout << "   Number of degrees of freedom: "
+      pcout << "   Number of degrees of freedom:    "
 	    << dof_handler.n_dofs ()
 	    << std::endl;
 
