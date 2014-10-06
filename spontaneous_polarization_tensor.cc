@@ -43,9 +43,9 @@ namespace nil
   {}
 
 
-  template <enum GroupSymmetry GroupSymm, int Order, typename ValueType>
+  template <enum GroupSymmetry group_symmetry, int Order, typename ValueType>
   void 
-  SpontaneousPolarizationTensor<GroupSymm, Order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)
+  SpontaneousPolarizationTensor<group_symmetry, Order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)
   {
     // Since template specialisations are used by this function there
     // is no need for sorting group symmetry or order of the tensor.

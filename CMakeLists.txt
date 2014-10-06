@@ -14,9 +14,7 @@ SET(TARGET_SRC
   piezoelectric_tensor.cc
   piezoelectric_tensor_base.cc
   spontaneous_polarization_tensor.cc
-  spontaneous_polarization_tensor_base.cc
   strain_tensor.cc
-  strain_tensor_base.cc
   tensor_base.cc
 #
   ${TARGET}.cc

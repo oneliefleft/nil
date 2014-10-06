@@ -36,7 +36,7 @@
 #define __nil_spontaneous_polarization_tensor_h
 
 #include "group_symmetry.h"
-#include "spontaneous_polarization_tensor_base.h"
+#include "tensor_base.h"
 
 #include <fstream>
 #include <iostream>
@@ -55,7 +55,7 @@ namespace nil
   template <enum GroupSymmetry group_symmetry, int order, typename ValueType = double>
     class SpontaneousPolarizationTensor
     :
-    public SpontaneousPolarizationTensorBase<group_symmetry, order, ValueType>
+    public TensorBase<group_symmetry, order, order, ValueType>
     {
     public:
     
@@ -76,10 +76,6 @@ namespace nil
 
     private:
     
-    /**
-     * The underlying tensor.
-     */
-    SpontaneousPolarizationTensorBase<group_symmetry, order, ValueType> tensor;
     
     }; /* SpontaneousPolarizationTensor */
   

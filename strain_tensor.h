@@ -36,7 +36,7 @@
 #define __nil_strain_tensor_h
 
 #include "group_symmetry.h"
-#include "strain_tensor_base.h"
+#include "tensor_base.h"
 
 #include <fstream>
 #include <iostream>
@@ -54,10 +54,10 @@ namespace nil
    *
    * @author Toby D. Young  2010, 2011, 2014.
    */  
-  template <int order, typename ValueType = double>
+  template <enum GroupSymmetry group_symmetry, int order, typename ValueType = double>
     class StrainTensor
     :
-    public StrainTensorBase<order, ValueType>
+    public TensorBase<group_symmetry, order, 2*order, ValueType>
     {
     public:
 
@@ -69,12 +69,6 @@ namespace nil
 
 
     private:
-    
-
-    /**
-     * The underlying tensor.
-     */
-    StrainTensorBase<order, ValueType> tensor;
     
 
    }; /* StrainTensor */

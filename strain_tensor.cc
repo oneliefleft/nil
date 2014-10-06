@@ -38,8 +38,8 @@
 namespace nil
 {  
 
-  template <int order, typename ValueType>
-  StrainTensor<order, ValueType>::StrainTensor ()
+  template <enum GroupSymmetry group_symmetry, int order, typename ValueType>
+  StrainTensor<group_symmetry, order, ValueType>::StrainTensor ()
   {}
    
 } // namespace nil
@@ -49,7 +49,9 @@ namespace nil
 
 // First-order tensors
 template class 
-nil::StrainTensor<1, double>;
+nil::StrainTensor<nil::GroupSymmetry::ZincBlende, 1, double>;
+template class 
+nil::StrainTensor<nil::GroupSymmetry::Wurtzite, 1, double>;
 
 
 
