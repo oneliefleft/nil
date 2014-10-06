@@ -85,6 +85,9 @@ namespace nil
   /**
    * A class that handles how piezoelectric parameters are handled.
    *
+   * @note Supported tensor types are: Elastic, Dielectric,
+   * Piezoelectric, and SpontaneousPolarization.
+   *
    * @author Toby D. Young 2014.
    */
   template <enum nil::GroupSymmetry group_symmetry, typename ValueType = double>
@@ -209,6 +212,8 @@ namespace nil
   {}
 
 
+  // @note, this is the part where input can be read from the
+  // parameter file, right?
   template <enum nil::GroupSymmetry group_symmetry, typename ValueType>
   void
   PiezoelectricCoefficients<group_symmetry, ValueType>::distribute_coefficients ()
@@ -308,10 +313,11 @@ private:
   std::vector<ValueType> second_order_piezoelectric_coefficients;
 
   /**
-   * @note In contrast to the above, we can control via the class
-   * PiezoelectricCoefficients.
+   * Sets of piezoelectric coefficients that are to be used in this
+   * application - one for AlN and one for GaN.
    */
-  nil::PiezoelectricCoefficients<nil::GroupSymmetry::Wurtzite, ValueType> piezoelectric_coefficients;
+  nil::PiezoelectricCoefficients<nil::GroupSymmetry::Wurtzite, ValueType> aln_coefficients;
+  nil::PiezoelectricCoefficients<nil::GroupSymmetry::Wurtzite, ValueType> gan_coefficients;
 
 
   /**
@@ -322,7 +328,7 @@ private:
   /**
    * The size of the Bravais lattice.
    */
-  std::vector<double>    bravais_lattice;
+  std::vector<double> bravais_lattice;
 
   /**
    * A I<code>deal.II</code> hack tha outputs to the first processor
