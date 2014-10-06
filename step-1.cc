@@ -43,6 +43,7 @@
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/table_handler.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/grid_refinement.h>
@@ -94,7 +95,7 @@ public:
   PiezoelectricProblem ();
 
   /**
-   * destructor.
+   * Destructor.
    */
   ~PiezoelectricProblem ();
   
@@ -118,6 +119,7 @@ private:
 
   void setup_system ();
   void setup_coefficients ();
+  void assemble_system ();
 
   void output_results () const;
 
@@ -157,9 +159,19 @@ private:
    */
   dealii::parallel::distributed::Triangulation<dim> triangulation;
 
-  // piezoelectric problem
+  /**
+   * The finite element system.
+   */
   const dealii::FESystem<dim>                    fe_q;
+
+  /**
+   * Handler of degrees of freedom.
+   */
   dealii::DoFHandler<dim>                        dof_handler;
+
+  /**
+   * A matrix holding all constraints.
+   */
   dealii::ConstraintMatrix                       constraints;
 
   /**
@@ -199,7 +211,7 @@ private:
   dealii::ParameterHandler parameters;
 
   /**
-   * A table to handle a set of commonly intersting results.
+   * A table to handle a set of commonly interesting results.
    */
   dealii::TableHandler output_table;
 };
@@ -248,6 +260,18 @@ void
 PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
 {
   // First declare the parameters that are expected to be found.
+  parameters.declare_entry ("First-order elastic coefficients",
+			    "-0.230",
+			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
+			    "A list of the first-order elastic coefficients. " 
+			    "Default is zinc-blende GaAs. ");
+
+  parameters.declare_entry ("First-order dielectric coefficients",
+			    "-0.230",
+			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
+			    "A list of the first-order piezoelectric coefficients. " 
+			    "Default is zinc-blende GaAs. ");
+
   parameters.declare_entry ("First-order piezoelectric coefficients",
 			    "-0.230",
 			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
@@ -269,6 +293,14 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
 
   parameters.read_input (command_line.get_prm_file ());
 
+  first_order_elastic_coefficients = 
+    dealii::Utilities::string_to_double
+    (dealii::Utilities::split_string_list (parameters.get ("First-order elastic coefficients")));
+
+  first_order_dielectric_coefficients = 
+    dealii::Utilities::string_to_double
+    (dealii::Utilities::split_string_list (parameters.get ("First-order dielectric coefficients")));
+
   first_order_piezoelectric_coefficients = 
     dealii::Utilities::string_to_double
     (dealii::Utilities::split_string_list (parameters.get ("First-order piezoelectric coefficients")));
@@ -280,10 +312,6 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
   bravais_lattice = 
     dealii::Utilities::string_to_double
     (dealii::Utilities::split_string_list (parameters.get ("Bravais lattice dimensions")));
-
-  // Some checks
-  // AssertThrow (bravais_lattice.size ()==3,
-  // 	       dealii::ExcMessage ("The Bravais lattice is required to have three components."));
 
 }
 
@@ -328,6 +356,15 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_coefficients ()
 
   // and second-order coefficients.
   second_order_piezoelectric_tensor.distribute_coefficients (second_order_piezoelectric_coefficients);
+
+  std::cout << "Tensors of coefficients:"
+	    << std::endl
+	    << "   First-order Elastic:             " << first_order_elastic_tensor
+	    << std::endl
+	    << "   First-order dielectric:          " << first_order_dielectric_tensor
+	    << std::endl
+	    << "   First-orfer piezoelectric:       " << first_order_piezoelectric_tensor
+	    << std::endl;
 }
 
 
@@ -373,6 +410,20 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_system ()
 }
 
 
+/**
+ * This function assembles the system matrix and rhight-hand-side
+ * vector.
+ */
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+void 
+PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
+{
+ 
+  dealii::QGauss<dim> face_quadrature_formula ();
+  
+}
+
+
 
 /**
  * This is the run function, which wraps all of the above into a
@@ -388,6 +439,9 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
  
   // Then create the coarse grid
   make_coarse_grid (3);
+
+  // Make coefficient tensors.
+  setup_coefficients ();
 
   // Here comes the adaptive cycles
   for (unsigned int cycle=0; cycle<1; ++cycle)
