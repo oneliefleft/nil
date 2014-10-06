@@ -156,15 +156,15 @@ namespace nil
       tensor[0][0][1][1] = tensor[1][1][0][0] = coefficients[1];
 
       // C_13 = C_23 \mapsto:
-      tensor[2][2][3][3] = tensor[3][3][2][2] = coefficients[2];
+      tensor[0][0][2][2] = tensor[1][1][2][2] = coefficients[2];
 
       // C_33 \mapsto:
       tensor[2][2][2][2] = coefficients[3];
 
       // C_44 = C55 \mapsto:
-      tensor[2][3][2][3] = tensor[3][2][2][3] = tensor[3][2][3][2] = tensor[2][3][3][2] 
+      tensor[1][2][1][2] = tensor[2][1][1][2] = tensor[2][1][2][1] = tensor[1][2][2][1] 
 	=
-	tensor[3][1][3][1] = tensor[1][3][3][1] = tensor[1][3][1][3] = tensor[3][1][1][3] 
+	tensor[2][0][2][0] = tensor[0][2][2][0] = tensor[0][2][0][2] = tensor[2][0][0][2] 
 	= 
 	coefficients[4];
 
