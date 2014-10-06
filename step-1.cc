@@ -228,6 +228,10 @@ namespace nil
 
     if (this->first_order_spontaneous)
       first_order_spontaneous_polarization_tensor.distribute_coefficients (first_order_spontaneous_polarization_coefficients);
+
+    // In fact, this can not be done yet :-(
+    AssertThrow (this->second_order.none == false, 
+		 dealii::ExcNotImplemented ());
   }
 
   
