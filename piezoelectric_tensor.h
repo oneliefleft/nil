@@ -133,7 +133,7 @@ namespace nil
 			      std::vector<ValueType>                                     &coefficients)
     {
       Assert (tensor.rank ()==3, dealii::ExcInternalError ()); 
-      
+
       AssertThrow (coefficients.size ()==3,
 		   dealii::ExcMessage ("The number of coefficients does not match the default number required for wurtzite structure."));
 
@@ -239,7 +239,7 @@ namespace nil
       Assert (tensor.rank ()==5, dealii::ExcInternalError ()); 
 
       AssertThrow (coefficients.size ()==8,
-		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
+		   dealii::ExcMessage ("The number of coefficients does not match the default number required for wurtzite structure."));
 
       // Then distribute the coefficients on to the tensor. It seems
       // there is no automagic way to do this, so just insert those
