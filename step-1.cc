@@ -100,7 +100,7 @@ namespace nil
      * A structure that defines which first-order coefficients are to be
      * used.
      */
-    struct first_order
+    struct FirstOrder
     {
       bool none                     = true;
       bool elastic                  = false;
@@ -114,7 +114,7 @@ namespace nil
      * A structure that defines which second-order coefficients are to be
      * used.
      */
-    struct second_order
+    struct SecondOrder
     {
       bool none                     = true;
       bool elastic                  = false;
@@ -124,6 +124,12 @@ namespace nil
     };
     
     
+    // /**
+    //  * Constructor.
+    //  */
+    // PiezoelectricCoefficients ();
+
+
     /**
      * Constructor.
      */
