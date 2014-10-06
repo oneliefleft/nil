@@ -8,7 +8,7 @@ SET(TARGET "step-1")
 SET(TARGET_SRC
   command_line.cc
 #
-  group_symmetry.cc
+  src/group_symmetry.cc
   src/dielectric_tensor.cc
   src/elastic_tensor.cc
   src/piezoelectric_tensor.cc

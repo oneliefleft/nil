@@ -35,7 +35,7 @@
 #ifndef __nil_spontaneous_polarization_tensor_h
 #define __nil_spontaneous_polarization_tensor_h
 
-#include "../../group_symmetry.h"
+#include "../..//include/nil/group_symmetry.h"
 #include "../../tensor_base.h"
 
 #include <fstream>

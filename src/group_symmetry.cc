@@ -32,7 +32,7 @@
 // implied, of the nil authors.
 // -------------------------------------------------------------------
 
-#include "group_symmetry.h"
+#include "../include/nil/group_symmetry.h"
 
 namespace nil
 {

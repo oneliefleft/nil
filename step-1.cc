@@ -64,7 +64,7 @@
 #include <deal.II/lac/sparsity_tools.h>
 
 // Library-based headers.
-#include "group_symmetry.h"
+#include "include/nil/group_symmetry.h"
 #include "include/nil/dielectric_tensor.h"
 #include "include/nil/elastic_tensor.h"
 #include "include/nil/piezoelectric_tensor.h"
