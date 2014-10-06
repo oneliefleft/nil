@@ -36,7 +36,7 @@
 #define __nil_piezoelectric_tensor_h
 
 #include "group_symmetry.h"
-#include "piezoelectric_tensor_base.h"
+#include "tensor_base.h"
 
 #include <fstream>
 #include <iostream>
@@ -55,7 +55,7 @@ namespace nil
   template <enum GroupSymmetry group_symmetry, int order, typename ValueType = double>
     class PiezoelectricTensor
     :
-    public PiezoelectricTensorBase<group_symmetry, order, ValueType>
+    public TensorBase<group_symmetry, order, 2*order+1, ValueType>
     {
     public:
     
@@ -75,11 +75,7 @@ namespace nil
     
 
     private:
-    
-    /**
-     * The underlying tensor.
-     */
-    PiezoelectricTensorBase<group_symmetry, order, ValueType> tensor;
+
     
     }; /* PiezoelectricTensor */
   

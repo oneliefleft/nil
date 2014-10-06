@@ -12,7 +12,6 @@ SET(TARGET_SRC
   dielectric_tensor.cc
   elastic_tensor.cc
   piezoelectric_tensor.cc
-  piezoelectric_tensor_base.cc
   spontaneous_polarization_tensor.cc
   strain_tensor.cc
   tensor_base.cc
