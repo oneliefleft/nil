@@ -103,6 +103,17 @@ namespace nil
 			      std::vector<ValueType>                                 &coefficients)
     {
       AssertThrow (false, dealii::ExcNotImplemented ());
+
+      Assert (tensor.rank ()==4, dealii::ExcInternalError ());
+
+      AssertThrow (coefficients.size ()==4,
+		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
+
+      // Then distribute the coefficients on to the tensor. It seems
+      // there is no automagic way to do this, so just insert those
+      // elements that are non-zero.
+      // 
+      // In Voight notation these are: 
     }
 
 
@@ -118,7 +129,39 @@ namespace nil
     distribute_coefficients_ (ElasticTensor<GroupSymmetry::Wurtzite, 1, ValueType> &tensor, 
 			      std::vector<ValueType>                               &coefficients)
     {
-      AssertThrow (false, dealii::ExcNotImplemented ());
+      Assert (tensor.rank ()==4, dealii::ExcInternalError ());
+
+      AssertThrow (coefficients.size ()==5,
+		   dealii::ExcMessage ("The number of coefficients does not match the default number required for wurtzite structure."));
+
+      // Then distribute the coefficients on to the tensor. It seems
+      // there is no automagic way to do this, so just insert those
+      // elements that are non-zero.
+      // 
+      // In Voight notation these are: C_11 = C_22, C_12, C_13 = C_23,
+      // C_33, C_44 = C_55. In total there are five independent
+      // coefficients.
+
+      // C_11 = C_22 \mapsto:
+      tensor[0][0][0][0] = coefficients[0];
+
+      // C_12 \mapsto:
+      tensor[0][0][0][0] = coefficients[1];
+
+      // C_13 \mapsto:
+      tensor[0][0][0][0] = coefficients[2];
+
+      // C_33 \mapsto:
+      tensor[0][0][0][0] = coefficients[3];
+
+      // C_44 = C55 \mapsto:
+      tensor[0][0][0][0] = coefficients[4];
+
+      // C_66 = C55 \mapsto:
+      tensor[0][0][0][0] 
+	= 
+	(coefficients[0] - coefficients[1]) /2.;
+      
     }
 
 

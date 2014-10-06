@@ -182,9 +182,9 @@ namespace nil
       // there is no automagic way to do this, so just insert those
       // elements that are non-zero.
       //
-      // In Voight notation these are: e_114 = e_124 = e_156, and
-      // additionally, cyclic permutations x->y->z. In total there are
-      // 24 non-zero elements.
+      // In Voight notation these are: e_114, e_124, e_156, and cyclic
+      // permutations of x->y->z. In total there are 24 non-zero
+      // elements.
       
       // e_114 = e_225 = e_336 \mapsto:
       tensor[0][0][0][1][2] = tensor[0][0][0][2][1] = tensor[0][1][2][0][0] = tensor[0][2][1][0][0] 
