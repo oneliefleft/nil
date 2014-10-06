@@ -70,6 +70,7 @@
 #include "dielectric_tensor.h"
 #include "elastic_tensor.h"
 #include "piezoelectric_tensor.h"
+#include "spontaneous_polarization_tensor.h"
 
 // Application-base headers.
 #include "command_line.h"
@@ -130,21 +131,26 @@ private:
 
   // Following that we have a list of the tensors that will be used in
   // this calculation. They are, first- 
-  nil::ElasticTensor<GroupSymm, 1, ValueType>       first_order_elastic_tensor;
-  nil::DielectricTensor<GroupSymm, 1, ValueType>    first_order_dielectric_tensor;
-  nil::PiezoelectricTensor<GroupSymm, 1, ValueType> first_order_piezoelectric_tensor;
-  nil::PiezoelectricTensor<GroupSymm, 1, ValueType> first_order_spontaneous_polarization_tensor;
+  nil::ElasticTensor<GroupSymm, 1, ValueType>                 first_order_elastic_tensor;
+  nil::DielectricTensor<GroupSymm, 1, ValueType>              first_order_dielectric_tensor;
+  nil::PiezoelectricTensor<GroupSymm, 1, ValueType>           first_order_piezoelectric_tensor;
+  nil::SpontaneousPolarizationTensor<GroupSymm, 1, ValueType> first_order_spontaneous_polarization_tensor;
 
   // and second-order piezoelectric tensors
   nil::PiezoelectricTensor<GroupSymm, 2, ValueType> second_order_piezoelectric_tensor;
  
-  // Additionally, lists of coefficients are needed for those tensors
+  // Additionally, lists of coefficients are needed for those tensors.
   std::vector<ValueType> first_order_elastic_coefficients;
   std::vector<ValueType> first_order_dielectric_coefficients;
   std::vector<ValueType> first_order_piezoelectric_coefficients;
   std::vector<ValueType> first_order_spontaneous_polarization_coefficients;
 
   std::vector<ValueType> second_order_piezoelectric_coefficients;
+
+  /**
+   * Mismatch strain tensor.
+   */
+  dealii::Tensor<2, dim, ValueType> mismatch_strain_tensor;
 
   /**
    * The size of the Bravais lattice.
@@ -272,7 +278,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
   parameters.declare_entry ("First-order dielectric coefficients",
 			    "-0.230",
 			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
-			    "A list of the first-order piezoelectric coefficients. " 
+			    "A list of the first-order dielectric coefficients. " 
 			    "Default is zinc-blende GaAs. ");
 
   parameters.declare_entry ("First-order piezoelectric coefficients",
@@ -366,19 +372,25 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_coefficients ()
   first_order_elastic_tensor.distribute_coefficients (first_order_elastic_coefficients);
   first_order_dielectric_tensor.distribute_coefficients (first_order_dielectric_coefficients);
   first_order_piezoelectric_tensor.distribute_coefficients (first_order_piezoelectric_coefficients);
+  first_order_spontaneous_polarization_tensor.distribute_coefficients (first_order_spontaneous_polarization_coefficients);
 
   // and second-order coefficients.
   second_order_piezoelectric_tensor.distribute_coefficients (second_order_piezoelectric_coefficients);
 
+  // mismatch strain
+  mismatch_strain_tensor.clear ();
+  mismatch_strain_tensor[0][0] = mismatch_strain_tensor[1][1] = 0.5;
+  mismatch_strain_tensor[2][2] = 0.5;
+
   pcout << "Tensors of coefficients:"
 	<< std::endl
-	<< "   First-order Elastic:             " << first_order_elastic_tensor
+	<< "   First-order elastic:             " << first_order_elastic_tensor
 	<< std::endl
 	<< "   First-order dielectric:          " << first_order_dielectric_tensor
 	<< std::endl
-	<< "   First-orfer piezoelectric:       " << first_order_piezoelectric_tensor
+	<< "   First-order piezoelectric:       " << first_order_piezoelectric_tensor
 	<< std::endl
-	<< "   First-orfer spont. polarization: " << first_order_spontaneous_polarization_tensor
+	<< "   First-order spont. polarization: " << first_order_spontaneous_polarization_tensor
 	<< std::endl;
 }
 
@@ -450,6 +462,12 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 
   std::vector<dealii::types::global_dof_index> local_dof_indices (n_dofs_per_cell);
 
+  // So-called "finite elemnt views" that define parts of the finite
+  // elemnt system connected with displacements (u on position
+  // [0,1,2]) and electric potential (phi on position 3).
+  const dealii::FEValuesExtractors::Vector u   (0);
+  const dealii::FEValuesExtractors::Scalar phi (dim);
+
   typename dealii::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -470,10 +488,39 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 	    for (unsigned int i=0; i<n_dofs_per_cell; ++i)
 	      {
 
+                const dealii::Tensor<2, dim> u_i_grad
+                  = fe_values[u].symmetric_gradient (i, q_point);
+
+                const dealii::Tensor<1, dim> phi_i_grad
+                  = fe_values[phi].gradient (i, q_point);
+
 		for (unsigned int j=0; i<n_dofs_per_cell; ++i)
 		  {
 
+		    const dealii::Tensor<2, dim> u_j_grad
+		      = fe_values[u].symmetric_gradient (j, q_point);
+		    
+		    const dealii::Tensor<1, dim> phi_j_grad
+		      = fe_values[phi].gradient (j, q_point);
+		    
+                    // cell_matrix (i,j) +=
+                    //   (contract (u_i_grad, first_order_elastic_tensor, 
+		    // 		 u_j_grad)
+                    //    +
+                    //    contract (phi_i_grad, first_order_dielectric_tensor, 
+		    // 		 phi_j_grad))
+                    //   *
+                    //   fe_values.JxW (q_point);
+
+
 		  } // dof j
+
+		// cell_rhs (i) +=
+		// contract (u_i_grad, first_order_elastic_tensor, mismatch_strain_tensor);
+		//  +
+		//  contract (phi_i_grad, first_order_spontaneous_polarization_tensor))
+		// *
+		// fe_values.JxW (q_point);
 
 	      } // dof i
 
