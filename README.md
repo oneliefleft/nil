@@ -1,9 +1,11 @@
 nil
 ===
 
-Nano Interrogation Library based on deal.II.
+# Nano Interrogation Library based on deal.II
 
-step-0: Strain-based second order piezoelectric coefficients.
+# Getting started
 
-step-1: ???
+Start by installing deal.II with PETSc and SLEPc and then use CMake
+and make to compile the application program.
+
 
