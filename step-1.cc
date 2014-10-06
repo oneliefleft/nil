@@ -82,6 +82,25 @@
 namespace nil
 {
   
+  enum UpdateFlags
+  {
+    /**
+     * A structure that defines which first-order coefficients are to
+     * be used.
+     */
+    first_order_elastic,
+    first_order_dielectric,
+    first_order_piezoelectric,
+    first_order_spontaneous_polarization,
+    
+    second_order_elastic,
+    second_order_dielectric,
+    second_order_piezoelectric,
+    second_order_spontaneous_polarization
+    
+  }; // enum UpdateFlags
+  
+  
   /**
    * A class that handles how piezoelectric parameters are handled.
    *
@@ -95,45 +114,18 @@ namespace nil
   {
   public:
     
-    
+   
     /**
-     * A structure that defines which first-order coefficients are to be
-     * used.
+     * Constructor. This initializes an empty state with the flags
+     * FirstOrder=None and SecondOrder = None.
      */
-    struct FirstOrder
-    {
-      bool none                     = true;
-      bool elastic                  = false;
-      bool dielectric               = false;
-      bool piezoelectric            = false;
-      bool spontaneous_polarization = false;
-    };
+    PiezoelectricCoefficients ();
     
-    
-    /**
-     * A structure that defines which second-order coefficients are to be
-     * used.
-     */
-    struct SecondOrder
-    {
-      bool none                     = true;
-      bool elastic                  = false;
-      bool dielectric               = false;
-      bool piezoelectric            = false;
-      bool spontaneous_polarization = false;
-    };
-    
-    
-    // /**
-    //  * Constructor.
-    //  */
-    // PiezoelectricCoefficients ();
-
 
     /**
      * Constructor.
      */
-    PiezoelectricCoefficients ();
+    PiezoelectricCoefficients (const nil::UpdateFlags flags);
     
     
     /**
@@ -205,12 +197,36 @@ namespace nil
      */
     std::vector<ValueType> first_order_spontaneous_polarization_coefficients;
 
+    /**
+     * A local copy of the update flags handed to the constructor.
+     */
+    UpdateFlags update_flags;
+
   };
-  
-  
+
+
   template <enum nil::GroupSymmetry group_symmetry, typename ValueType>
   PiezoelectricCoefficients<group_symmetry, ValueType>::PiezoelectricCoefficients ()
   {}
+
+
+  template <enum nil::GroupSymmetry group_symmetry, typename ValueType>
+  PiezoelectricCoefficients<group_symmetry, ValueType>::PiezoelectricCoefficients (const nil::UpdateFlags flags)
+  {
+    if (flags == nil::UpdateFlags::first_order_elastic)
+      {
+	// FirstOrder::Elastic = true;
+	// FirstOrder::None    = false;
+      }
+
+
+    // Piezolectric coupling without an elastic and electric field
+    // make little (or no) physical sense. Do not allow it.
+    // if ((FirstOrder::Piezoelectric) 
+    // 	&& 
+    // 	((!FirstOrder::Elastic) || (!FirstOrder::Dielectric)))
+    //   AssertThrow (false, dealii::ExcInternalError ());
+  }
 
 
   template <enum nil::GroupSymmetry group_symmetry, typename ValueType>
@@ -624,6 +640,9 @@ template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
 PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 {
+  nil::PiezoelectricCoefficients<nil::GroupSymmetry::Wurtzite, ValueType> 
+    aln_coefficients (nil::first_order_elastic);
+
   // @todo: The number of quadrature points should be decided
   // elsewhere.
   dealii::QGauss<dim> quadrature_formula (3);
