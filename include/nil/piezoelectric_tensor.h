@@ -36,7 +36,7 @@
 #define __nil_piezoelectric_tensor_h
 
 #include "../..//include/nil/group_symmetry.h"
-#include "../../tensor_base.h"
+#include "../../include/nil/tensor_base.h"
 
 #include <fstream>
 #include <iostream>

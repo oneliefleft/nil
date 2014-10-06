@@ -13,7 +13,7 @@ SET(TARGET_SRC
   src/elastic_tensor.cc
   src/piezoelectric_tensor.cc
   src/spontaneous_polarization_tensor.cc
-  tensor_base.cc
+  src/tensor_base.cc
 #
   piezoelectric_coefficients.cc
 #

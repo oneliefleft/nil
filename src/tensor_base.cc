@@ -32,7 +32,7 @@
 // implied, of the nil authors.
 // -------------------------------------------------------------------
 
-#include "tensor_base.h"
+#include "../include/nil/tensor_base.h"
 
 namespace nil
 {  
