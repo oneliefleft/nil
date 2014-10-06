@@ -10,9 +10,7 @@ SET(TARGET_SRC
 #
   group_symmetry.cc
   dielectric_tensor.cc
-  dielectric_tensor_base.cc
   elastic_tensor.cc
-  elastic_tensor_base.cc
   piezoelectric_tensor.cc
   piezoelectric_tensor_base.cc
   spontaneous_polarization_tensor.cc
