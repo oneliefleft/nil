@@ -674,11 +674,11 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
     if (cell->is_locally_owned ())
       {
 
+	// Initialise objects that are needed to be in a clean state
+	// on this cell.
 	fe_values.reinit (cell);
 	cell_matrix = 0;
 	cell_rhs    = 0;
-
-	// get strain
 
 	for (unsigned int q_point = 0; q_point<n_q_points; ++q_point)
 	  {
