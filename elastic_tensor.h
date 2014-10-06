@@ -74,6 +74,17 @@ namespace nil
     distribute_coefficients (std::vector<ValueType> &coefficients);
     
 
+    /* /\** */
+    /*  * Read only access operator to the underlying */
+    /*  * <code>deal.II</code> tensor. */
+    /*  *\/     */
+    /* inline */
+    /* dealii::Tensor<4*order, 3, ValueType>* operator* () const */
+    /* { */
+    /*   return *this; */
+    /* } */
+
+
     private:
 
     

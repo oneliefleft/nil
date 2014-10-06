@@ -103,6 +103,8 @@ namespace nil
       AssertThrow (coefficients.size ()==0,
 		   dealii::ExcMessage ("The number of coefficients does not match the default number required for zinc-blende structure."));
 
+      // Nothing to do for zinc-blende.
+
     }
 
   

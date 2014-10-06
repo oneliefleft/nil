@@ -82,22 +82,19 @@ namespace nil
     /**
      * Reinitialise (zero out) this tensor.
      */
-    void 
-    reinit ();
+    void reinit ();
 
 
     /**
      * Return the order of this tensor.
      */
-    unsigned int 
-    order () const;
+    unsigned int order () const;
 
 
     /**
      * Return the rank of this tensor.
      */
-    unsigned int 
-    rank () const;
+    unsigned int rank () const;
     
 
     /**
@@ -105,15 +102,13 @@ namespace nil
      * returns the integer three, since these tensors are properly
      * defined in three-dimensions only.
      */
-    unsigned int 
-    dim () const;
+    unsigned int dim () const;
 
 
     /**
      * Make the group symmetry of this tensor public. 
      */
-    std::string 
-    group_symmetry () const; 
+    std::string group_symmetry () const; 
    
 
     protected:
@@ -135,9 +130,9 @@ namespace nil
      * Make the rank of this tensor known to all derived classes.
      */
     const int rank_; 
-    
 
-    private:
+
+    protected:
 
 
     /**
