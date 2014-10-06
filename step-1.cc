@@ -393,13 +393,15 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_coefficients ()
 
   pcout << "Tensors of coefficients:"
 	<< std::endl
-	<< "   First-order elastic:             " << first_order_elastic_tensor
+	<< "   1st-order elastic:               " << first_order_elastic_tensor
 	<< std::endl
-	<< "   First-order dielectric:          " << first_order_dielectric_tensor
+	<< "   1st-order dielectric:            " << first_order_dielectric_tensor
 	<< std::endl
-	<< "   First-order piezoelectric:       " << first_order_piezoelectric_tensor
+	<< "   1st-order piezoelectric:         " << first_order_piezoelectric_tensor
 	<< std::endl
-	<< "   First-order spont. polarization: " << first_order_spontaneous_polarization_tensor
+	<< "   1st-order spont. polarization:   " << first_order_spontaneous_polarization_tensor
+	<< std::endl
+	<< "   2nd-order piezoelectric:         " << second_order_piezoelectric_tensor
 	<< std::endl;
 }
 
