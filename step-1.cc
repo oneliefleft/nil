@@ -103,7 +103,7 @@ namespace nil
       bool elastic                  = false;
       bool dielectric               = false;
       bool piezoelectric            = false;
-      bool spontaneous = false;
+      bool spontaneous_polarization = false;
     };
     
     
@@ -117,7 +117,7 @@ namespace nil
       bool elastic                  = false;
       bool dielectric               = false;
       bool piezoelectric            = false;
-      bool spontaneous = false;
+      bool spontaneous_polarization = false;
     };
     
     
@@ -164,13 +164,38 @@ namespace nil
     /**
      * First-order spontaneous polarization tensor.
      */
-    nil::SpontaneousPolarizationTensor<group_symmetry, 1, ValueType> first_order_spontaneous_tensor;
+    nil::SpontaneousPolarizationTensor<group_symmetry, 1, ValueType> first_order_spontaneous_polarization_tensor;
 
 
     /**
      * First-order piezoelectric tensor.
      */
     nil::PiezoelectricTensor<group_symmetry, 2, ValueType> second_order_piezoelectric_tensor;
+
+
+    /**
+     * First-order elastic coefficients.
+     */
+    std::vector<ValueType> first_order_elastic_coefficients;
+
+
+    /**
+     * First-order dielectric coefficients.
+     */
+    std::vector<ValueType> first_order_dielectric_coefficients;
+
+
+    /**
+     * First-order piezoelectric coefficients.
+     */
+    std::vector<ValueType> first_order_piezoelectric_coefficients;
+
+
+    /**
+     * First-order spontaneous polarization coefficients.
+     */
+    std::vector<ValueType> first_order_spontaneous_polarization_coefficients;
+
   };
   
   
@@ -192,11 +217,6 @@ namespace nil
     Assert ((this->first_order.none == false) || (this->second_order.none == false), 
 	    dealii::ExcMessage ("Distributing coefficients can not be done because first"));
 
-    std::vector<ValueType> first_order_elastic_coefficients;
-    std::vector<ValueType> first_order_dielectric_coefficients;
-    std::vector<ValueType> first_order_piezoelectric_coefficients;
-    std::vector<ValueType> first_order_spontaneous_coefficients;
-
     if (this->first_order_elastic)
       first_order_elastic_tensor.distribute_coefficients (first_order_elastic_coefficients);
 
@@ -207,7 +227,7 @@ namespace nil
       first_order_piezoelectric_tensor.distribute_coefficients (first_order_piezoelectric_coefficients);
 
     if (this->first_order_spontaneous)
-      first_order_spontaneous_tensor.distribute_coefficients (first_order_spontaneous_coefficients);
+      first_order_spontaneous_polarization_tensor.distribute_coefficients (first_order_spontaneous_polarization_coefficients);
   }
 
   
@@ -269,17 +289,18 @@ private:
   nil::ElasticTensor<GroupSymm, 1, ValueType>                 first_order_elastic_tensor;
   nil::DielectricTensor<GroupSymm, 1, ValueType>              first_order_dielectric_tensor;
   nil::PiezoelectricTensor<GroupSymm, 1, ValueType>           first_order_piezoelectric_tensor;
-  nil::SpontaneousPolarizationTensor<GroupSymm, 1, ValueType> first_order_spontaneous_tensor;
+  nil::SpontaneousPolarizationTensor<GroupSymm, 1, ValueType> first_order_spontaneous_polarization_tensor;
 
   // and second-order piezoelectric tensors
   nil::PiezoelectricTensor<GroupSymm, 2, ValueType> second_order_piezoelectric_tensor;
  
-  // Additionally, lists of coefficients are needed for those tensors.
+  // Additionally, lists of coefficients are needed for first-order
   std::vector<ValueType> first_order_elastic_coefficients;
   std::vector<ValueType> first_order_dielectric_coefficients;
   std::vector<ValueType> first_order_piezoelectric_coefficients;
-  std::vector<ValueType> first_order_spontaneous_coefficients;
+  std::vector<ValueType> first_order_spontaneous_polarization_coefficients;
 
+  // and second-order tensors.
   std::vector<ValueType> second_order_piezoelectric_coefficients;
 
   /**
@@ -466,7 +487,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
     dealii::Utilities::string_to_double
     (dealii::Utilities::split_string_list (parameters.get ("Second-order piezoelectric coefficients")));
 
-  first_order_spontaneous_coefficients = 
+  first_order_spontaneous_polarization_coefficients = 
     dealii::Utilities::string_to_double
     (dealii::Utilities::split_string_list (parameters.get ("First-order spontaneous polarization coefficients")));
 
@@ -514,7 +535,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_coefficients ()
   first_order_elastic_tensor.distribute_coefficients (first_order_elastic_coefficients);
   first_order_dielectric_tensor.distribute_coefficients (first_order_dielectric_coefficients);
   first_order_piezoelectric_tensor.distribute_coefficients (first_order_piezoelectric_coefficients);
-  first_order_spontaneous_tensor.distribute_coefficients (first_order_spontaneous_coefficients);
+  first_order_spontaneous_polarization_tensor.distribute_coefficients (first_order_spontaneous_polarization_coefficients);
 
   // and second-order coefficients.
   second_order_piezoelectric_tensor.distribute_coefficients (second_order_piezoelectric_coefficients);
@@ -532,7 +553,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_coefficients ()
 	<< std::endl
 	<< "   First-order piezoelectric:       " << first_order_piezoelectric_tensor
 	<< std::endl
-	<< "   First-order spont. polarization: " << first_order_spontaneous_tensor
+	<< "   First-order spont. polarization: " << first_order_spontaneous_polarization_tensor
 	<< std::endl;
 }
 
@@ -660,7 +681,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 		// cell_rhs (i) +=
 		// contract (u_i_grad, first_order_elastic_tensor, mismatch_strain_tensor);
 		//  +
-		//  contract (phi_i_grad, first_order_spontaneous_tensor))
+		//  contract (phi_i_grad, first_order_spontaneous_polarization_tensor))
 		// *
 		// fe_values.JxW (q_point);
 
