@@ -444,7 +444,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem ()
 
 
 /**
- * Destructor. This just ensures freeing some memory allocation.
+ * Destructor. This just frees some memory allocation.
  */
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 PiezoelectricProblem<dim, GroupSymm, ValueType>::~PiezoelectricProblem ()
@@ -686,20 +686,16 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 	    for (unsigned int i=0; i<n_dofs_per_cell; ++i)
 	      {
 
-                const dealii::Tensor<2, dim> u_i_grad
-                  = fe_values[u].symmetric_gradient (i, q_point);
-
-                const dealii::Tensor<1, dim> phi_i_grad
-                  = fe_values[phi].gradient (i, q_point);
+		// obtain symmetric gradient for the ith q_point.
+                const dealii::Tensor<2, dim> u_i_grad   = fe_values[u].symmetric_gradient (i, q_point);
+                const dealii::Tensor<1, dim> phi_i_grad = fe_values[phi].gradient (i, q_point);
 
 		for (unsigned int j=0; i<n_dofs_per_cell; ++i)
 		  {
 
-		    const dealii::Tensor<2, dim> u_j_grad
-		      = fe_values[u].symmetric_gradient (j, q_point);
-		    
-		    const dealii::Tensor<1, dim> phi_j_grad
-		      = fe_values[phi].gradient (j, q_point);
+		    // obtain symmetric gradient for the jth q_point.
+		    const dealii::Tensor<2, dim> u_j_grad   = fe_values[u].symmetric_gradient (j, q_point);
+		    const dealii::Tensor<1, dim> phi_j_grad = fe_values[phi].gradient (j, q_point);
 		    
                     // cell_matrix (i,j) +=
                     //   (contract (u_i_grad, first_order_elastic_tensor, 
