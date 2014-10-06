@@ -15,6 +15,8 @@ SET(TARGET_SRC
   spontaneous_polarization_tensor.cc
   tensor_base.cc
 #
+  piezoelectric_coefficients.cc
+#
   ${TARGET}.cc
   )
 
