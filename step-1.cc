@@ -324,7 +324,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
 			    "Default is zinc-blende GaAs. ");
 
   parameters.declare_entry ("Bravais lattice dimensions",
-   			    "1., 1., 1.",
+   			    "1.",
    			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
    			    "A list of the Bravais lattice dimensions. ");
 
@@ -552,8 +552,8 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::make_coefficient_tensors ()
 
   // mismatch strain
   mismatch_strain_tensor.clear ();
-  mismatch_strain_tensor[0][0] = mismatch_strain_tensor[1][1] = 0.5;
-  mismatch_strain_tensor[2][2] = 0.5;
+  mismatch_strain_tensor[0][0] = mismatch_strain_tensor[1][1] = bravais_lattice[0];
+  mismatch_strain_tensor[2][2] = bravais_lattice[1];
 
   pcout << "Tensors of coefficients:"
 	<< std::endl
@@ -624,8 +624,8 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
     aln_coefficients (nil::first_order_elastic);
 
   // @todo: The number of quadrature points should be decided
-  // elsewhere.
-  dealii::QGauss<dim> quadrature_formula (3);
+  // elsewhere. @note: overspecify the number of quadrature points.
+  dealii::QGauss<dim> quadrature_formula (9);
   
   dealii::FEValues<dim> fe_values (fe_q, quadrature_formula,
 				   dealii::update_values    | 
