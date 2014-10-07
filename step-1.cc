@@ -800,7 +800,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::output_results (const unsigned 
       const std::string visit_master_filename 
 	= ("solution-" +
 	   dealii::Utilities::int_to_string (cycle, 4) +
-	   ".visit");
+	   ".paraview");
 
       std::ofstream visit_master (visit_master_filename.c_str());
       data_out.write_visit_record (visit_master, filenames);
