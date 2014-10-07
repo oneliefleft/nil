@@ -61,7 +61,12 @@
 #include <deal.II/lac/compressed_simple_sparsity_pattern.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_precondition.h>
+#include <deal.II/lac/petsc_solver.h>
 #include <deal.II/lac/sparsity_tools.h>
+
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/data_postprocessor.h>
 
 // Library-based headers.
 #include "include/nil/group_symmetry.h"
@@ -119,10 +124,12 @@ private:
   void make_boundary_constraints ();
 
   void setup_system ();
-  void setup_coefficients ();
+  void make_coefficient_tensors ();
   void assemble_system ();
 
-  void output_results () const;
+  unsigned int solve ();
+
+  void output_results (const unsigned int cycle) const;
 
   /**
    * A local copy of the MPI communicator.
@@ -232,6 +239,12 @@ private:
    * A table to handle a set of commonly interesting results.
    */
   dealii::TableHandler output_table;
+
+
+  /**
+   * A separate (sub-)class that handles Postprocessing.
+   */
+  class Postprocessor;
 };
 
 
@@ -343,6 +356,157 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
 
 }
 
+  
+/**
+ * Postprocess piezoelectric solution.
+ */
+template <int dim, enum nil::GroupSymmetry group_symmetry = nil::None, typename ValueType = double>
+class PiezoelectricProblem<dim, group_symmetry, ValueType>::Postprocessor 
+  : 
+  public dealii::DataPostprocessor<dim>
+{
+public:
+
+  /**
+   * Constructor.
+   */  
+  Postprocessor (const unsigned int partition);
+
+
+  /**
+   * Main postprocessing function. 
+   */
+  virtual
+  void
+  compute_derived_quantities_vector (const std::vector<dealii::Vector<ValueType> >                       &uh,
+				     const std::vector<std::vector<dealii::Tensor<1, dim, ValueType> > > &duh,
+				     const std::vector<std::vector<dealii::Tensor<2, dim, ValueType> > > &dduh,
+				     const std::vector<dealii::Point<dim, ValueType> >                   &normals,
+				     const std::vector<dealii::Point<dim, ValueType> >                   &evaluation_points,
+				     std::vector<dealii::Vector<ValueType> >                             &computed_quantities) const;
+
+  
+  /**
+   * Get an the names of each of the components of the output vector.
+   */  
+  virtual 
+  std::vector<std::string> get_names () const;
+
+
+  /**
+   * Get an interpretation of what the components of the output vector mean.
+   */  
+  virtual
+  std::vector<dealii::DataComponentInterpretation::DataComponentInterpretation> 
+  get_data_component_interpretation () const;
+  
+
+  /**
+   * Get the update flags for the subdomain \f$h\f$ (ie. finite
+   * element) thata re needed to postprocess the solution in
+   * quadrature.
+   */
+  virtual 
+  dealii::UpdateFlags get_needed_update_flags () const;
+  
+private:
+  
+  const unsigned int partition;
+
+};
+
+
+template <int dim, enum nil::GroupSymmetry group_symmetry, typename ValueType>
+PiezoelectricProblem<dim, group_symmetry, ValueType>::Postprocessor::Postprocessor (const unsigned int partition)
+  :
+  partition (partition)
+{}
+
+
+template <int dim, enum nil::GroupSymmetry group_symmetry, typename ValueType>
+std::vector<std::string>
+PiezoelectricProblem<dim, group_symmetry, ValueType>::Postprocessor::get_names () const
+{
+  std::vector<std::string> solution_names;
+
+  // First deal with the displacement vector (u_i).  
+  for (unsigned int d=0; d<dim; ++d)
+    {
+      const std::string u_name = "u_" + dealii::Utilities::int_to_string (d);
+      solution_names.push_back (u_name);
+    }
+
+  // and then the potential (phi).
+  solution_names.push_back ("phi");
+
+  // solution_names.push_back ("partition");
+  
+  return solution_names;
+}
+
+
+template <int dim, enum nil::GroupSymmetry group_symmetry, typename ValueType>
+std::vector<dealii::DataComponentInterpretation::DataComponentInterpretation>
+PiezoelectricProblem<dim, group_symmetry, ValueType>::Postprocessor::get_data_component_interpretation () const
+{
+  // First deal with the displacement vector (u_i).
+  std::vector<dealii::DataComponentInterpretation::DataComponentInterpretation>
+    interpretation (dim, dealii::DataComponentInterpretation::component_is_part_of_vector);
+  
+  // and then the potential (phi).
+  interpretation.push_back (dealii::DataComponentInterpretation::component_is_scalar);
+  
+  return interpretation;
+}
+
+
+template <int dim, enum nil::GroupSymmetry group_symmetry, typename ValueType>
+dealii::UpdateFlags
+PiezoelectricProblem<dim, group_symmetry, ValueType>::Postprocessor::get_needed_update_flags() const
+{
+  return 
+    dealii::update_values    | 
+    dealii::update_gradients | 
+    dealii::update_q_points;
+}
+
+
+template <int dim, enum nil::GroupSymmetry group_symmetry, typename ValueType>
+void
+PiezoelectricProblem<dim, group_symmetry, ValueType>::Postprocessor::
+compute_derived_quantities_vector (const std::vector<dealii::Vector<ValueType> >                       &uh,
+				   const std::vector<std::vector<dealii::Tensor<1, dim, ValueType> > > &duh,
+				   const std::vector<std::vector<dealii::Tensor<2, dim, ValueType> > > &/* dduh              */,
+				   const std::vector<dealii::Point<dim, ValueType> >                   &/* normals           */,
+				   const std::vector<dealii::Point<dim, ValueType> >                   &/* evaluation_points */,
+				   std::vector<dealii::Vector<ValueType> >                             &computed_quantities) const
+{
+  const unsigned int n_quadrature_points = uh.size ();
+
+  Assert (duh.size() == n_quadrature_points, dealii::ExcInternalError ());
+  Assert (computed_quantities.size () == n_quadrature_points, dealii::ExcInternalError ());
+  Assert (uh[0].size() == dim+1, dealii::ExcInternalError());
+
+  for (unsigned int q=0; q<n_quadrature_points; ++q)
+     {
+       // First deal with the displacement vector (u_i).  
+       for (unsigned int d=0; d<dim; ++d)
+	 computed_quantities[q](d) = uh[q](d);
+
+       // and then the potential (phi).
+       computed_quantities[q](dim) = uh[q](dim+1);
+
+       //     Tensor<2,dim> grad_u;
+       //     for (unsigned int d=0; d<dim; ++d)
+       // 	grad_u[d] = duh[q][d];
+       //     const SymmetricTensor<2,dim> strain_rate = symmetrize (grad_u);
+       //     computed_quantities[q](dim+2) = 2 * EquationData::eta *
+       // 	strain_rate * strain_rate;
+       //     computed_quantities[q](dim+3) = partition;
+     }
+}
+
+
 
 /**
  * Generate the coarse grid that will be used for this calculation.
@@ -367,7 +531,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::make_coarse_grid (const unsigne
  */
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_coefficients ()
+PiezoelectricProblem<dim, GroupSymm, ValueType>::make_coefficient_tensors ()
 {
   // Initialise the first- 
   first_order_elastic_tensor.reinit ();
@@ -506,9 +670,9 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
                 const dealii::Tensor<2, dim> u_i_grad   = fe_values[u].symmetric_gradient (i, q_point);
                 const dealii::Tensor<1, dim> phi_i_grad = fe_values[phi].gradient (i, q_point);
 
-		for (unsigned int j=0; i<n_dofs_per_cell; ++i)
+		for (unsigned int j=0; j<n_dofs_per_cell; ++j)
 		  {
-
+		    
 		    // obtain symmetric gradient for the jth q_point.
 		    const dealii::Tensor<2, dim> u_j_grad   = fe_values[u].symmetric_gradient (j, q_point);
 		    const dealii::Tensor<1, dim> phi_j_grad = fe_values[phi].gradient (j, q_point);
@@ -521,13 +685,13 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 				  phi_j_grad))
 		      *
 		      fe_values.JxW (q_point);
-
-
+		    
+		    
 		  } // dof j
-
-		cell_rhs (i) +=
+		
+		cell_rhs (i) += 
 		  (contract (u_i_grad, first_order_elastic_tensor, 
-			     mismatch_strain_tensor)
+		 	     mismatch_strain_tensor)
 		   +
 		   contract (phi_i_grad, first_order_spontaneous_polarization_tensor))
 		  *
@@ -553,6 +717,96 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 }
 
 
+/**
+ * Solve the linear algebra system. @note In the general case, the
+ * matrix is not symmetric.
+ */
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+unsigned int
+PiezoelectricProblem<dim, GroupSymm, ValueType>::solve ()
+{
+
+  // Ultimately, a vector is required that stores not only the
+  // elements of the solution for degrees of freedom the current
+  // processor owns, but also all other locally relevant degrees of
+  // freedom. The solver itself needs a vector that is uniquely split
+  // between processors, without any overlap. Therefore create a
+  // vector at the beginning of this function that has these
+  // properties, use it to solve the linear system, and only assign it
+  // to the vector we want at the very end. This last step ensures
+  // that all ghost elements are also copied as necessary.
+  dealii::PETScWrappers::MPI::Vector distributed_solution (locally_owned_dofs, mpi_communicator);
+  dealii::SolverControl solver_control (system_matrix.m (), 1e-09*system_rhs.l2_norm ());
+  dealii::PETScWrappers::PreconditionBlockJacobi preconditioner (system_matrix);
+  dealii::PETScWrappers::SolverBicgstab solver (solver_control, mpi_communicator);
+
+  solver.solve (system_matrix, distributed_solution, system_rhs, 
+		preconditioner);
+
+  constraints.distribute (distributed_solution);
+  solution = distributed_solution;
+
+  return solver_control.last_step ();
+}
+
+
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+void
+PiezoelectricProblem<dim, GroupSymm, ValueType>::output_results (const unsigned int cycle) const
+{
+  Postprocessor postprocessor (dealii::Utilities::MPI::this_mpi_process (mpi_communicator));
+
+  dealii::DataOut<dim> data_out;
+  data_out.attach_dof_handler (dof_handler);
+  data_out.add_data_vector (solution, postprocessor);
+  data_out.build_patches ();
+
+  const std::string filename 
+    = ("solution-" +
+       dealii::Utilities::int_to_string (cycle, 4) +
+       "." +
+       dealii::Utilities::int_to_string (triangulation.locally_owned_subdomain(), 4) +
+       ".vtu");
+  
+  std::ofstream output (filename.c_str());
+
+  data_out.write_vtu (output);
+
+  // For calculations in parallel it is convenient to have a master
+  // record written. This allows paravew (and friends) to read the
+  // entire structure by binding blocks (*.vtu) into a single
+  // structure (*.visit). This only needs to be done by one processor.
+  if (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0)
+    {
+      std::vector<std::string> filenames;
+
+      // The filenames to bind into the master record should match the
+      // filenames used above.
+      for (unsigned int i=0; i<dealii::Utilities::MPI::n_mpi_processes (mpi_communicator); ++i)
+	filenames.push_back ("solution-" +
+			     dealii::Utilities::int_to_string (cycle, 4) +
+			     "." +
+			     dealii::Utilities::int_to_string (triangulation.locally_owned_subdomain(), 4) +
+			     ".vtu");
+
+      const std::string
+	pvtu_master_filename = ("solution-" +
+				dealii::Utilities::int_to_string (cycle, 4) +
+				".pvtu");
+  
+      std::ofstream pvtu_master (pvtu_master_filename.c_str());
+      data_out.write_pvtu_record (pvtu_master, filenames);
+
+      const std::string visit_master_filename 
+	= ("solution-" +
+	   dealii::Utilities::int_to_string (cycle, 4) +
+	   ".visit");
+
+      std::ofstream visit_master (visit_master_filename.c_str());
+      data_out.write_visit_record (visit_master, filenames);
+    }
+}
+
 
 /**
  * This is the run function, which wraps all of the above into a
@@ -565,12 +819,12 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
 
   // First find the parameters need for this calculation
   get_parameters ();
+
+  // Make coefficient tensors.
+  make_coefficient_tensors ();
  
   // Then create the coarse grid
   make_coarse_grid (3);
-
-  // Make coefficient tensors.
-  setup_coefficients ();
 
   // Here comes the adaptive cycles
   for (unsigned int cycle=0; cycle<1; ++cycle)
@@ -597,7 +851,18 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
 	    << std::endl
 	    << "   Number of non-zero elements:     "
 	    << system_matrix.n_nonzero_elements ()
+	    << std::endl
+	    << "   System rhs l2-norm:              "
+	    << system_rhs.l2_norm ()
 	    << std::endl;
+
+      const unsigned int n_iterations = solve ();
+
+      pcout << "Solver converged in:                "
+	    << n_iterations << " iterations"
+	    << std::endl;
+
+      output_results (cycle);
     }
 
 }
