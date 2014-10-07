@@ -8,12 +8,12 @@ SET(TARGET "step-1")
 SET(TARGET_SRC
   command_line.cc
 #
-  src/group_symmetry.cc
-  src/dielectric_tensor.cc
-  src/elastic_tensor.cc
-  src/piezoelectric_tensor.cc
-  src/spontaneous_polarization_tensor.cc
-  src/tensor_base.cc
+  source/group_symmetry.cc
+  source/dielectric_tensor.cc
+  source/elastic_tensor.cc
+  source/piezoelectric_tensor.cc
+  source/spontaneous_polarization_tensor.cc
+  source/tensor_base.cc
 #
   piezoelectric_coefficients.cc
 #
