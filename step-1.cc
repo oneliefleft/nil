@@ -513,25 +513,26 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 		    const dealii::Tensor<2, dim> u_j_grad   = fe_values[u].symmetric_gradient (j, q_point);
 		    const dealii::Tensor<1, dim> phi_j_grad = fe_values[phi].gradient (j, q_point);
 		    
-                    // cell_matrix (i,j) +=
-                    //   (contract (u_i_grad, first_order_elastic_tensor, 
-		    // 		 u_j_grad)
-                    //    +
-                    //    contract (phi_i_grad, first_order_dielectric_tensor, 
-		    // 		 phi_j_grad))
-                    //   *
-                    //   fe_values.JxW (q_point);
+		    cell_matrix (i,j) +=
+                       (contract (u_i_grad, first_order_elastic_tensor, 
+				  u_j_grad)
+			+
+			contract (phi_i_grad, first_order_dielectric_tensor, 
+				  phi_j_grad))
+		      *
+		      fe_values.JxW (q_point);
 
 
 		  } // dof j
 
-		// cell_rhs (i) +=
-		// contract (u_i_grad, first_order_elastic_tensor, mismatch_strain_tensor);
-		//  +
-		//  contract (phi_i_grad, first_order_spontaneous_polarization_tensor))
-		// *
-		// fe_values.JxW (q_point);
-
+		cell_rhs (i) +=
+		  (contract (u_i_grad, first_order_elastic_tensor, 
+			     mismatch_strain_tensor)
+		   +
+		   contract (phi_i_grad, first_order_spontaneous_polarization_tensor))
+		  *
+		  fe_values.JxW (q_point);
+		
 	      } // dof i
 
 	  } // q_point
