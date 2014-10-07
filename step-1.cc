@@ -77,9 +77,6 @@
 
 #include "piezoelectric_coefficients.h"
 
-// Application-base headers.
-#include "command_line.h"
-
 #include <fstream>
 #include <iostream>
 
@@ -98,7 +95,7 @@ public:
   /**
    * Constructor.
    */
-  PiezoelectricProblem ();
+  PiezoelectricProblem (const std::string &parameter_file = "gaas.prm");
 
   /**
    * Destructor.
@@ -109,10 +106,6 @@ public:
    * Run the problem (a basic useage example)
    */
   void run ();
-  
-  // Coefficients are held in a parameter file, so it will be
-  // necessary to read in a file from the command line.
-  nil::CommandLine command_line;
   
 private:
   
@@ -161,7 +154,6 @@ private:
    */
   nil::PiezoelectricCoefficients<nil::GroupSymmetry::Wurtzite, ValueType> aln_coefficients;
   nil::PiezoelectricCoefficients<nil::GroupSymmetry::Wurtzite, ValueType> gan_coefficients;
-
 
   /**
    * Mismatch strain tensor.
@@ -240,6 +232,12 @@ private:
    */
   dealii::TableHandler output_table;
 
+  /**
+   * The filename of the parameter file where material parameters are
+   * kept. @note If no parameter file is given, the default GaAs is
+   * used.
+   */
+  const std::string prm_file;
 
   /**
    * A separate (sub-)class that handles Postprocessing.
@@ -252,7 +250,7 @@ private:
  * Constructor of the piezoelectric problem
  */
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
-PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem ()
+PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem (const std::string &parameter_file)
   :
   mpi_communicator (MPI_COMM_WORLD),
 
@@ -266,7 +264,9 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem ()
   fe_q (dealii::FE_Q<dim> (2), dim, /* displacement       */
 	dealii::FE_Q<dim> (1), 1),  /* electric potential */
 
-  dof_handler (triangulation)
+  dof_handler (triangulation),
+
+  prm_file (parameter_file)
 {}
 
 
@@ -328,7 +328,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
    			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
    			    "A list of the Bravais lattice dimensions. ");
 
-  parameters.read_input (command_line.get_prm_file ());
+  parameters.read_input (prm_file);
 
   first_order_elastic_coefficients = 
     dealii::Utilities::string_to_double
@@ -878,10 +878,8 @@ int main (int argc, char **argv)
     {
       dealii::deallog.depth_console (0);
 
-      // Initialise the problem, 3d wurtzite, parse the command
-      // line options and then run the problem.
-      PiezoelectricProblem<3, nil::GroupSymmetry::Wurtzite> piezoelectric_problem;
-      piezoelectric_problem.command_line.parse_command_line (argc, argv); 
+      // Initialise the problem, 3d wurtzite, (default double).
+      PiezoelectricProblem<3, nil::GroupSymmetry::Wurtzite> piezoelectric_problem ("step-1.prm");
       piezoelectric_problem.run ();
     }
 
