@@ -783,28 +783,33 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::output_results (const unsigned 
       // The filenames to bind into the master record should match the
       // filenames used above.
       for (unsigned int i=0; i<dealii::Utilities::MPI::n_mpi_processes (mpi_communicator); ++i)
-	filenames.push_back ("solution-" +
-			     dealii::Utilities::int_to_string (cycle, 4) +
-			     "." +
-			     dealii::Utilities::int_to_string (triangulation.locally_owned_subdomain(), 4) +
-			     ".vtu");
+	{
+	  filenames.push_back ("solution-" +
+			       dealii::Utilities::int_to_string (cycle, 4) +
+			       "." +
+			       dealii::Utilities::int_to_string (i, 4) +
+			       ".vtu");
+	}
+      std::cout << std::endl;
 
       const std::string
 	pvtu_master_filename = ("solution-" +
 				dealii::Utilities::int_to_string (cycle, 4) +
 				".pvtu");
   
-      std::ofstream pvtu_master (pvtu_master_filename.c_str());
+      std::ofstream pvtu_master (pvtu_master_filename.c_str ());
       data_out.write_pvtu_record (pvtu_master, filenames);
 
+      // Create master record for visit
       const std::string visit_master_filename 
 	= ("solution-" +
 	   dealii::Utilities::int_to_string (cycle, 4) +
-	   ".paraview");
+	   ".visit");
 
-      std::ofstream visit_master (visit_master_filename.c_str());
+      std::ofstream visit_master (visit_master_filename.c_str ());
       data_out.write_visit_record (visit_master, filenames);
     }
+
 }
 
 
