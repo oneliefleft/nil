@@ -582,28 +582,6 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::make_coefficient_tensors ()
 
   lattice_mismatch_tensor[1][0][0] = lattice_mismatch_tensor[1][1][1] = delta_a;
   lattice_mismatch_tensor[1][2][2] = delta_c;
-
-  for (unsigned int i=0; i<n_material_ids; ++i)
-    { 
-      pcout << "Tensors of coefficients:"
-	    << std::endl
-	    << "   Lattice coefficients:            ";
-      for (unsigned int j=0; j<lattice_coefficients[i].size (); ++j)
-	pcout << lattice_coefficients[i][j] << " ";
-      pcout << std::endl
-	    << "   Lattice mismatch:                " << lattice_mismatch_tensor[i]
-	    << std::endl
-	    << "   1st-order elastic:               " << first_order_elastic_tensor[i]
-	    << std::endl
-	    << "   1st-order dielectric:            " << first_order_dielectric_tensor[i]
-	    << std::endl
-	    << "   1st-order piezoelectric:         " << first_order_piezoelectric_tensor[i]
-	    << std::endl
-	    << "   1st-order spont. polarization:   " << first_order_spontaneous_polarization_tensor[i]
-	    << std::endl
-	    << "   2nd-order piezoelectric:         " << second_order_piezoelectric_tensor[i]
-	    << std::endl;
-    }
 }
 
 
@@ -873,15 +851,38 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
   // Make coefficient tensors.
   make_coefficient_tensors ();
 
- 
+  for (unsigned int i=0; i<n_material_ids; ++i)
+    { 
+      pcout << std::endl
+	    << "Tensors of coefficients:"
+	    << std::endl
+	    << "   Lattice coefficients:            ";
+      for (unsigned int j=0; j<lattice_coefficients[i].size (); ++j)
+	pcout << lattice_coefficients[i][j] << " ";
+      pcout << std::endl
+	    << "   Lattice mismatch:                " << lattice_mismatch_tensor[i]
+	    << std::endl
+	    << "   1st-order elastic:               " << first_order_elastic_tensor[i]
+	    << std::endl
+	    << "   1st-order dielectric:            " << first_order_dielectric_tensor[i]
+	    << std::endl
+	    << "   1st-order piezoelectric:         " << first_order_piezoelectric_tensor[i]
+	    << std::endl
+	    << "   1st-order spont. polarization:   " << first_order_spontaneous_polarization_tensor[i]
+	    << std::endl
+	    << "   2nd-order piezoelectric:         " << second_order_piezoelectric_tensor[i]
+	    << std::endl;
+    }
+
   // Then create the coarse grid
-  make_coarse_grid (3);
+  make_coarse_grid (2);
 
   // Here comes the adaptive cycles
   for (unsigned int cycle=0; cycle<1; ++cycle)
     {
       
-      pcout << "Grid:"
+      pcout << std::endl
+	    << "Grid:"
 	    << std::endl
 	    << "   Number of active cells:          "
 	    << triangulation.n_global_active_cells ()
@@ -892,7 +893,10 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
       
       setup_system ();
       
-      pcout << "   Number of degrees of freedom:    "
+      pcout << std::endl
+	    << "Linear algebra sysem:"
+	    << std::endl
+	    << "   Number of degrees of freedom:    "
 	    << dof_handler.n_dofs ()
 	    << std::endl;
 
