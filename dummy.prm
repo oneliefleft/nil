@@ -22,7 +22,7 @@ subsection Material id 0
 
   # A list of the second-order piezoelectric coefficients. Default is
   # zinc-blende GaAs. See: PRL 96, 187602 (2006).
-  set Second-order piezoelectric coefficients           = 
+  set Second-order piezoelectric coefficients           = 4.4, 2.4, -0.1, 3.0, 3.0, 3.8, -26.0, 3.2
 end
 
 
@@ -48,7 +48,7 @@ subsection Material id 1
 
   # A list of the second-order piezoelectric coefficients. Default is
   # zinc-blende GaAs. See: PRL 96, 187602 (2006).
-  set Second-order piezoelectric coefficients           = 
+  set Second-order piezoelectric coefficients           = 4.5, 2.8, 1.6, 4.8, 3.7, 0.0, -14.1, 0.9
 end
 
 
