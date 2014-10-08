@@ -1,0 +1,4 @@
+
+template class 
+nil::GeometryDescription::HyperCube<3, double>;
+      
