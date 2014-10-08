@@ -662,8 +662,9 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
   dealii::QGauss<dim> quadrature_formula (9);
   
   dealii::FEValues<dim> fe_values (fe_q, quadrature_formula,
-				   dealii::update_values    | 
-				   dealii::update_gradients |
+				   dealii::update_quadrature_points | 
+				   dealii::update_values            | 
+				   dealii::update_gradients         | 
 				   dealii::update_JxW_values);
   
   const unsigned int n_dofs_per_cell = fe_q.dofs_per_cell;
