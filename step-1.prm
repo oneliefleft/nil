@@ -2,32 +2,6 @@
 # ---------------------
 subsection Material id 0
   # A list of the Bravais lattice coefficients.
-  set Bravais lattice coefficients                      = 3.112, 4.982
-
-  # A list of the first-order dielectric coefficients. Default is zinc-blende
-  # GaAs.
-  set First-order dielectric coefficients               = 8.57, 8.67
-
-  # A list of the first-order elastic coefficients. Default is zinc-blende
-  # GaAs.
-  set First-order elastic coefficients                  = 396, 137, 108, 373, 116
-
-  # A list of the first-order piezoelectric coefficients. Default is
-  # zinc-blende GaAs. See: PRL 96, 187602 (2006).
-  set First-order piezoelectric coefficients            = -0.60, -0.60, 1.46
-
-  # A list of the first-order spontaneous polarization coefficients. Default
-  # is zinc-blende GaAs.
-  set First-order spontaneous polarization coefficients = -0.081
-
-  # A list of the second-order piezoelectric coefficients. Default is
-  # zinc-blende GaAs. See: PRL 96, 187602 (2006).
-  set Second-order piezoelectric coefficients           = 4.4, 2.4, -0.1, 3.0, 3.0, 3.8, -26.0, 3.2
-end
-
-
-subsection Material id 1
-  # A list of the Bravais lattice coefficients.
   set Bravais lattice coefficients                      = 3.189, 5.185
 
   # A list of the first-order dielectric coefficients. Default is zinc-blende
@@ -52,3 +26,27 @@ subsection Material id 1
 end
 
 
+subsection Material id 1
+  # A list of the Bravais lattice coefficients.
+  set Bravais lattice coefficients                      = 3.112, 4.982
+
+  # A list of the first-order dielectric coefficients. Default is zinc-blende
+  # GaAs.
+  set First-order dielectric coefficients               = 8.57, 8.67
+
+  # A list of the first-order elastic coefficients. Default is zinc-blende
+  # GaAs.
+  set First-order elastic coefficients                  = 396, 137, 108, 373, 116
+
+  # A list of the first-order piezoelectric coefficients. Default is
+  # zinc-blende GaAs. See: PRL 96, 187602 (2006).
+  set First-order piezoelectric coefficients            = -0.60, -0.60, 1.46
+
+  # A list of the first-order spontaneous polarization coefficients. Default
+  # is zinc-blende GaAs.
+  set First-order spontaneous polarization coefficients = -0.081
+
+  # A list of the second-order piezoelectric coefficients. Default is
+  # zinc-blende GaAs. See: PRL 96, 187602 (2006).
+  set Second-order piezoelectric coefficients           = 4.4, 2.4, -0.1, 3.0, 3.0, 3.8, -26.0, 3.2
+end
