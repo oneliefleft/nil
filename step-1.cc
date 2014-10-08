@@ -75,6 +75,8 @@
 #include "include/nil/piezoelectric_tensor.h"
 #include "include/nil/spontaneous_polarization_tensor.h"
 
+#include "parameter_reader.h"
+
 #include "piezoelectric_coefficients.h"
 
 #include <fstream>
@@ -158,12 +160,8 @@ private:
   /**
    * Mismatch strain tensor.
    */
-  dealii::Tensor<2, dim, ValueType> mismatch_strain_tensor;
-
-  /**
-   * The size of the Bravais lattice.
-   */
-  std::vector<double> bravais_lattice;
+  std::vector<dealii::Tensor<2, dim, ValueType> > lattice_mismatch_tensor;
+  std::vector<std::vector<ValueType> >            lattice_coefficients;
 
   /**
    * A I<code>deal.II</code> hack tha outputs to the first processor
@@ -225,7 +223,7 @@ private:
    * An object to hold various run-time parameters that are specified
    * in an "prm file".
    */
-  dealii::ParameterHandler parameters;
+  dealii::ParameterHandler prm_handler;
 
   /**
    * A table to handle a set of commonly interesting results.
@@ -243,6 +241,9 @@ private:
    * A separate (sub-)class that handles Postprocessing.
    */
   class Postprocessor;
+
+  // A dummy number that counts how many ids we have.
+  const unsigned int n_material_ids = 2;
 };
 
 
@@ -290,70 +291,86 @@ template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
 PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
 {
+
+  nil::ParameterReader prm_reader (prm_handler, prm_file);
+  prm_reader.read_parameters ();
+
+#ifdef MANUAL_PARAMETR_HANDLER
   // First declare the parameters that are expected to be found.
-  parameters.declare_entry ("First-order elastic coefficients",
+  prm_handler.declare_entry ("First-order elastic coefficients",
 			    "-0.230",
 			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
 			    "A list of the first-order elastic coefficients. " 
 			    "Default is zinc-blende GaAs. ");
 
-  parameters.declare_entry ("First-order dielectric coefficients",
+  prm_handler.declare_entry ("First-order dielectric coefficients",
 			    "-0.230",
 			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
 			    "A list of the first-order dielectric coefficients. " 
 			    "Default is zinc-blende GaAs. ");
 
-  parameters.declare_entry ("First-order piezoelectric coefficients",
+  prm_handler.declare_entry ("First-order piezoelectric coefficients",
 			    "-0.230",
 			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
 			    "A list of the first-order piezoelectric coefficients. " 
 			    "Default is zinc-blende GaAs. "
 			    "See: PRL 96, 187602 (2006). ");
   
-  parameters.declare_entry ("Second-order piezoelectric coefficients",
+  prm_handler.declare_entry ("Second-order piezoelectric coefficients",
 			    "-0.439, -3.765, -0.492",
 			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
 			    "A list of the second-order piezoelectric coefficients. "
 			    "Default is zinc-blende GaAs. "
 			    "See: PRL 96, 187602 (2006). ");
 
-  parameters.declare_entry ("First-order spontaneous polarization coefficients",
+  prm_handler.declare_entry ("First-order spontaneous polarization coefficients",
 			    "0.",
 			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
 			    "A list of the first-order spontaneous polarization coefficients. " 
 			    "Default is zinc-blende GaAs. ");
 
-  parameters.declare_entry ("Bravais lattice dimensions",
+  prm_handler.declare_entry ("Bravais lattice coefficients",
    			    "1.",
    			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
-   			    "A list of the Bravais lattice dimensions. ");
+   			    "A list of the Bravais lattice coefficients. ");
 
-  parameters.read_input (prm_file);
+  prm_handler.read_input (prm_file);
+#endif
 
-  first_order_elastic_coefficients = 
-    dealii::Utilities::string_to_double
-    (dealii::Utilities::split_string_list (parameters.get ("First-order elastic coefficients")));
-
-  first_order_dielectric_coefficients = 
-    dealii::Utilities::string_to_double
-    (dealii::Utilities::split_string_list (parameters.get ("First-order dielectric coefficients")));
-
-  first_order_piezoelectric_coefficients = 
-    dealii::Utilities::string_to_double
-    (dealii::Utilities::split_string_list (parameters.get ("First-order piezoelectric coefficients")));
-
-  second_order_piezoelectric_coefficients = 
-    dealii::Utilities::string_to_double
-    (dealii::Utilities::split_string_list (parameters.get ("Second-order piezoelectric coefficients")));
-
-  first_order_spontaneous_polarization_coefficients = 
-    dealii::Utilities::string_to_double
-    (dealii::Utilities::split_string_list (parameters.get ("First-order spontaneous polarization coefficients")));
-
-  bravais_lattice = 
-    dealii::Utilities::string_to_double
-    (dealii::Utilities::split_string_list (parameters.get ("Bravais lattice dimensions")));
-
+  for (unsigned int i=0; i<n_material_ids; ++i)
+    {
+      std::string subsection 
+	= "Material id " + dealii::Utilities::int_to_string (i);
+      
+      prm_handler.enter_subsection (subsection);
+      {
+    
+	first_order_elastic_coefficients = 
+	  dealii::Utilities::string_to_double
+	  (dealii::Utilities::split_string_list (prm_handler.get ("First-order elastic coefficients")));
+	
+	first_order_dielectric_coefficients = 
+	  dealii::Utilities::string_to_double
+	  (dealii::Utilities::split_string_list (prm_handler.get ("First-order dielectric coefficients")));
+	
+	first_order_piezoelectric_coefficients = 
+	  dealii::Utilities::string_to_double
+	  (dealii::Utilities::split_string_list (prm_handler.get ("First-order piezoelectric coefficients")));
+	
+	second_order_piezoelectric_coefficients = 
+	  dealii::Utilities::string_to_double
+	  (dealii::Utilities::split_string_list (prm_handler.get ("Second-order piezoelectric coefficients")));
+	
+	first_order_spontaneous_polarization_coefficients = 
+	  dealii::Utilities::string_to_double
+	  (dealii::Utilities::split_string_list (prm_handler.get ("First-order spontaneous polarization coefficients")));
+	
+	lattice_coefficients.push_back ( 
+	  dealii::Utilities::string_to_double
+	  (dealii::Utilities::split_string_list (prm_handler.get ("Bravais lattice coefficients"))));
+      }
+      prm_handler.leave_subsection ();
+    }
 }
 
   
@@ -551,22 +568,37 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::make_coefficient_tensors ()
   second_order_piezoelectric_tensor.distribute_coefficients (second_order_piezoelectric_coefficients);
 
   // mismatch strain
-  mismatch_strain_tensor.clear ();
-  mismatch_strain_tensor[0][0] = mismatch_strain_tensor[1][1] = bravais_lattice[0];
-  mismatch_strain_tensor[2][2] = bravais_lattice[1];
+  lattice_mismatch_tensor.resize (n_material_ids);
+  lattice_mismatch_tensor[0].clear ();
+  lattice_mismatch_tensor[1].clear ();
 
-  pcout << "Tensors of coefficients:"
-	<< std::endl
-	<< "   1st-order elastic:               " << first_order_elastic_tensor
-	<< std::endl
-	<< "   1st-order dielectric:            " << first_order_dielectric_tensor
-	<< std::endl
-	<< "   1st-order piezoelectric:         " << first_order_piezoelectric_tensor
-	<< std::endl
-	<< "   1st-order spont. polarization:   " << first_order_spontaneous_polarization_tensor
-	<< std::endl
-	<< "   2nd-order piezoelectric:         " << second_order_piezoelectric_tensor
-	<< std::endl;
+  const double delta_a = lattice_coefficients[1][0]/lattice_coefficients[0][0]-1.;
+  const double delta_c = lattice_coefficients[1][1]/lattice_coefficients[0][1]-1.;
+
+  lattice_mismatch_tensor[1][0][0] = lattice_mismatch_tensor[1][1][1] = delta_a;
+  lattice_mismatch_tensor[1][2][2] = delta_c;
+
+  for (unsigned int i=0; i<n_material_ids; ++i)
+    { 
+      pcout << "Tensors of coefficients:"
+	    << std::endl
+	    << "   Lattice coefficients:            ";
+      for (unsigned int j=0; j<lattice_coefficients[i].size (); ++j)
+	pcout << lattice_coefficients[i][j] << " ";
+      pcout << std::endl
+	    << "   Lattice mismatch:                " << lattice_mismatch_tensor[i]
+	    << std::endl
+	    << "   1st-order elastic:               " << first_order_elastic_tensor
+	    << std::endl
+	    << "   1st-order dielectric:            " << first_order_dielectric_tensor
+	    << std::endl
+	    << "   1st-order piezoelectric:         " << first_order_piezoelectric_tensor
+	    << std::endl
+	    << "   1st-order spont. polarization:   " << first_order_spontaneous_polarization_tensor
+	    << std::endl
+	    << "   2nd-order piezoelectric:         " << second_order_piezoelectric_tensor
+	    << std::endl;
+    }
 }
 
 
@@ -691,7 +723,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 		
 		cell_rhs (i) += 
 		  (contract (u_i_grad, first_order_elastic_tensor, 
-		 	     mismatch_strain_tensor)
+		 	     lattice_mismatch_tensor)
 		   +
 		   contract (phi_i_grad, first_order_spontaneous_polarization_tensor))
 		  *
@@ -827,6 +859,8 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
 
   // Make coefficient tensors.
   make_coefficient_tensors ();
+
+#ifdef DO_SOMETHING
  
   // Then create the coarse grid
   make_coarse_grid (3);
@@ -869,6 +903,8 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
 
       output_results (cycle);
     }
+
+#endif
 
 }
 
