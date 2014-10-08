@@ -75,6 +75,7 @@
 #include "include/nil/piezoelectric_tensor.h"
 #include "include/nil/spontaneous_polarization_tensor.h"
 
+#include "geometry_description.h"
 #include "parameter_reader.h"
 
 #include "piezoelectric_coefficients.h"
@@ -133,22 +134,22 @@ private:
 
   // Following that we have a list of the tensors that will be used in
   // this calculation. They are, first- 
-  nil::ElasticTensor<GroupSymm, 1, ValueType>                 first_order_elastic_tensor;
-  nil::DielectricTensor<GroupSymm, 1, ValueType>              first_order_dielectric_tensor;
-  nil::PiezoelectricTensor<GroupSymm, 1, ValueType>           first_order_piezoelectric_tensor;
-  nil::SpontaneousPolarizationTensor<GroupSymm, 1, ValueType> first_order_spontaneous_polarization_tensor;
+  std::vector<nil::ElasticTensor<GroupSymm, 1, ValueType> >                 first_order_elastic_tensor;
+  std::vector<nil::DielectricTensor<GroupSymm, 1, ValueType> >              first_order_dielectric_tensor;
+  std::vector<nil::PiezoelectricTensor<GroupSymm, 1, ValueType> >           first_order_piezoelectric_tensor;
+  std::vector<nil::SpontaneousPolarizationTensor<GroupSymm, 1, ValueType> > first_order_spontaneous_polarization_tensor;
 
   // and second-order piezoelectric tensors
-  nil::PiezoelectricTensor<GroupSymm, 2, ValueType> second_order_piezoelectric_tensor;
+  std::vector<nil::PiezoelectricTensor<GroupSymm, 2, ValueType> > second_order_piezoelectric_tensor;
  
   // Additionally, lists of coefficients are needed for first-order
-  std::vector<ValueType> first_order_elastic_coefficients;
-  std::vector<ValueType> first_order_dielectric_coefficients;
-  std::vector<ValueType> first_order_piezoelectric_coefficients;
-  std::vector<ValueType> first_order_spontaneous_polarization_coefficients;
+  std::vector<std::vector<ValueType> > first_order_elastic_coefficients;
+  std::vector<std::vector<ValueType> > first_order_dielectric_coefficients;
+  std::vector<std::vector<ValueType> > first_order_piezoelectric_coefficients;
+  std::vector<std::vector<ValueType> > first_order_spontaneous_polarization_coefficients;
 
   // and second-order tensors.
-  std::vector<ValueType> second_order_piezoelectric_coefficients;
+  std::vector<std::vector<ValueType> > second_order_piezoelectric_coefficients;
 
   /**
    * Sets of piezoelectric coefficients that are to be used in this
@@ -345,25 +346,25 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
       prm_handler.enter_subsection (subsection);
       {
     
-	first_order_elastic_coefficients = 
+	first_order_elastic_coefficients.push_back (
 	  dealii::Utilities::string_to_double
-	  (dealii::Utilities::split_string_list (prm_handler.get ("First-order elastic coefficients")));
+	  (dealii::Utilities::split_string_list (prm_handler.get ("First-order elastic coefficients"))));
 	
-	first_order_dielectric_coefficients = 
+	first_order_dielectric_coefficients.push_back (
 	  dealii::Utilities::string_to_double
-	  (dealii::Utilities::split_string_list (prm_handler.get ("First-order dielectric coefficients")));
+	  (dealii::Utilities::split_string_list (prm_handler.get ("First-order dielectric coefficients"))));
 	
-	first_order_piezoelectric_coefficients = 
+	first_order_piezoelectric_coefficients.push_back (
 	  dealii::Utilities::string_to_double
-	  (dealii::Utilities::split_string_list (prm_handler.get ("First-order piezoelectric coefficients")));
+	  (dealii::Utilities::split_string_list (prm_handler.get ("First-order piezoelectric coefficients"))));
 	
-	second_order_piezoelectric_coefficients = 
+	second_order_piezoelectric_coefficients.push_back ( 
 	  dealii::Utilities::string_to_double
-	  (dealii::Utilities::split_string_list (prm_handler.get ("Second-order piezoelectric coefficients")));
+	  (dealii::Utilities::split_string_list (prm_handler.get ("Second-order piezoelectric coefficients"))));
 	
-	first_order_spontaneous_polarization_coefficients = 
+	first_order_spontaneous_polarization_coefficients.push_back (
 	  dealii::Utilities::string_to_double
-	  (dealii::Utilities::split_string_list (prm_handler.get ("First-order spontaneous polarization coefficients")));
+	  (dealii::Utilities::split_string_list (prm_handler.get ("First-order spontaneous polarization coefficients"))));
 	
 	lattice_coefficients.push_back ( 
 	  dealii::Utilities::string_to_double
@@ -551,21 +552,25 @@ void
 PiezoelectricProblem<dim, GroupSymm, ValueType>::make_coefficient_tensors ()
 {
   // Initialise the first- 
-  first_order_elastic_tensor.reinit ();
-  first_order_dielectric_tensor.reinit ();
-  first_order_piezoelectric_tensor.reinit ();
+  first_order_elastic_tensor.resize (n_material_ids);
+  first_order_dielectric_tensor.resize (n_material_ids);
+  first_order_piezoelectric_tensor.resize (n_material_ids);
+  first_order_spontaneous_polarization_tensor.resize (n_material_ids);
 
   // and second-order coefficient tensors,
-  second_order_piezoelectric_tensor.reinit ();
+  second_order_piezoelectric_tensor.resize (n_material_ids);
 
-  // and then distribute the first-
-  first_order_elastic_tensor.distribute_coefficients (first_order_elastic_coefficients);
-  first_order_dielectric_tensor.distribute_coefficients (first_order_dielectric_coefficients);
-  first_order_piezoelectric_tensor.distribute_coefficients (first_order_piezoelectric_coefficients);
-  first_order_spontaneous_polarization_tensor.distribute_coefficients (first_order_spontaneous_polarization_coefficients);
-
-  // and second-order coefficients.
-  second_order_piezoelectric_tensor.distribute_coefficients (second_order_piezoelectric_coefficients);
+  for (unsigned int i=0; i<n_material_ids; ++i)
+    {
+      // and then distribute the first-
+      first_order_elastic_tensor[i].distribute_coefficients (first_order_elastic_coefficients[i]);
+      first_order_dielectric_tensor[i].distribute_coefficients (first_order_dielectric_coefficients[i]);
+      first_order_piezoelectric_tensor[i].distribute_coefficients (first_order_piezoelectric_coefficients[i]);
+      first_order_spontaneous_polarization_tensor[i].distribute_coefficients (first_order_spontaneous_polarization_coefficients[i]);
+      
+      // and second-order coefficients.
+      second_order_piezoelectric_tensor[i].distribute_coefficients (second_order_piezoelectric_coefficients[i]);
+    }
 
   // mismatch strain
   lattice_mismatch_tensor.resize (n_material_ids);
@@ -588,15 +593,15 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::make_coefficient_tensors ()
       pcout << std::endl
 	    << "   Lattice mismatch:                " << lattice_mismatch_tensor[i]
 	    << std::endl
-	    << "   1st-order elastic:               " << first_order_elastic_tensor
+	    << "   1st-order elastic:               " << first_order_elastic_tensor[i]
 	    << std::endl
-	    << "   1st-order dielectric:            " << first_order_dielectric_tensor
+	    << "   1st-order dielectric:            " << first_order_dielectric_tensor[i]
 	    << std::endl
-	    << "   1st-order piezoelectric:         " << first_order_piezoelectric_tensor
+	    << "   1st-order piezoelectric:         " << first_order_piezoelectric_tensor[i]
 	    << std::endl
-	    << "   1st-order spont. polarization:   " << first_order_spontaneous_polarization_tensor
+	    << "   1st-order spont. polarization:   " << first_order_spontaneous_polarization_tensor[i]
 	    << std::endl
-	    << "   2nd-order piezoelectric:         " << second_order_piezoelectric_tensor
+	    << "   2nd-order piezoelectric:         " << second_order_piezoelectric_tensor[i]
 	    << std::endl;
     }
 }
@@ -652,9 +657,6 @@ template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
 PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 {
-  nil::PiezoelectricCoefficients<nil::GroupSymmetry::Wurtzite, ValueType> 
-    aln_coefficients (nil::first_order_elastic);
-
   // @todo: The number of quadrature points should be decided
   // elsewhere. @note: overspecify the number of quadrature points.
   dealii::QGauss<dim> quadrature_formula (9);
@@ -671,6 +673,10 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
   dealii::Vector<ValueType>     cell_rhs    (n_dofs_per_cell);
 
   std::vector<dealii::types::global_dof_index> local_dof_indices (n_dofs_per_cell);
+
+  // Get a copy of the geometry for the quantum dot
+  nil::GeometryDescription::HyperCube<dim, ValueType> hyper_cube (-5,5);
+  std::vector<ValueType> cell_hyper_cube (n_q_points);
 
   // So-called "finite elemnt views" that define parts of the finite
   // elemnt system connected with displacements (u on position
@@ -692,8 +698,14 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 	cell_matrix = 0;
 	cell_rhs    = 0;
 
+	// Obtain the material pattern on quandrature points.
+	hyper_cube.value_list (fe_values.get_quadrature_points (), cell_hyper_cube);
+
 	for (unsigned int q_point = 0; q_point<n_q_points; ++q_point)
 	  {
+
+	    // This is the material id 1 in the dot and 0 otherwise.
+	    const unsigned int material_id = cell_hyper_cube[q_point];
 
 	    for (unsigned int i=0; i<n_dofs_per_cell; ++i)
 	      {
@@ -710,10 +722,10 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 		    const dealii::Tensor<1, dim> phi_j_grad = fe_values[phi].gradient (j, q_point);
 		    
 		    cell_matrix (i,j) +=
-                       (contract (u_i_grad, first_order_elastic_tensor, 
+                       (contract (u_i_grad, first_order_elastic_tensor[material_id], 
 				  u_j_grad)
 			+
-			contract (phi_i_grad, first_order_dielectric_tensor, 
+			contract (phi_i_grad, first_order_dielectric_tensor[material_id], 
 				  phi_j_grad))
 		      *
 		      fe_values.JxW (q_point);
@@ -722,10 +734,10 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 		  } // dof j
 		
 		cell_rhs (i) += 
-		  (contract (u_i_grad, first_order_elastic_tensor, 
-		 	     lattice_mismatch_tensor)
+		  (contract (u_i_grad, first_order_elastic_tensor[material_id], 
+		 	     lattice_mismatch_tensor[i])
 		   +
-		   contract (phi_i_grad, first_order_spontaneous_polarization_tensor))
+		   contract (phi_i_grad, first_order_spontaneous_polarization_tensor[material_id]))
 		  *
 		  fe_values.JxW (q_point);
 		
@@ -860,7 +872,6 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
   // Make coefficient tensors.
   make_coefficient_tensors ();
 
-#ifdef DO_SOMETHING
  
   // Then create the coarse grid
   make_coarse_grid (3);
@@ -903,8 +914,6 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
 
       output_results (cycle);
     }
-
-#endif
 
 }
 
