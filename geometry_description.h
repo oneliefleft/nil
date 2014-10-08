@@ -99,5 +99,5 @@ namespace nil
   } // namespace GeometryDescription
   
 } // namespace nil
-
+  
 #endif // __nil_geometry_description_h
