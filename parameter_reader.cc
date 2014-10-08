@@ -67,7 +67,7 @@ namespace nil
     for (unsigned int i=0; i<read_material_id (); ++i)
       {
 	std::string subsection 
-	  = "Matererial id " + dealii::Utilities::int_to_string (i);
+	  = "Material id " + dealii::Utilities::int_to_string (i);
 	
 	prm_handler.enter_subsection (subsection);
 	{
