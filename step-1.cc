@@ -712,11 +712,14 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 		    
 		  } // dof j
 		
-		cell_rhs (i) += 
+		// @todo By commenting out the first line, the solver
+		// converges (no -nan).
+		cell_rhs (i) -= 
 		  (contract (u_i_grad, first_order_elastic_tensor[material_id], 
-		 	     lattice_mismatch_tensor[i])
+		   	     lattice_mismatch_tensor[material_id])
 		   +
 		   contract (phi_i_grad, first_order_spontaneous_polarization_tensor[material_id]))
+		  
 		  *
 		  fe_values.JxW (q_point);
 		
@@ -762,6 +765,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::solve ()
   dealii::SolverControl solver_control (system_matrix.m (), 1e-09*system_rhs.l2_norm ());
   dealii::PETScWrappers::PreconditionBlockJacobi preconditioner (system_matrix);
   dealii::PETScWrappers::SolverBicgstab solver (solver_control, mpi_communicator);
+  // dealii::PETScWrappers::SolverGMRES solver (solver_control, mpi_communicator);
 
   solver.solve (system_matrix, distributed_solution, system_rhs, 
 		preconditioner);
@@ -813,7 +817,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::output_results (const unsigned 
 			       dealii::Utilities::int_to_string (i, 4) +
 			       ".vtu");
 	}
-      std::cout << std::endl;
+      pcout << std::endl;
 
       const std::string
 	pvtu_master_filename = ("solution-" +
@@ -894,7 +898,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
       setup_system ();
       
       pcout << std::endl
-	    << "Linear algebra sysem:"
+	    << "System:"
 	    << std::endl
 	    << "   Number of degrees of freedom:    "
 	    << dof_handler.n_dofs ()
@@ -902,14 +906,25 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
 
       assemble_system ();
 
-      pcout << "Linear algebra system:"
+      pcout << std::endl
+	    << "Linear algebra system:"
 	    << std::endl
 	    << "   Number of non-zero elements:     "
 	    << system_matrix.n_nonzero_elements ()
 	    << std::endl
 	    << "   System rhs l2-norm:              "
 	    << system_rhs.l2_norm ()
-	    << std::endl;
+	    << std::endl << std::flush;
+
+      // std::cout << std::endl
+      // 		<< "System matrix:"
+      // 		<< std::endl;
+      // system_matrix.print (std::cout);
+      // std::cout << std::endl
+      // 		<< "System rhs:"
+      // 		<< std::endl;
+      // system_rhs.print (std::cout);
+      // std::cout << std::endl;
 
       const unsigned int n_iterations = solve ();
 
