@@ -714,7 +714,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 		
 		// @todo By commenting out the first line, the solver
 		// converges (no -nan).
-		cell_rhs (i) -= 
+		cell_rhs (i) += 
 		  (contract (u_i_grad, first_order_elastic_tensor[material_id], 
 		   	     lattice_mismatch_tensor[material_id])
 		   +
