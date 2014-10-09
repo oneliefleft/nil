@@ -244,7 +244,7 @@ private:
   class Postprocessor;
 
   // A dummy number that counts how many ids we have.
-  const unsigned int n_material_ids = 2;
+  unsigned int n_material_ids = 2;
 };
 
 
