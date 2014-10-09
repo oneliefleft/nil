@@ -202,7 +202,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem (const std
   // fe_q (dealii::FE_Q<dim> (2), dim, /* displacement       */
   // 	dealii::FE_Q<dim> (1), 1),  /* electric potential */
 
-  fe_q (dealii::FE_Q<dim> (2), dim+1),  /* electric potential */
+  fe_q (dealii::FE_Q<dim> (1), dim+1),  /* all */
 
   dof_handler (triangulation),
 
@@ -452,7 +452,7 @@ compute_derived_quantities_vector (const std::vector<dealii::Vector<ValueType> >
 	 computed_quantities[q](d) = uh[q](d);
 
        // and then the potential (phi).
-       computed_quantities[q](dim) = uh[q](dim+1);
+       computed_quantities[q](dim) = uh[q](dim);
 
        //     Tensor<2,dim> grad_u;
        //     for (unsigned int d=0; d<dim; ++d)
@@ -654,7 +654,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 		    
 		  } // dof j
 		
-		cell_rhs (i) += 
+		cell_rhs (i) -= 
 		  (contract (u_i_grad, first_order_elastic_tensor[material_id], 
 		   	     lattice_mismatch_tensor[material_id])
 		   +
@@ -868,7 +868,8 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
 
       const unsigned int n_iterations = solve ();
 
-      pcout << "Solver converged in:                "
+      pcout << std::endl
+	    << "Solver converged in:                "
 	    << n_iterations << " iterations"
 	    << std::endl;
 
