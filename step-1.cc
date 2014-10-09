@@ -244,7 +244,7 @@ private:
   class Postprocessor;
 
   // A dummy number that counts how many ids we have.
-  unsigned int n_material_ids = 2;
+  const unsigned int n_material_ids;
 };
 
 
@@ -268,7 +268,9 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem (const std
 
   dof_handler (triangulation),
 
-  prm_file (parameter_file)
+  prm_file (parameter_file),
+
+  n_material_ids (2)
 {}
 
 
