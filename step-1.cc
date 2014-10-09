@@ -118,7 +118,7 @@ private:
   void make_boundary_constraints ();
 
   void setup_system ();
-  void make_coefficient_tensors ();
+  void setup_coefficient_tensors ();
   void assemble_system ();
 
   unsigned int solve ();
@@ -232,52 +232,12 @@ template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
 PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
 {
-
+  // Assign parameters to the parameter handler and check sanity of t
+  // he parameter. @note If no file exists an unusal default is made.
   nil::ParameterReader prm_reader (prm_handler, prm_file);
   prm_reader.read_parameters ();
 
-#ifdef MANUAL_PARAMETR_HANDLER
-  // First declare the parameters that are expected to be found.
-  prm_handler.declare_entry ("First-order elastic coefficients",
-			    "-0.230",
-			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
-			    "A list of the first-order elastic coefficients. " 
-			    "Default is zinc-blende GaAs. ");
-
-  prm_handler.declare_entry ("First-order dielectric coefficients",
-			    "-0.230",
-			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
-			    "A list of the first-order dielectric coefficients. " 
-			    "Default is zinc-blende GaAs. ");
-
-  prm_handler.declare_entry ("First-order piezoelectric coefficients",
-			    "-0.230",
-			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
-			    "A list of the first-order piezoelectric coefficients. " 
-			    "Default is zinc-blende GaAs. "
-			    "See: PRL 96, 187602 (2006). ");
-  
-  prm_handler.declare_entry ("Second-order piezoelectric coefficients",
-			    "-0.439, -3.765, -0.492",
-			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
-			    "A list of the second-order piezoelectric coefficients. "
-			    "Default is zinc-blende GaAs. "
-			    "See: PRL 96, 187602 (2006). ");
-
-  prm_handler.declare_entry ("First-order spontaneous polarization coefficients",
-			    "0.",
-			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
-			    "A list of the first-order spontaneous polarization coefficients. " 
-			    "Default is zinc-blende GaAs. ");
-
-  prm_handler.declare_entry ("Bravais lattice coefficients",
-   			    "1.",
-   			    dealii::Patterns::List (dealii::Patterns::Double (), 1),
-   			    "A list of the Bravais lattice coefficients. ");
-
-  prm_handler.read_input (prm_file);
-#endif
-
+  // then read in the parameters and store them
   for (unsigned int i=0; i<n_material_ids; ++i)
     {
       std::string subsection 
@@ -491,7 +451,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::make_coarse_grid (const unsigne
  */
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
-PiezoelectricProblem<dim, GroupSymm, ValueType>::make_coefficient_tensors ()
+PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_coefficient_tensors ()
 {
   // Initialise the first- 
   first_order_elastic_tensor.resize (n_material_ids);
@@ -793,7 +753,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
   get_parameters ();
 
   // Make coefficient tensors.
-  make_coefficient_tensors ();
+  setup_coefficient_tensors ();
 
   for (unsigned int i=0; i<n_material_ids; ++i)
     { 
