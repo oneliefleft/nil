@@ -122,8 +122,10 @@ private:
   void assemble_system ();
 
   unsigned int solve ();
+  void refine_grid ();
 
   void output_results (const unsigned int cycle) const;
+
 
   // A local copy of the MPI communicator.
   MPI_Comm mpi_communicator;
@@ -679,6 +681,14 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::solve ()
 
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void
+PiezoelectricProblem<dim, GroupSymm, ValueType>::refine_grid ()
+{
+  
+}
+
+
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+void
 PiezoelectricProblem<dim, GroupSymm, ValueType>::output_results (const unsigned int cycle) const
 {
   PiezoelectricProblem::Postprocessor postprocessor (dealii::Utilities::MPI::this_mpi_process (mpi_communicator));
@@ -795,6 +805,8 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
 	    << " levels)"
 	    << std::endl;
       
+      // Distribute degrees of freedom and reinitialize matrices and
+      // vectors.
       setup_system ();
       
       pcout << std::endl
@@ -804,6 +816,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
 	    << dof_handler.n_dofs ()
 	    << std::endl;
 
+      // Assemble the matrix and rhs vector.
       assemble_system ();
 
       pcout << std::endl
@@ -816,16 +829,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
 	    << system_rhs.l2_norm ()
 	    << std::endl << std::flush;
 
-      // std::cout << std::endl
-      // 		<< "System matrix:"
-      // 		<< std::endl;
-      // system_matrix.print (std::cout);
-      // std::cout << std::endl
-      // 		<< "System rhs:"
-      // 		<< std::endl;
-      // system_rhs.print (std::cout);
-      // std::cout << std::endl;
-
+      // Solve the problem.
       const unsigned int n_iterations = solve ();
 
       pcout << std::endl
@@ -833,7 +837,11 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
 	    << n_iterations << " iterations"
 	    << std::endl;
 
+      // Write derived quantities to files.
       output_results (cycle);
+
+      // Finally use Kelly's error estimate to refine the grid.
+      refine_grid ();
     }
 
 }
