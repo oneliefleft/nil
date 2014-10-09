@@ -98,16 +98,14 @@ public:
   /**
    * Constructor.
    */
-  PiezoelectricProblem (const std::string &parameter_file = "gaas.prm");
+  PiezoelectricProblem (const std::string &parameter_file);
 
   /**
    * Destructor.
    */
   ~PiezoelectricProblem ();
   
-  /**
-   * Run the problem (a basic useage example)
-   */
+  // Run the problem.
   void run ();
   
 private:
@@ -127,9 +125,7 @@ private:
 
   void output_results (const unsigned int cycle) const;
 
-  /**
-   * A local copy of the MPI communicator.
-   */
+  // A local copy of the MPI communicator.
   MPI_Comm mpi_communicator;
 
   // Following that we have a list of the tensors that will be used in
@@ -139,7 +135,7 @@ private:
   std::vector<nil::PiezoelectricTensor<GroupSymm, 1, ValueType> >           first_order_piezoelectric_tensor;
   std::vector<nil::SpontaneousPolarizationTensor<GroupSymm, 1, ValueType> > first_order_spontaneous_polarization_tensor;
 
-  // and second-order piezoelectric tensors
+  // and second-order tensors of coefficients
   std::vector<nil::PiezoelectricTensor<GroupSymm, 2, ValueType> > second_order_piezoelectric_tensor;
  
   // Additionally, lists of coefficients are needed for first-order
@@ -151,105 +147,45 @@ private:
   // and second-order tensors.
   std::vector<std::vector<ValueType> > second_order_piezoelectric_coefficients;
 
-  /**
-   * Sets of piezoelectric coefficients that are to be used in this
-   * application - one for AlN and one for GaN.
-   */
-  nil::PiezoelectricCoefficients<nil::GroupSymmetry::Wurtzite, ValueType> aln_coefficients;
-  nil::PiezoelectricCoefficients<nil::GroupSymmetry::Wurtzite, ValueType> gan_coefficients;
-
-  /**
-   * Mismatch strain tensor.
-   */
+  
+  // Mismatch strain tensor.
   std::vector<dealii::Tensor<2, dim, ValueType> > lattice_mismatch_tensor;
   std::vector<std::vector<ValueType> >            lattice_coefficients;
 
-  /**
-   * A I<code>deal.II</code> hack tha outputs to the first processor
-   * only (useful for output in parallel ca;culations).
-   */
+
+  // A I<code>deal.II</code> hack that outputs to the first processor
+  // only (useful for output in parallel calculations).
   dealii::ConditionalOStream pcout;
 
-  /**
-   * A parallel distributed triangulation.
-   */
+  // A parallel distributed triangulation.
   dealii::parallel::distributed::Triangulation<dim> triangulation;
 
-  /**
-   * The finite element system.
-   */
+  // The finite element and linear algebra system.
   const dealii::FESystem<dim>                    fe_q;
-
-  /**
-   * Handler of degrees of freedom.
-   */
   dealii::DoFHandler<dim>                        dof_handler;
-
-  /**
-   * A matrix holding all constraints.
-   */
   dealii::ConstraintMatrix                       constraints;
-
-  /**
-   * An index set of the degrees of freedom locally owned by this
-   * processor.
-   */
   dealii::IndexSet                               locally_owned_dofs;
-
-  /**
-   * An index set of the degrees of freedom?
-   */
   dealii::IndexSet                               locally_relevant_dofs;
-
-  /**
-   * The system matrix. This has a block structure but, since we do
-   * not need the blocks, us a standard MPI sparse matrix.
-   */
   dealii::PETScWrappers::MPI::SparseMatrix       system_matrix;
-
-  /**
-   * The system rhs. This has a block structure but, since we do not
-   * need the blocks, us a standard MPI vector.
-   */
   dealii::PETScWrappers::MPI::Vector             system_rhs;
-
-  /**
-   * The solution. This has a block structure but, since we do not
-   * need the blocks, us a standard MPI vector. @note This vector has
-   * hpghost elements.
-   */
   dealii::PETScWrappers::MPI::Vector             solution;
 
-  /**
-   * An object to hold various run-time parameters that are specified
-   * in an "prm file".
-   */
+
+  // An object to hold various run-time parameters that are specified
+  // in a "prm file".
   dealii::ParameterHandler prm_handler;
+  const std::string        prm_file;
 
-  /**
-   * A table to handle a set of commonly interesting results.
-   */
-  dealii::TableHandler output_table;
-
-  /**
-   * The filename of the parameter file where material parameters are
-   * kept. @note If no parameter file is given, the default GaAs is
-   * used.
-   */
-  const std::string prm_file;
-
-  /**
-   * A separate (sub-)class that handles Postprocessing.
-   */
+  // Piezoelectric postprocessor.
   class Postprocessor;
 
-  // A dummy number that counts how many ids we have.
+  // A dummy number that counts how many material ids we have.
   const unsigned int n_material_ids;
 };
 
 
 /**
- * Constructor of the piezoelectric problem
+ * Constructor.
  */
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem (const std::string &parameter_file)
@@ -263,8 +199,10 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem (const std
 		 (dealii::Triangulation<dim>::smoothing_on_refinement |
 		  dealii::Triangulation<dim>::smoothing_on_coarsening)),
   
-  fe_q (dealii::FE_Q<dim> (2), dim, /* displacement       */
-	dealii::FE_Q<dim> (1), 1),  /* electric potential */
+  // fe_q (dealii::FE_Q<dim> (2), dim, /* displacement       */
+  // 	dealii::FE_Q<dim> (1), 1),  /* electric potential */
+
+  fe_q (dealii::FE_Q<dim> (2), dim+1),  /* electric potential */
 
   dof_handler (triangulation),
 
