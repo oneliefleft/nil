@@ -483,9 +483,9 @@ dealii::UpdateFlags
 PiezoelectricProblem<dim, group_symmetry, ValueType>::Postprocessor::get_needed_update_flags() const
 {
   return 
-    dealii::update_values    | 
-    dealii::update_gradients | 
-    dealii::update_q_points;
+    dealii::update_quadrature_points | 
+    dealii::update_values            | 
+    dealii::update_gradients;
 }
 
 
@@ -522,6 +522,8 @@ compute_derived_quantities_vector (const std::vector<dealii::Vector<ValueType> >
        // 	strain_rate * strain_rate;
        //     computed_quantities[q](dim+3) = partition;
      }
+
+
 }
 
 
@@ -779,7 +781,7 @@ template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void
 PiezoelectricProblem<dim, GroupSymm, ValueType>::output_results (const unsigned int cycle) const
 {
-  Postprocessor postprocessor (dealii::Utilities::MPI::this_mpi_process (mpi_communicator));
+  PiezoelectricProblem::Postprocessor postprocessor (dealii::Utilities::MPI::this_mpi_process (mpi_communicator));
 
   dealii::DataOut<dim> data_out;
   data_out.attach_dof_handler (dof_handler);
