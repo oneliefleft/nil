@@ -199,10 +199,10 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem (const std
 		 (dealii::Triangulation<dim>::smoothing_on_refinement |
 		  dealii::Triangulation<dim>::smoothing_on_coarsening)),
   
-  // fe_q (dealii::FE_Q<dim> (2), dim, /* displacement       */
-  // 	dealii::FE_Q<dim> (1), 1),  /* electric potential */
+  fe_q (dealii::FE_Q<dim> (2), dim, /* displacement       */
+   	dealii::FE_Q<dim> (1), 1),  /* electric potential */
 
-  fe_q (dealii::FE_Q<dim> (1), dim+1),  /* all */
+  // fe_q (dealii::FE_Q<dim> (1), dim+1),  /* all */
 
   dof_handler (triangulation),
 
