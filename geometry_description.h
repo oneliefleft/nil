@@ -66,8 +66,8 @@ namespace nil
 		 const ValueType right =  0.5) 
       : 
       dealii::Function<dim> (),
-      l (left),
-      r (right)
+      left_  (left),
+      right_ (right)
       {
 	Assert (left<right, 
 		dealii::ExcMessage ("The left coordinate must take a lower value than the right coordinate."));
@@ -88,12 +88,12 @@ namespace nil
       /**
        * Local copy of the left point of the hyper-cube boundary.
        */
-      ValueType l;
+      ValueType left_;
       
       /**
        * Local copy of the right point of the hyper-cube boundary.
        */
-      ValueType r;
+      ValueType right_;
       
       }; // HyperCube
     
@@ -120,7 +120,8 @@ namespace nil
 		     const ValueType height = 0.5) 
       : 
       dealii::Function<dim> (),
-      base_ (base),
+      base_   (base),
+      hat_    (hat),
       height_ (height)
       {}
 
@@ -175,7 +176,8 @@ namespace nil
 			const ValueType height = 0.5) 
       : 
       dealii::Function<dim> (),
-      base_ (base),
+      base_   (base),
+      hat_    (hat),
       height_ (height)
       {}
 

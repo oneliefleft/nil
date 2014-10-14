@@ -49,23 +49,74 @@ namespace nil
       
       switch (dim)
 	{
+
+	case 1:
+	  {
+	    if ((p[0]<right_) && (p[0]>left_))
+	      is_in_hyper_cube = 1;
+	    break;
+	  }
+	  
+	case 2:
+	  {
+	    if ((p[0]<right_) && (p[0]>left_) &&
+		(p[1]<right_) && (p[1]>left_))
+	      is_in_hyper_cube = 1;
+	    break;
+	  }
 	  
 	case 3:
 	  {
-	    if ((p[0]<r) && (p[0]>l) &&
-		(p[1]<r) && (p[1]>l) &&
-		(p[2]<r) && (p[2]>l))
+	    if ((p[0]<right_) && (p[0]>left_) &&
+		(p[1]<right_) && (p[1]>left_) &&
+		(p[2]<right_) && (p[2]>left_))
 	      is_in_hyper_cube = 1;
 	    break;
 	  }
 	  
 	default:
 	  AssertThrow (false, dealii::ExcNotImplemented ());
-	  
 	}
       
       return is_in_hyper_cube;
     }
+    
+
+    template <int dim, typename ValueType>
+    double
+    SquarePyramid<dim, ValueType>::value (const dealii::Point<dim, ValueType> &p,
+					  const unsigned int                   /* component */) const
+    {
+      double is_in_square_pyramid = 0.;
+
+      switch (dim)
+	{
+	  
+	default:
+	  AssertThrow (false, dealii::ExcNotImplemented ());
+	}
+      
+      return is_in_square_pyramid;
+    }
+
+
+    template <int dim, typename ValueType>
+    double
+    HexagonalPyramid<dim, ValueType>::value (const dealii::Point<dim, ValueType> &p,
+					     const unsigned int                   /* component */) const
+    {
+      double is_in_hexagonal_pyramid = 0.;
+      
+      switch (dim)
+	{
+	  
+	default:
+	  AssertThrow (false, dealii::ExcNotImplemented ());
+	}
+
+      return is_in_hexagonal_pyramid;
+    }
+
     
   } // name GeometryDescription
   
