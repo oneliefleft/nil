@@ -168,9 +168,9 @@ namespace nil
 	= 
 	coefficients[4];
 
-      // C_66 = C55 \mapsto:
-      tensor[0][0][0][0] 
-	= 
+      // C_66 \mapsto:
+      tensor[0][1][0][1] = tensor[1][0][0][1] = tensor[1][0][1][0] = tensor[0][1][1][0]
+	=  
 	(coefficients[0] - coefficients[1]) /2.;
       
     }
