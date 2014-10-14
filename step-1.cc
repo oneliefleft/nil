@@ -166,14 +166,14 @@ private:
   dealii::parallel::distributed::Triangulation<dim> triangulation;
 
   // The finite element and linear algebra system.
-  const dealii::FESystem<dim>                    fe_q;
-  dealii::DoFHandler<dim>                        dof_handler;
-  dealii::ConstraintMatrix                       constraints;
-  dealii::IndexSet                               locally_owned_dofs;
-  dealii::IndexSet                               locally_relevant_dofs;
-  dealii::PETScWrappers::MPI::SparseMatrix       system_matrix;
-  dealii::PETScWrappers::MPI::Vector             system_rhs;
-  dealii::PETScWrappers::MPI::Vector             solution;
+  const dealii::FESystem<dim>              fe_q;
+  dealii::DoFHandler<dim>                  dof_handler;
+  dealii::ConstraintMatrix                 constraints;
+  dealii::IndexSet                         locally_owned_dofs;
+  dealii::IndexSet                         locally_relevant_dofs;
+  dealii::PETScWrappers::MPI::SparseMatrix system_matrix;
+  dealii::PETScWrappers::MPI::Vector       system_rhs;
+  dealii::PETScWrappers::MPI::Vector       solution;
 
 
   // An object to hold various run-time parameters that are specified
@@ -216,7 +216,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem (const std
 
 
 /**
- * Destructor. This just frees some memory allocation.
+ * Destructor. Free some memory allocation.
  */
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 PiezoelectricProblem<dim, GroupSymm, ValueType>::~PiezoelectricProblem ()
@@ -417,16 +417,13 @@ compute_derived_quantities_vector (const std::vector<dealii::Vector<ValueType> >
        // and then the potential (phi).
        computed_quantities[q](dim) = uh[q](dim);
 
-       //     Tensor<2,dim> grad_u;
-       //     for (unsigned int d=0; d<dim; ++d)
-       // 	grad_u[d] = duh[q][d];
-       //     const SymmetricTensor<2,dim> strain_rate = symmetrize (grad_u);
-       //     computed_quantities[q](dim+2) = 2 * EquationData::eta *
-       // 	strain_rate * strain_rate;
-       //     computed_quantities[q](dim+3) = partition;
+       dealii::Tensor<2, dim, ValueType> grad_u;
+
+       for (unsigned int d=0; d<dim; ++d)
+	 grad_u[d] = duh[q][d];
+
+       const dealii::SymmetricTensor<2, dim, ValueType> strain = symmetrize (grad_u);
      }
-
-
 }
 
 
