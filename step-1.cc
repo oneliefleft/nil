@@ -63,10 +63,12 @@
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_precondition.h>
 #include <deal.II/lac/petsc_solver.h>
+#include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/sparsity_tools.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/data_postprocessor.h>
+#include <deal.II/numerics/vector_tools.h>
 
 // Library-based headers.
 #include "include/nil/group_symmetry.h"
@@ -125,6 +127,7 @@ private:
   void refine_grid ();
 
   void output_results (const unsigned int cycle) const;
+  void output_material_id (const unsigned int cycle) const;
 
 
   // A local copy of the MPI communicator.
@@ -570,7 +573,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
   typename dealii::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-  
+
   for (; cell != endc; ++cell)
     if (cell->is_locally_owned ())
       {
@@ -615,7 +618,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 		    
 		    
 		  } // dof j
-		
+
 		cell_rhs (i) -= 
 		  (contract (u_i_grad, first_order_elastic_tensor[material_id], 
 		   	     lattice_mismatch_tensor[material_id])
@@ -689,6 +692,43 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::refine_grid ()
 
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void
+PiezoelectricProblem<dim, GroupSymm, ValueType>::output_material_id (const unsigned int cycle) const
+{
+
+  // This is a speedy relatively operation, so we can get away with
+  // running it on one processor only.
+  if (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0)
+    {      
+      dealii::DataOut<dim> data_out;
+      data_out.attach_dof_handler (dof_handler);
+
+      dealii::PETScWrappers::Vector projected_material_id (dof_handler.n_dofs ());
+      
+      nil::GeometryDescription::HyperCube<dim, ValueType> hyper_cube (-5,5);
+      dealii::VectorTools::interpolate (dof_handler, hyper_cube, 
+					projected_material_id);
+
+      pcout << "   Material id max/min:             "
+	    << projected_material_id.max () << "/"
+	    << projected_material_id.min ()
+	    << std::endl;
+      
+      const std::string filename 
+	= ("material_id-" +
+	   dealii::Utilities::int_to_string (cycle, 4) +
+	   ".vtu");
+
+      data_out.add_data_vector (projected_material_id, "projected_material_id");
+      data_out.build_patches ();
+
+      std::ofstream output (filename.c_str()); 
+      data_out.write_vtu (output);
+    }
+}
+
+
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+void
 PiezoelectricProblem<dim, GroupSymm, ValueType>::output_results (const unsigned int cycle) const
 {
   PiezoelectricProblem::Postprocessor postprocessor (dealii::Utilities::MPI::this_mpi_process (mpi_communicator));
@@ -706,7 +746,6 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::output_results (const unsigned 
        ".vtu");
   
   std::ofstream output (filename.c_str());
-
   data_out.write_vtu (output);
 
   // For calculations in parallel it is convenient to have a master
@@ -839,6 +878,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
 
       // Write derived quantities to files.
       output_results (cycle);
+      output_material_id (cycle);
 
       // Finally use Kelly's error estimate to refine the grid.
       refine_grid ();
