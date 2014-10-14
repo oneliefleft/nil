@@ -59,7 +59,8 @@ namespace nil
       public:
       
       /**
-       * Constructor.
+       * Constructor. Takes the left and right points of the
+       * hyper-cube.
        */  
       HyperCube (const ValueType left  = -0.5,
 		 const ValueType right =  0.5) 
@@ -94,8 +95,118 @@ namespace nil
        */
       ValueType r;
       
-      };
+      }; // HyperCube
     
+
+    /**
+     * A class that produces a solid square-based truncated pyramid
+     * from a scalar function.
+     *
+     * @author Toby D. Young 2014
+     */
+    template <int dim, typename ValueType = double>
+      class SquarePyramid
+      :
+      public dealii::Function<dim>
+      {
+      public:
+      
+      /**
+       * Constructor. Takes the diameter of the square base, square
+       * hat, and height.
+       */  
+      SquarePyramid (const ValueType base   = 1.0,
+		     const ValueType hat    = 0.5,
+		     const ValueType height = 0.5) 
+      : 
+      dealii::Function<dim> (),
+      base_ (base),
+      height_ (height)
+      {}
+
+      /**
+       * Return a boolean value (1) if this point <code>p</code> is in
+       * or on the hyper-cube boundary defined by a previous call to the
+       * <code>reinit</code function.
+       */
+      virtual 
+      double value (const dealii::Point<dim, ValueType> &p,
+		    const unsigned int                   /* component */) const;
+
+      private:
+      
+      /**
+       * Local copy of the diameter of the base of the pyramid.
+       */
+      ValueType base_;
+
+      /**
+       * Local copy of the diameter of the hat of the pyramid.
+       */
+      ValueType hat_;
+
+      /**
+       * Local copy of the diameter of the height of the pyramid.
+       */
+      ValueType height_;
+
+      }; // SquarePyramid
+
+
+    /**
+     * A class that produces a solid hexagonal-based truncated pyramid
+     * from a scalar function.  
+     *
+     * @author Toby D. Young 2011, 2014
+     */
+    template <int dim, typename ValueType = double>
+      class HexagonalPyramid
+      :
+      public dealii::Function<dim>
+      {
+      public:
+      
+      /**
+       * Constructor. Takes the diameter of the hexagonal base,
+       * hexagonal hat, and height.
+       */  
+      HexagonalPyramid (const ValueType base   = 1.0,
+			const ValueType hat    = 0.5,
+			const ValueType height = 0.5) 
+      : 
+      dealii::Function<dim> (),
+      base_ (base),
+      height_ (height)
+      {}
+
+      /**
+       * Return a boolean value (1) if this point <code>p</code> is in
+       * or on the hyper-cube boundary defined by a previous call to the
+       * <code>reinit</code function.
+       */
+      virtual 
+      double value (const dealii::Point<dim, ValueType> &p,
+		    const unsigned int                   /* component */) const;
+
+      private:
+      
+      /**
+       * Local copy of the diameter of the base of the pyramid.
+       */
+      ValueType base_;
+
+      /**
+       * Local copy of the diameter of the hat of the pyramid.
+       */
+      ValueType hat_;
+
+      /**
+       * Local copy of the diameter of the height of the pyramid.
+       */
+      ValueType height_;
+
+      }; // HexagonalPyramid
+
   } // namespace GeometryDescription
   
 } // namespace nil
