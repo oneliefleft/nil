@@ -207,8 +207,6 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem (const std
   fe_q (dealii::FE_Q<dim> (2), dim, /* displacement       */
    	dealii::FE_Q<dim> (1), 1),  /* electric potential */
 
-  // fe_q (dealii::FE_Q<dim> (1), dim+1),  /* all */
-
   dof_handler (triangulation),
 
   prm_file (parameter_file),
