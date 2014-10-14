@@ -1,4 +1,13 @@
-
+template class 
+nil::GeometryDescription::HyperCube<1, double>;
+template class 
+nil::GeometryDescription::HyperCube<2, double>;
 template class 
 nil::GeometryDescription::HyperCube<3, double>;
+
+template class 
+nil::GeometryDescription::SquarePyramid<3, double>;
+
+template class 
+nil::GeometryDescription::HexagonalPyramid<3, double>;
       
