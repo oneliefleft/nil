@@ -691,7 +691,9 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::output_material_id (const unsig
 {
 
   // This is a speedy relatively operation, so we can get away with
-  // running it on one processor only.
+  // running it on one processor only. In fact, we should attach a
+  // different dof handler to this since the current one has four
+  // components but only one isneeded for material_id.
   if (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0)
     {      
       dealii::DataOut<dim> data_out;
