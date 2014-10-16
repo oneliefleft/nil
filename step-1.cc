@@ -76,6 +76,7 @@
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/data_postprocessor.h>
+#include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/vector_tools.h>
 
 // Library-based headers.
@@ -721,7 +722,18 @@ template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void
 PiezoelectricProblem<dim, GroupSymm, ValueType>::refine_grid ()
 {
+  dealii::Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+  dealii::KellyErrorEstimator<dim>::estimate (dof_handler,
+					      dealii::QGauss<dim-1> (3),
+					      typename dealii::FunctionMap<dim>::type (),
+					      solution, estimated_error_per_cell);
   
+  dealii::parallel::distributed::GridRefinement::
+    refine_and_coarsen_fixed_number (triangulation,
+				     estimated_error_per_cell,
+				     0.125, 0.00);
+
+  triangulation.execute_coarsening_and_refinement ();
 }
 
 
@@ -867,7 +879,9 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
   make_coarse_grid (3);
 
   // Here comes the adaptive cycles
-  for (unsigned int cycle=0; cycle<1; ++cycle)
+  const unsigned int n_cycles = 3;
+
+  for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
     {
       
       pcout << std::endl
