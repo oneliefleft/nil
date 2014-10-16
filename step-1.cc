@@ -621,9 +621,16 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 		    cell_matrix (i,j) +=
                        (contract (u_i_grad, first_order_elastic_tensor[material_id], 
 				  u_j_grad)
+		        -
+			contract (u_i_grad, first_order_piezoelectric_tensor[material_id], 
+				  phi_j_grad)
 			+
 			contract (phi_i_grad, first_order_dielectric_tensor[material_id], 
-				  phi_j_grad))
+				  phi_j_grad)
+			+ 
+			contract (phi_i_grad, first_order_piezoelectric_tensor[material_id], 
+				  u_j_grad))
+
 		      *
 		      fe_values.JxW (q_point);
 		    
