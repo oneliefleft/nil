@@ -118,7 +118,7 @@ namespace nil
 	  // is above or on the z-axis of the center
 	  if ((p[1]>=center_[1]) && 
 	      (distance<=radius_))
-	      is_in_half_hyper_ball = 1.;
+	    is_in_half_hyper_ball = 1.;
 	  
 	  break;
 
@@ -129,17 +129,13 @@ namespace nil
 	  // is above or on the z-axis of the center
 	  if ((p[2]>=center_[2]) && 
 	      (distance<=radius_))
-	      is_in_half_hyper_ball = 1.;
+	    is_in_half_hyper_ball = 1.;
 	  
 	  break;
 	  
 	default:
 	  AssertThrow (false, dealii::ExcNotImplemented ());
 	}
-
-
-      if (distance<=radius_)
-	is_in_half_hyper_ball = 1.;
 
       return is_in_half_hyper_ball;
     }
