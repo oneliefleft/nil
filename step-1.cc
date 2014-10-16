@@ -519,12 +519,15 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_system ()
   dealii::DoFTools::extract_locally_relevant_dofs (dof_handler,
 						   locally_relevant_dofs);
 
+  // Deal with hanging-node and boundary constraints.
   constraints.clear ();
   constraints.reinit (locally_relevant_dofs);
   dealii::DoFTools::make_hanging_node_constraints (dof_handler, constraints);
   dealii::DoFTools::make_zero_boundary_constraints (dof_handler, constraints);
   constraints.close ();
 
+  // Obtain a compressed sparsity pattern for sparse-matrix memory
+  // allocation.
   dealii::CompressedSimpleSparsityPattern csp (locally_relevant_dofs);
   dealii::DoFTools::make_sparsity_pattern (dof_handler, csp, constraints, false);
   dealii::SparsityTools::distribute_sparsity_pattern (csp,
@@ -532,7 +535,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_system ()
 						      mpi_communicator,
 						      locally_relevant_dofs);
 
-  // @todo The system_matrix initialisation screws up with petsc-3.5.x
+  // @todo The system_matrix initialisation screws up with petsc-3.5.x.
   system_matrix.reinit (locally_owned_dofs,
 			locally_owned_dofs,
 			csp,
@@ -540,7 +543,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::setup_system ()
   
   system_rhs.reinit (locally_owned_dofs, mpi_communicator);
   
-  // The solution vector has ghost elements
+  // The solution vector has ghost elements.
   solution.reinit (locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
 
 }
@@ -624,10 +627,11 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 		    // | A B |
 		    // | C D |
 		    //
-		    // Where A is the elastic part, B is the reverse
-		    // piezoelectric part, C is the piezoelectric
-		    // part, and D is the dielectric part. In that
-		    // order, the cell matrix is assembled below.
+		    // Where the components of A are the elastic part,
+		    // B are the reverse piezoelectric part, C are the
+		    // piezoelectric part, and D are the dielectric
+		    // part. In that order, the cell matrix is
+		    // assembled below.
 		    cell_matrix (i,j) +=
                        (contract (u_i_grad, first_order_elastic_tensor[material_id], 
 				  u_j_grad)
@@ -647,6 +651,15 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 		    
 		  } // dof j
 
+
+		// The cell vector is a block vector of the form:
+		// 
+		// |x|
+		// |y|
+		//
+		// where the components x are the lattice mismatch
+		// strain and y are the polarelectric field. In that
+		// order, the cell vector is assembled below.
 		cell_rhs (i) += 
 		  (contract (u_i_grad, first_order_elastic_tensor[material_id], 
 		   	     lattice_mismatch_tensor[material_id])
