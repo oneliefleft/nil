@@ -257,8 +257,8 @@ namespace nil
       height_ (height),
       center_ (center)
       {
-	AssertThrow (center==dealii::Point<dim, ValueType> (), 
-		     dealii::ExcNotImplemented ());
+	/* AssertThrow (center==dealii::Point<dim, ValueType> (),  */
+	/* 	     dealii::ExcNotImplemented ()); */
 
 	Assert (base_radius>=0., 
 		dealii::ExcMessage ("The base radius must take a positive value."));
