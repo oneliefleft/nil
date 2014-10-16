@@ -32,20 +32,20 @@
 // implied, of the authors.
 // -------------------------------------------------------------------
 
-#include "../include/nil/spontaneous_polarization_tensor.h"
+#include "../include/nil/polarelectric_tensor.h"
 
 
 namespace nil
 {  
 
   template <enum GroupSymmetry group_symmetry, int order, typename ValueType>
-  SpontaneousPolarizationTensor<group_symmetry, order, ValueType>::SpontaneousPolarizationTensor ()
+  PolarelectricTensor<group_symmetry, order, ValueType>::PolarelectricTensor ()
   {}
 
 
   template <enum GroupSymmetry group_symmetry, int Order, typename ValueType>
   void 
-  SpontaneousPolarizationTensor<group_symmetry, Order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)
+  PolarelectricTensor<group_symmetry, Order, ValueType>::distribute_coefficients (std::vector<ValueType> &coefficients)
   {
     // Since template specialisations are used by this function there
     // is no need for sorting group symmetry or order of the tensor.
@@ -61,9 +61,9 @@ namespace nil
 
 // First-order tensors
 template class 
-nil::SpontaneousPolarizationTensor<nil::GroupSymmetry::ZincBlende, 1, double>;
+nil::PolarelectricTensor<nil::GroupSymmetry::ZincBlende, 1, double>;
 template class 
-nil::SpontaneousPolarizationTensor<nil::GroupSymmetry::Wurtzite, 1, double>;
+nil::PolarelectricTensor<nil::GroupSymmetry::Wurtzite, 1, double>;
 
 
 

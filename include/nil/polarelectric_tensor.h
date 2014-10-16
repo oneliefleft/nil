@@ -32,8 +32,8 @@
 // implied, of the nil authors.
 // -------------------------------------------------------------------
 
-#ifndef __nil_spontaneous_polarization_tensor_h
-#define __nil_spontaneous_polarization_tensor_h
+#ifndef __nil_polarelectric_tensor_h
+#define __nil_polarelectric_tensor_h
 
 #include "../..//include/nil/group_symmetry.h"
 #include "../../include/nil/tensor_base.h"
@@ -46,14 +46,14 @@ namespace nil
 {
   
   /**
-   * \brief Spontaneous polarization Tensor.
+   * \brief Polar electric Tensor.
    *
-   * \f$N\,\f$-order spontaneous polarization tensor. 
+   * \f$N\,\f$-order polarelectric tensor. 
    *
    * @author Toby D. Young  2011, 2014.
    */  
   template <enum GroupSymmetry group_symmetry, int order, typename ValueType = double>
-    class SpontaneousPolarizationTensor
+    class PolarelectricTensor
     :
     public TensorBase<group_symmetry, order, order, ValueType>
     {
@@ -63,7 +63,7 @@ namespace nil
     /**
      * Constructor. 
      */
-    SpontaneousPolarizationTensor ();
+    PolarelectricTensor ();
 
 
     /**
@@ -87,7 +87,7 @@ namespace nil
     private:
     
     
-    }; /* SpontaneousPolarizationTensor */
+    }; /* PolarelectricTensor */
   
   
   /* ----------------- Non-member functions operating on tensors. ------------ */
@@ -104,8 +104,8 @@ namespace nil
   template <typename ValueType> 
     inline
     void 
-    distribute_coefficients_ (SpontaneousPolarizationTensor<GroupSymmetry::ZincBlende, 1, ValueType> &tensor, 
-			      std::vector<ValueType>                                                 &coefficients)
+    distribute_coefficients_ (PolarelectricTensor<GroupSymmetry::ZincBlende, 1, ValueType> &tensor, 
+			      std::vector<ValueType>                                       &coefficients)
     {
       
       Assert (tensor.rank ()==1, dealii::ExcInternalError ());
@@ -127,8 +127,8 @@ namespace nil
   template <typename ValueType> 
     inline
     void 
-    distribute_coefficients_ (SpontaneousPolarizationTensor<GroupSymmetry::Wurtzite, 1, ValueType> &tensor, 
-			      std::vector<ValueType>                                               &coefficients)
+    distribute_coefficients_ (PolarelectricTensor<GroupSymmetry::Wurtzite, 1, ValueType> &tensor, 
+			      std::vector<ValueType>                                     &coefficients)
     {
       Assert (tensor.rank ()==1, dealii::ExcInternalError ()); 
       
@@ -150,6 +150,6 @@ namespace nil
 } /* namespace nil */
 
 
-#endif /* __nil_spontaneous_polarization_tensor_h */
+#endif /* __nil_polarelectric_tensor_h */
 
 

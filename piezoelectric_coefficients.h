@@ -38,7 +38,7 @@
 #include "include/nil/dielectric_tensor.h"
 #include "include/nil/elastic_tensor.h"
 #include "include/nil/piezoelectric_tensor.h"
-#include "include/nil/spontaneous_polarization_tensor.h"
+#include "include/nil/polarelectric_tensor.h"
 
 
 namespace nil
@@ -64,7 +64,7 @@ namespace nil
    * A class that handles how piezoelectric parameters are handled.
    *
    * @note Supported tensor types are: Elastic, Dielectric,
-   * Piezoelectric, and SpontaneousPolarization.
+   * Piezoelectric, and Polarelectric.
    *
    * @author Toby D. Young 2014.
    */
@@ -124,7 +124,7 @@ namespace nil
     /**
      * First-order spontaneous polarization tensor.
      */
-    nil::SpontaneousPolarizationTensor<group_symmetry, 1, ValueType> first_order_spontaneous_polarization_tensor;
+    nil::PolarelectricTensor<group_symmetry, 1, ValueType> first_order_spontaneous_polarization_tensor;
     
     
     /**
