@@ -112,8 +112,20 @@ namespace nil
       switch (dim)
 	{
 
+	case 2:
+	  // check if we are in the upper half of the half
+	  // hyper-ball. In 2d this happens if the 2-axis of the point
+	  // is above or on the z-axis of the center
+	  if ((p[1]>=center_[1]) && 
+	      (distance<=radius_))
+	      is_in_half_hyper_ball = 1.;
+	  
+	  break;
+
 	case 3:
-	  // check if we are in the upper half of the half hyper-ball
+	  // check if we are in the upper half of the half
+	  // hyper-ball. In 3d this happens if the 3-axis of the point
+	  // is above or on the z-axis of the center
 	  if ((p[2]>=center_[2]) && 
 	      (distance<=radius_))
 	      is_in_half_hyper_ball = 1.;

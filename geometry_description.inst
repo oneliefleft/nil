@@ -6,6 +6,18 @@ template class
 nil::GeometryDescription::HyperCube<3, double>;
 
 template class 
+nil::GeometryDescription::HyperBall<1, double>;
+template class 
+nil::GeometryDescription::HyperBall<2, double>;
+template class 
+nil::GeometryDescription::HyperBall<3, double>;
+
+template class 
+nil::GeometryDescription::HalfHyperBall<2, double>;
+template class 
+nil::GeometryDescription::HalfHyperBall<3, double>;
+
+template class 
 nil::GeometryDescription::SquarePyramid<3, double>;
 
 template class 
