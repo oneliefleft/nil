@@ -489,7 +489,7 @@ PiezoelectricProblem<dim, group_symmetry, ValueType>::Postprocessor::get_names (
   // First deal with the displacement vector (u_i).  
   for (unsigned int d=0; d<dim; ++d)
     {
-      const std::string u_name = "u_" + dealii::Utilities::int_to_string (d);
+      const std::string u_name = "u_" + dealii::Utilities::int_to_string (d+1);
       solution_names.push_back (u_name);
     }
 
@@ -894,7 +894,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::output_material_id (const unsig
   dealii::TrilinosWrappers::Vector projected_material_id (dof_handler.n_dofs ());
 #endif
   
-  nil::GeometryFunction::HalfHyperBall<dim, ValueType> geometry (5., dealii::Point<dim, ValueType> ());
+  nil::GeometryFunction::SquarePyramid<dim, ValueType> geometry (10., 5., 5., dealii::Point<dim, ValueType> ());
   dealii::VectorTools::interpolate (dof_handler, geometry, 
 				    projected_material_id);
   
@@ -1021,23 +1021,23 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
   for (unsigned int i=0; i<n_material_ids; ++i)
     { 
       pcout << std::endl
-	    << "   Tensors of coefficients:"
+	    << "Tensors of coefficients for material " << i << ":"
 	    << std::endl
-	    << "      Lattice coefficients:            ";
+	    << "   Lattice coefficients:            ";
       for (unsigned int j=0; j<lattice_coefficients[i].size (); ++j)
 	pcout << lattice_coefficients[i][j] << " ";
       pcout << std::endl
-	    << "      Lattice mismatch:                " << lattice_mismatch_tensor[i]
+	    << "   Lattice mismatch:                " << lattice_mismatch_tensor[i]
 	    << std::endl
-	    << "      1st-order elastic:               " << first_order_elastic_tensor[i]
+	    << "   1st-order elastic:               " << first_order_elastic_tensor[i]
 	    << std::endl
-	    << "      1st-order dielectric:            " << first_order_dielectric_tensor[i]
+	    << "   1st-order dielectric:            " << first_order_dielectric_tensor[i]
 	    << std::endl
-	    << "      1st-order piezoelectric:         " << first_order_piezoelectric_tensor[i]
+	    << "   1st-order piezoelectric:         " << first_order_piezoelectric_tensor[i]
 	    << std::endl
-	    << "      1st-order spont. polarization:   " << first_order_polarelectric_tensor[i]
+	    << "   1st-order spont. polarization:   " << first_order_polarelectric_tensor[i]
 	    << std::endl
-	    << "      2nd-order piezoelectric:         " << second_order_piezoelectric_tensor[i]
+	    << "   2nd-order piezoelectric:         " << second_order_piezoelectric_tensor[i]
 	    << std::endl;
     }
 
@@ -1053,7 +1053,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
       pcout << std::endl
 	    << "Cycle:                              "
 	    << cycle
-	    << std::endl << std::endl;
+	    << std::endl;
 
       pcout << "   Number of active cells:          "
 	    << triangulation.n_global_active_cells ()
@@ -1083,7 +1083,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
       // Solve the problem.
       const unsigned int n_iterations = solve ();
 
-      pcout << "   Solver converged in:                "
+      pcout << "   Solver converged in:             "
 	    << n_iterations << " iterations"
 	    << std::endl;
 
