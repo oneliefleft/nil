@@ -34,7 +34,6 @@
 
 #include "../include/nil/dielectric_tensor.h"
 
-
 namespace nil
 {  
 

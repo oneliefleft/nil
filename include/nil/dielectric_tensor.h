@@ -35,8 +35,8 @@
 #ifndef __nil_dielectric_tensor_h
 #define __nil_dielectric_tensor_h
 
-#include "../../include/nil/group_symmetry.h"
-#include "../../include/nil/tensor_base.h"
+#include "./base/group_symmetry.h"
+#include "./base/tensor_base.h"
 
 #include <fstream>
 #include <iostream>

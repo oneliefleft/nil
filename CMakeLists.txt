@@ -9,12 +9,13 @@ SET(TARGET_SRC
   source/geometry_function.cc
   source/parameter_reader.cc
 #
-  source/group_symmetry.cc
   source/dielectric_tensor.cc
   source/elastic_tensor.cc
   source/piezoelectric_tensor.cc
   source/polarelectric_tensor.cc
-  source/tensor_base.cc
+#
+  source/base/group_symmetry.cc
+  source/base/tensor_base.cc
 #
   piezoelectric_coefficients.cc
 #

@@ -80,7 +80,8 @@
 #include <deal.II/numerics/vector_tools.h>
 
 // Library-based headers.
-#include "include/nil/group_symmetry.h"
+#include "include/nil/base/group_symmetry.h"
+
 #include "include/nil/dielectric_tensor.h"
 #include "include/nil/elastic_tensor.h"
 #include "include/nil/piezoelectric_tensor.h"

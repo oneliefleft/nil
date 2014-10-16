@@ -35,8 +35,8 @@
 #ifndef __nil_polarelectric_tensor_h
 #define __nil_polarelectric_tensor_h
 
-#include "../..//include/nil/group_symmetry.h"
-#include "../../include/nil/tensor_base.h"
+#include "../..//include/nil/base/group_symmetry.h"
+#include "../../include/nil/base/tensor_base.h"
 
 #include <fstream>
 #include <iostream>

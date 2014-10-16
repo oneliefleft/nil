@@ -37,7 +37,7 @@
 
 #include <deal.II/base/tensor.h>
 
-#include "../../include/nil/group_symmetry.h"
+#include "../../../include/nil/base/group_symmetry.h"
 
 #include <fstream>
 #include <iostream>
