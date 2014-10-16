@@ -88,7 +88,7 @@
 
 #include "include/nil/geometry_function.h"
 
-#include "parameter_reader.h"
+#include "include/nil/parameter_reader.h"
 
 #include "piezoelectric_coefficients.h"
 

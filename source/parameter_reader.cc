@@ -32,7 +32,7 @@
 // implied, of the nil authors.
 // -------------------------------------------------------------------
 
-#include "parameter_reader.h"
+#include "../include/nil/parameter_reader.h"
 
 namespace nil
 {

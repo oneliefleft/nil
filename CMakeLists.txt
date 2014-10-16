@@ -7,7 +7,7 @@ SET(TARGET "step-1")
 
 SET(TARGET_SRC
   source/geometry_function.cc
-  parameter_reader.cc
+  source/parameter_reader.cc
 #
   source/group_symmetry.cc
   source/dielectric_tensor.cc
