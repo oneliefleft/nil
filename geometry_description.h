@@ -99,9 +99,8 @@ namespace nil
       
       /**
        * A class that produces a solid hyper-ball from a scalar
-       * function. The hyper-ball volume is
-       * \f$4\pi/3\times\f$<code>radius</code>. By default a unit
-       * ball centred on the origin is created.
+       * function. By default a unit ball centred on the origin is
+       * created.
        *
        * @author Toby D. Young 2011, 2014
        */
@@ -113,8 +112,8 @@ namespace nil
       public:
       
       /**
-       * Constructor. Takes the left and right points of the
-       * hyper-cube.
+       * Constructor. Takes the center point and radius of the
+       * hyper-ball.
        */  
       HyperBall (const dealii::Point<dim, ValueType> center = dealii::Point<dim, ValueType> (),
 		 const ValueType radius                     = 0.5) 
@@ -149,6 +148,61 @@ namespace nil
       ValueType radius_;
       
       }; // HyperBall
+
+
+      /**
+       * A class that produces a solid half hyper-ball from a scalar
+       * function. By default a unit half-ball centred on the origin
+       * is created. @note Currently the `center' here refers to the
+       * center of the repective hyper-ball and not to the center of
+       * the half hyper-ball.
+       *
+       * @author Toby D. Young 2014
+       */
+      template <int dim, typename ValueType = double>
+      class HalfHyperBall
+      :
+      public dealii::Function<dim>
+      {
+      public:
+      
+      /**
+       * Constructor. Takes the center point and radius of the half
+       * hyper-ball.
+       */  
+      HalfHyperBall (const dealii::Point<dim, ValueType> center = dealii::Point<dim, ValueType> (),
+		     const ValueType radius                     = 0.5) 
+      : 
+      dealii::Function<dim> (),
+      center_ (center),
+      radius_ (radius)
+      {
+	Assert (radius>=0., 
+		dealii::ExcMessage ("The radius must take a positive value."));
+      }
+      
+      
+      /**
+       * Return a boolean value (1) if this point <code>p</code> is in
+       * or on the hyper-ball boundary.
+       */
+      virtual 
+      double value (const dealii::Point<dim, ValueType> &p,
+		    const unsigned int                   /* component */) const;
+      
+      private:
+      
+      /**
+       * Local copy of the `center-point' of the half hyper-ball.
+       */
+      dealii::Point<dim, ValueType> center_;
+      
+      /**
+       * Local copy of the radius of the hyper-ball
+       */
+      ValueType radius_;
+      
+      }; // HalfHyperBall
     
 
     /**

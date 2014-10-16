@@ -96,6 +96,40 @@ namespace nil
 
       return is_in_hyper_ball;
     }
+
+
+    template <int dim, typename ValueType>
+    double
+    HalfHyperBall<dim, ValueType>::value (const dealii::Point<dim, ValueType> &p,
+					  const unsigned int                   /* component */) const
+    {
+      double is_in_half_hyper_ball = 0.;
+     
+      // This is the distance to the center that refers to a
+      // hyper-ball.
+      const double distance = p.distance (center_);
+ 
+      switch (dim)
+	{
+
+	case 3:
+	  // check if we are in the upper half of the half hyper-ball
+	  if ((p[2]>=center_[2]) && 
+	      (distance<=radius_))
+	      is_in_half_hyper_ball = 1.;
+	  
+	  break;
+	  
+	default:
+	  AssertThrow (false, dealii::ExcNotImplemented ());
+	}
+
+
+      if (distance<=radius_)
+	is_in_half_hyper_ball = 1.;
+
+      return is_in_half_hyper_ball;
+    }
     
 
     template <int dim, typename ValueType>
