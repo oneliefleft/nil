@@ -159,7 +159,8 @@ namespace nil
 	  // First check if the z-range is in play. If not, there is
 	  // no sane reason to check the other components of the
 	  // coordinate.
-	  if ((p[2]>center_[2]) && (p[2]<center_[2]+height_))
+	  if ((p[2]>center_[2])          && 
+	      (p[2]<center_[2]+height_))
 	    {
 	      // Then check if the point is inside a possibly
 	      // truncated 3d pyramid. In this case the x- and
@@ -169,10 +170,10 @@ namespace nil
 	      //
 	      // To that end first get the angles we want in the x-
 	      // and y-directions.
-	      const double vartheta_y = fabs (std::atan2 (fabs (p[2]), fabs (p[1])));
-	      const double vartheta_x = fabs (std::atan2 (fabs (p[2]), fabs (p[0])));
+	      const double theta_y = fabs (std::atan2 (fabs (p[2]), fabs (p[1])));
+	      const double theta_x = fabs (std::atan2 (fabs (p[2]), fabs (p[0])));
 
-	      if ((vartheta_y<theta) && (vartheta_x<theta))
+	      if ((theta_y<theta) && (theta_x<theta))
 		is_in_square_pyramid = 1.;
 	    }
 
