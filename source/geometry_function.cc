@@ -113,6 +113,7 @@ namespace nil
 	{
 
 	case 2:
+
 	  // check if we are in the upper half of the half
 	  // hyper-ball. In 2d this happens if the 2-axis of the point
 	  // is above or on the z-axis of the center
@@ -148,13 +149,33 @@ namespace nil
     {
       double is_in_square_pyramid = 0.;
 
+      // Compute the angle theta of the pyramid walls.
+      const double theta = fabs (std::atan2 (height_, (base_-hat_)));
+
       switch (dim)
 	{
 	case 3:
 
-	  // Project the coordinate onto the first quadrant by using
-	  // and work with its absolute value.
-	  AssertThrow (false, dealii::ExcNotImplemented ());
+	  // First check if the z-range is in play. If not, there is
+	  // no sane reason to check the other components of the
+	  // coordinate.
+	  if ((p[2]>center_[2]) && (p[2]<center_[2]+height_))
+	    {
+	      // Then check if the point is inside a possibly
+	      // truncated 3d pyramid. In this case the x- and
+	      // y-coordinates decouple. What we need to do is to
+	      // check that the projection with respect to the slope
+	      // angle of the pyramid walls.
+	      //
+	      // To that end first get the angles we want in the x-
+	      // and y-directions.
+	      const double vartheta_y = fabs (std::atan2 (fabs (p[2]), fabs (p[1])));
+	      const double vartheta_x = fabs (std::atan2 (fabs (p[2]), fabs (p[0])));
+
+	      if ((vartheta_y<theta) && (vartheta_x<theta))
+		is_in_square_pyramid = 1.;
+	    }
+
 	  break;
 
 	default:
