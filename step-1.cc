@@ -814,7 +814,6 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::output_results (const unsigned 
 			       dealii::Utilities::int_to_string (i, 4) +
 			       ".vtu");
 	}
-      pcout << std::endl;
 
       const std::string
 	pvtu_master_filename = ("solution-" +
@@ -855,23 +854,23 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
   for (unsigned int i=0; i<n_material_ids; ++i)
     { 
       pcout << std::endl
-	    << "Tensors of coefficients:"
+	    << "   Tensors of coefficients:"
 	    << std::endl
-	    << "   Lattice coefficients:            ";
+	    << "      Lattice coefficients:            ";
       for (unsigned int j=0; j<lattice_coefficients[i].size (); ++j)
 	pcout << lattice_coefficients[i][j] << " ";
       pcout << std::endl
-	    << "   Lattice mismatch:                " << lattice_mismatch_tensor[i]
+	    << "      Lattice mismatch:                " << lattice_mismatch_tensor[i]
 	    << std::endl
-	    << "   1st-order elastic:               " << first_order_elastic_tensor[i]
+	    << "      1st-order elastic:               " << first_order_elastic_tensor[i]
 	    << std::endl
-	    << "   1st-order dielectric:            " << first_order_dielectric_tensor[i]
+	    << "      1st-order dielectric:            " << first_order_dielectric_tensor[i]
 	    << std::endl
-	    << "   1st-order piezoelectric:         " << first_order_piezoelectric_tensor[i]
+	    << "      1st-order piezoelectric:         " << first_order_piezoelectric_tensor[i]
 	    << std::endl
-	    << "   1st-order spont. polarization:   " << first_order_spontaneous_polarization_tensor[i]
+	    << "      1st-order spont. polarization:   " << first_order_spontaneous_polarization_tensor[i]
 	    << std::endl
-	    << "   2nd-order piezoelectric:         " << second_order_piezoelectric_tensor[i]
+	    << "      2nd-order piezoelectric:         " << second_order_piezoelectric_tensor[i]
 	    << std::endl;
     }
 
@@ -885,9 +884,11 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
     {
       
       pcout << std::endl
-	    << "Grid:"
-	    << std::endl
-	    << "   Number of active cells:          "
+	    << "Cycle:                              "
+	    << cycle
+	    << std::endl << std::endl;
+
+      pcout << "   Number of active cells:          "
 	    << triangulation.n_global_active_cells ()
 	    << " (on "
 	    << triangulation.n_levels ()
@@ -898,31 +899,24 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
       // vectors.
       setup_system ();
       
-      pcout << std::endl
-	    << "System:"
-	    << std::endl
-	    << "   Number of degrees of freedom:    "
+      pcout << "   Number of degrees of freedom:    "
 	    << dof_handler.n_dofs ()
 	    << std::endl;
 
       // Assemble the matrix and rhs vector.
       assemble_system ();
 
-      pcout << std::endl
-	    << "Linear algebra system:"
-	    << std::endl
-	    << "   Number of non-zero elements:     "
+      pcout << "   Number of non-zero elements:     "
 	    << system_matrix.n_nonzero_elements ()
 	    << std::endl
 	    << "   System rhs l2-norm:              "
 	    << system_rhs.l2_norm ()
-	    << std::endl << std::flush;
+	    << std::endl;
 
       // Solve the problem.
       const unsigned int n_iterations = solve ();
 
-      pcout << std::endl
-	    << "Solver converged in:                "
+      pcout << "   Solver converged in:                "
 	    << n_iterations << " iterations"
 	    << std::endl;
 
