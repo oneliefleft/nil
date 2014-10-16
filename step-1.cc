@@ -572,8 +572,8 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
   std::vector<dealii::types::global_dof_index> local_dof_indices (n_dofs_per_cell);
 
   // Get a copy of the geometry for the quantum dot
-  nil::GeometryDescription::HyperCube<dim, ValueType> hyper_cube (-5,5);
-  std::vector<ValueType> cell_hyper_cube (n_q_points);
+  nil::GeometryDescription::HalfHyperBall<dim, ValueType> geometry (dealii::Point<dim, ValueType> (), 5.);
+  std::vector<ValueType> cell_geometry (n_q_points);
 
   // So-called "finite elemnt views" that define parts of the finite
   // elemnt system connected with displacements (u on position
@@ -596,13 +596,13 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 	cell_rhs    = 0;
 
 	// Obtain the material pattern on quandrature points.
-	hyper_cube.value_list (fe_values.get_quadrature_points (), cell_hyper_cube);
+	geometry.value_list (fe_values.get_quadrature_points (), cell_geometry);
 
 	for (unsigned int q_point = 0; q_point<n_q_points; ++q_point)
 	  {
 
 	    // This is the material id 1 in the dot and 0 otherwise.
-	    const unsigned int material_id = cell_hyper_cube[q_point];
+	    const unsigned int material_id = cell_geometry[q_point];
 
 	    for (unsigned int i=0; i<n_dofs_per_cell; ++i)
 	      {
@@ -745,8 +745,8 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::output_material_id (const unsig
       dealii::TrilinosWrappers::Vector projected_material_id (dof_handler.n_dofs ());
 #endif
       
-      nil::GeometryDescription::HyperCube<dim, ValueType> hyper_cube (-5,5);
-      dealii::VectorTools::interpolate (dof_handler, hyper_cube, 
+      nil::GeometryDescription::HalfHyperBall<dim, ValueType> geometry (dealii::Point<dim, ValueType> (), 5.);
+      dealii::VectorTools::interpolate (dof_handler, geometry, 
 					projected_material_id);
 
       const std::string filename 
