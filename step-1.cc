@@ -760,7 +760,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::output_material_id (const unsig
 				    projected_material_id);
   
   const std::string filename 
-    = ("material_id-" +
+    = ("projected_material_id-" +
        dealii::Utilities::int_to_string (cycle, 4) +
        "." +
        dealii::Utilities::int_to_string (triangulation.locally_owned_subdomain(), 4) +
