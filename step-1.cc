@@ -723,16 +723,23 @@ void
 PiezoelectricProblem<dim, GroupSymm, ValueType>::refine_grid ()
 {
   dealii::Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+
+  // Attempt an estimate based on Kelly's error estimate of each
+  // component of the solution vector. @todo The Gauss quadrature used
+  // here should be probably greater than that of the actual solution
+  // vector.
   dealii::KellyErrorEstimator<dim>::estimate (dof_handler,
-					      dealii::QGauss<dim-1> (3),
+					      dealii::QGauss<dim-1> (9),
 					      typename dealii::FunctionMap<dim>::type (),
 					      solution, estimated_error_per_cell);
   
+  // Setup grid refinement by fixed numbers.
   dealii::parallel::distributed::GridRefinement::
     refine_and_coarsen_fixed_number (triangulation,
 				     estimated_error_per_cell,
 				     0.125, 0.00);
 
+  // Actually refine the grid.
   triangulation.execute_coarsening_and_refinement ();
 }
 
