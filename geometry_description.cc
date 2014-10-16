@@ -123,6 +123,7 @@ namespace nil
 	  break;
 
 	case 3:
+
 	  // check if we are in the upper half of the half
 	  // hyper-ball. In 3d this happens if the 3-axis of the point
 	  // is above or on the z-axis of the center
@@ -153,7 +154,13 @@ namespace nil
 
       switch (dim)
 	{
-	  
+	case 3:
+
+	  // Project the coordinate onto the first quadrant by using
+	  // and work with its absolute value.
+	  AssertThrow (false, dealii::ExcNotImplemented ());
+	  break;
+
 	default:
 	  AssertThrow (false, dealii::ExcNotImplemented ());
 	}
@@ -171,6 +178,12 @@ namespace nil
       
       switch (dim)
 	{
+	case 3:
+
+	  // Project the coordinate onto the first quadrant by using
+	  // and work with its absolute value.
+	  AssertThrow (false, dealii::ExcNotImplemented ());
+	  break;
 	  
 	default:
 	  AssertThrow (false, dealii::ExcNotImplemented ());

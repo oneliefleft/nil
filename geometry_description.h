@@ -139,8 +139,8 @@ namespace nil
        * Constructor. Takes the center point and radius of the
        * hyper-ball.
        */  
-      HyperBall (const dealii::Point<dim, ValueType> center = dealii::Point<dim, ValueType> (),
-		 const ValueType radius                     = 0.5) 
+      HyperBall (const ValueType radius                     = 0.5,
+		 const dealii::Point<dim, ValueType> center = dealii::Point<dim, ValueType> ()) 
       : 
       dealii::Function<dim> (),
       center_ (center),
@@ -194,8 +194,8 @@ namespace nil
        * Constructor. Takes the center point and radius of the half
        * hyper-ball.
        */  
-      HalfHyperBall (const dealii::Point<dim, ValueType> center = dealii::Point<dim, ValueType> (),
-		     const ValueType radius                     = 0.5) 
+      HalfHyperBall (const ValueType radius                     = 0.5,
+		     const dealii::Point<dim, ValueType> center = dealii::Point<dim, ValueType> ()) 
       : 
       dealii::Function<dim> (),
       center_ (center),
@@ -246,15 +246,25 @@ namespace nil
        * Constructor. Takes the diameter of the square base, square
        * hat, and height.
        */  
-      SquarePyramid (const ValueType base   = 1.0,
-		     const ValueType hat    = 0.5,
-		     const ValueType height = 0.5) 
+      SquarePyramid (const ValueType base_radius                = 1.0,
+		     const ValueType hat_radius                 = 0.5,
+		     const ValueType height                     = 0.5,
+		     const dealii::Point<dim, ValueType> center = dealii::Point<dim, ValueType> ()) 
       : 
       dealii::Function<dim> (),
-      base_   (base),
-      hat_    (hat),
+      base_   (base_radius),
+      hat_    (hat_radius),
       height_ (height)
-      {}
+      {
+	Assert (base_radius>=0., 
+		dealii::ExcMessage ("The base radius must take a positive value."));
+
+	Assert (hat_radius>=0., 
+		dealii::ExcMessage ("The hat radius must take a positive value."));
+
+	Assert (height>=0., 
+		dealii::ExcMessage ("The height must take a positive value."));
+      }
 
       /**
        * Return a boolean value (1) if this point <code>p</code> is in
@@ -302,15 +312,25 @@ namespace nil
        * Constructor. Takes the diameter of the hexagonal base,
        * hexagonal hat, and height.
        */  
-      HexagonalPyramid (const ValueType base   = 1.0,
-			const ValueType hat    = 0.5,
-			const ValueType height = 0.5) 
+      HexagonalPyramid (const ValueType base_radius                = 1.0,
+			const ValueType hat_radius                 = 0.5,
+			const ValueType height                     = 0.5,
+			const dealii::Point<dim, ValueType> center = dealii::Point<dim, ValueType> ()) 
       : 
       dealii::Function<dim> (),
-      base_   (base),
-      hat_    (hat),
+      base_   (base_radius),
+      hat_    (hat_radius),
       height_ (height)
-      {}
+      {
+	Assert (base_radius>=0., 
+		dealii::ExcMessage ("The base radius must take a positive value."));
+
+	Assert (hat_radius>=0., 
+		dealii::ExcMessage ("The hat radius must take a positive value."));
+
+	Assert (height>=0., 
+		dealii::ExcMessage ("The height must take a positive value."));
+      }
 
       /**
        * Return a boolean value (1) if this point <code>p</code> is in

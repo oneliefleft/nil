@@ -576,7 +576,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
   std::vector<dealii::types::global_dof_index> local_dof_indices (n_dofs_per_cell);
 
   // Get a copy of the geometry for the quantum dot
-  nil::GeometryFunction::HalfHyperBall<dim, ValueType> geometry (dealii::Point<dim, ValueType> (), 5.);
+  nil::GeometryFunction::HalfHyperBall<dim, ValueType> geometry (5., dealii::Point<dim, ValueType> ());
   std::vector<ValueType> cell_geometry (n_q_points);
 
   // So-called "finite elemnt views" that define parts of the finite
@@ -775,7 +775,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::output_material_id (const unsig
   dealii::TrilinosWrappers::Vector projected_material_id (dof_handler.n_dofs ());
 #endif
   
-  nil::GeometryFunction::HalfHyperBall<dim, ValueType> geometry (dealii::Point<dim, ValueType> (), 5.);
+  nil::GeometryFunction::HalfHyperBall<dim, ValueType> geometry (5., dealii::Point<dim, ValueType> ());
   dealii::VectorTools::interpolate (dof_handler, geometry, 
 				    projected_material_id);
   
