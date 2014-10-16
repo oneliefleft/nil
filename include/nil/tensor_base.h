@@ -171,6 +171,7 @@ inline
   return result;
 }
 
+
 /**
  * Contract a tensor of rank one with a tensor of rank two with a
  * tensor of rank one.
@@ -187,6 +188,50 @@ inline
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=0; j<dim; ++j)
       result += src1[i] * src2 [i][j] * src3[j];
+  
+  return result;
+}
+
+
+/**
+ * Contract a tensor of rank one with a tensor of rank three with a
+ * tensor of rank two.
+ */
+template<typename ValueType>
+inline
+  ValueType contract (const dealii::Tensor<1, 3, ValueType> &src1,
+		      const dealii::Tensor<3, 3, ValueType> &src2,
+		      const dealii::Tensor<2, 3, ValueType> &src3)
+{
+  unsigned int dim = 3;
+  ValueType result = 0;
+
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+	result += src1[i] * src2 [i][j][k] * src3[j][k];
+  
+  return result;
+}
+
+
+/**
+ * Contract a tensor of rank two with a tensor of rank three with a
+ * tensor of rank one.
+ */
+template<typename ValueType>
+inline
+  ValueType contract (const dealii::Tensor<2, 3, ValueType> &src1,
+		      const dealii::Tensor<3, 3, ValueType> &src2,
+		      const dealii::Tensor<1, 3, ValueType> &src3)
+{
+  unsigned int dim = 3;
+  ValueType result = 0;
+
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=0; j<dim; ++j)
+      for (unsigned int k=0; k<dim; ++k)
+	result += src1[i][j] * src2 [i][j][k] * src3[k];
   
   return result;
 }
