@@ -59,12 +59,20 @@
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/sparsity_tools.h>
+
+#ifdef USE_PETSC
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/petsc_precondition.h>
 #include <deal.II/lac/petsc_solver.h>
 #include <deal.II/lac/petsc_vector.h>
-#include <deal.II/lac/sparsity_tools.h>
+#else
+#include <deal.II/lac/trilinos_precondition.h>
+#include <deal.II/lac/trilinos_solver.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_vector.h>
+#endif
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/data_postprocessor.h>
@@ -171,9 +179,17 @@ private:
   dealii::ConstraintMatrix                 constraints;
   dealii::IndexSet                         locally_owned_dofs;
   dealii::IndexSet                         locally_relevant_dofs;
+
+  // Objects for linear algebra calculation
+#ifdef USE_PETSC
   dealii::PETScWrappers::MPI::SparseMatrix system_matrix;
   dealii::PETScWrappers::MPI::Vector       system_rhs;
   dealii::PETScWrappers::MPI::Vector       solution;
+#else
+  dealii::TrilinosWrappers::SparseMatrix   system_matrix;
+  dealii::TrilinosWrappers::MPI::Vector    system_rhs;
+  dealii::TrilinosWrappers::MPI::Vector    solution;
+#endif
 
 
   // An object to hold various run-time parameters that are specified
@@ -661,11 +677,17 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::solve ()
   // properties, use it to solve the linear system, and only assign it
   // to the vector we want at the very end. This last step ensures
   // that all ghost elements are also copied as necessary.
-  dealii::PETScWrappers::MPI::Vector distributed_solution (locally_owned_dofs, mpi_communicator);
   dealii::SolverControl solver_control (system_matrix.m (), 1e-09*system_rhs.l2_norm ());
+#ifdef USE_PETSC
+  dealii::PETScWrappers::MPI::Vector distributed_solution (locally_owned_dofs, mpi_communicator);
   dealii::PETScWrappers::PreconditionBlockJacobi preconditioner (system_matrix);
   dealii::PETScWrappers::SolverBicgstab solver (solver_control, mpi_communicator);
-  // dealii::PETScWrappers::SolverGMRES solver (solver_control, mpi_communicator);
+#else
+  dealii::TrilinosWrappers::MPI::Vector distributed_solution (locally_owned_dofs, mpi_communicator);
+  dealii::TrilinosWrappers::PreconditionBlockJacobi preconditioner;
+  preconditioner.initialize (system_matrix);
+dealii::TrilinosWrappers::SolverBicgstab solver (solver_control);
+#endif
 
   solver.solve (system_matrix, distributed_solution, system_rhs, 
 		preconditioner);
@@ -699,17 +721,16 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::output_material_id (const unsig
       dealii::DataOut<dim> data_out;
       data_out.attach_dof_handler (dof_handler);
 
+#ifdef USE_PETSC
       dealii::PETScWrappers::Vector projected_material_id (dof_handler.n_dofs ());
+#else
+      dealii::TrilinosWrappers::Vector projected_material_id (dof_handler.n_dofs ());
+#endif
       
       nil::GeometryDescription::HyperCube<dim, ValueType> hyper_cube (-5,5);
       dealii::VectorTools::interpolate (dof_handler, hyper_cube, 
 					projected_material_id);
 
-      pcout << "   Material id max/min:             "
-	    << projected_material_id.max () << "/"
-	    << projected_material_id.min ()
-	    << std::endl;
-      
       const std::string filename 
 	= ("material_id-" +
 	   dealii::Utilities::int_to_string (cycle, 4) +
