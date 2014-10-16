@@ -254,7 +254,8 @@ namespace nil
       dealii::Function<dim> (),
       base_   (base_radius),
       hat_    (hat_radius),
-      height_ (height)
+      height_ (height),
+      center_ (center)
       {
 	Assert (base_radius>=0., 
 		dealii::ExcMessage ("The base radius must take a positive value."));
@@ -291,6 +292,11 @@ namespace nil
        * Local copy of the diameter of the height of the pyramid.
        */
       ValueType height_;
+
+      /**
+       * Local copy of the `center-point' of the pyramid.
+       */
+      dealii::Point<dim, ValueType> center_;
 
       }; // SquarePyramid
 
