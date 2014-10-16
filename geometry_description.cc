@@ -52,25 +52,25 @@ namespace nil
 
 	case 1:
 	  {
-	    if ((p[0]<right_) && (p[0]>left_))
-	      is_in_hyper_cube = 1;
+	    if ((p[0]<=right_) && (p[0]>=left_))
+	      is_in_hyper_cube = 1.;
 	    break;
 	  }
 	  
 	case 2:
 	  {
-	    if ((p[0]<right_) && (p[0]>left_) &&
-		(p[1]<right_) && (p[1]>left_))
-	      is_in_hyper_cube = 1;
+	    if ((p[0]<=right_) && (p[0]>=left_) &&
+		(p[1]<=right_) && (p[1]>=left_))
+	      is_in_hyper_cube = 1.;
 	    break;
 	  }
 	  
 	case 3:
 	  {
-	    if ((p[0]<right_) && (p[0]>left_) &&
-		(p[1]<right_) && (p[1]>left_) &&
-		(p[2]<right_) && (p[2]>left_))
-	      is_in_hyper_cube = 1;
+	    if ((p[0]<=right_) && (p[0]>=left_) &&
+		(p[1]<=right_) && (p[1]>=left_) &&
+		(p[2]<=right_) && (p[2]>=left_))
+	      is_in_hyper_cube = 1.;
 	    break;
 	  }
 	  
