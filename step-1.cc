@@ -614,7 +614,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 		    
 		  } // dof j
 
-		cell_rhs (i) -= 
+		cell_rhs (i) += 
 		  (contract (u_i_grad, first_order_elastic_tensor[material_id], 
 		   	     lattice_mismatch_tensor[material_id])
 		   +
@@ -825,7 +825,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::run ()
     }
 
   // Then create the coarse grid
-  make_coarse_grid (2);
+  make_coarse_grid (3);
 
   // Here comes the adaptive cycles
   for (unsigned int cycle=0; cycle<1; ++cycle)
