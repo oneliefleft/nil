@@ -618,6 +618,15 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 		    const dealii::Tensor<2, dim> u_j_grad   = fe_values[u].symmetric_gradient (j, q_point);
 		    const dealii::Tensor<1, dim> phi_j_grad = fe_values[phi].gradient (j, q_point);
 		    
+		    // The cell matrix is a block matrix of the form:
+		    //
+		    // | A B |
+		    // | C D |
+		    //
+		    // Where A is the elastic part, B is the reverse
+		    // piezoelectric part, C is the piezoelectric
+		    // part, and D is the dielectric part. In that
+		    // order, the cell matrix is assembled below.
 		    cell_matrix (i,j) +=
                        (contract (u_i_grad, first_order_elastic_tensor[material_id], 
 				  u_j_grad)
