@@ -37,7 +37,7 @@
 namespace nil
 {
   
-  namespace GeometryDescription
+  namespace GeometryFunction
   {
     
     template <int dim, typename ValueType>

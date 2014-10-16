@@ -39,8 +39,32 @@
 
 namespace nil
 {
+
+  /**
+   * \brief A naming convention for geometry descriptions.
+   *
+   * Provides a list of human readable geometry descriptions that are
+   * directly associated with GeometryFunction.
+   *
+   * @note For historical reasons, the order is based on the order in
+   * which they were supported.
+   *
+   * @author Toby D. Young  2014.
+   */  
+  enum GeometryDescription
+  {
+    hyper_cube,
+    hyper_ball,
+    half_hyper_ball,
+    square_pyramid,
+    hexagonal_pyramid
+  };
   
-  namespace GeometryDescription
+
+  /**
+   * A namespace of functions that describe solid geometries.
+   */
+  namespace GeometryFunction
   {
     
     /**
