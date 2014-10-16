@@ -253,8 +253,10 @@ template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
 PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
 {
+  // The parameter file should not be an empty field if this function
+  // is called.
   AssertThrow (prm_file!="",
-	       dealii::ExcMessage ("Theparameter file name is empty or does not exist"));
+	       dealii::ExcMessage ("The parameter file name is empty or does not exist"));
 
   // Assign parameters to the parameter handler and check sanity of t
   // he parameter. @note If no file exists an unusal default is made.
