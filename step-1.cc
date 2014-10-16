@@ -97,6 +97,100 @@
 #include <iostream>
 
 
+
+/**
+ * This class can setup, solve, and output the results of the
+ * piezoelectric problem.
+ *
+ * @author Toby D. Young 2012, 2014
+ */ 
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType = double>
+class SixBandHoleProblem
+{
+public:
+
+  /**
+   * Constructor. Take a parameter file name if any.
+   */
+  SixBandHoleProblem (const std::string &parameter_file = "");
+
+  /**
+   * Destructor.
+   */
+  ~SixBandHoleProblem ();
+  
+  // Run the problem.
+  void run ();
+  
+private:
+
+  // A local copy of the MPI communicator.
+  MPI_Comm mpi_communicator;
+
+  // A I<code>deal.II</code> hack that outputs to the first processor
+  // only (useful for output in parallel calculations).
+  dealii::ConditionalOStream pcout;
+
+  // A parallel distributed triangulation.
+  dealii::parallel::distributed::Triangulation<dim> triangulation;
+
+  // The finite element and linear algebra system.
+  const dealii::FESystem<dim>              fe_q;
+  dealii::DoFHandler<dim>                  dof_handler;
+  dealii::ConstraintMatrix                 constraints;
+  dealii::IndexSet                         locally_owned_dofs;
+  dealii::IndexSet                         locally_relevant_dofs;
+
+  // Objects for linear algebra calculation
+#ifdef USE_SLEPC
+  dealii::PETScWrappers::MPI::SparseMatrix        system_matrix;
+  dealii::PETScWrappers::MPI::SparseMatrix        mass_matrix;
+  std::vector<dealii::PETScWrappers::MPI::Vector> eigenfunctions;
+  std::vector<ValueType>                          eigenfunctions;;
+#endif
+
+  // An object to hold various run-time parameters that are specified
+  // in a "prm file".
+  dealii::ParameterHandler prm_handler;
+  const std::string        prm_file;
+
+  // Piezoelectric postprocessor.
+  class Postprocessor;
+
+  // A dummy number that counts how many material ids we have.
+  const unsigned int n_material_ids;
+
+};
+
+
+/**
+ * Constructor. This takes in a parameter file name (if any).
+ */
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+SixBandHoleProblem<dim, GroupSymm, ValueType>::SixBandHoleProblem (const std::string &parameter_file)
+  :
+  mpi_communicator (MPI_COMM_WORLD),
+
+  pcout (std::cout, (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0)),
+  
+  triangulation (mpi_communicator,
+		 typename dealii::Triangulation<dim>::MeshSmoothing
+		 (dealii::Triangulation<dim>::smoothing_on_refinement |
+		  dealii::Triangulation<dim>::smoothing_on_coarsening)),
+  
+  fe_q (dealii::FE_Q<dim> (2), dim, /* displacement       */
+   	dealii::FE_Q<dim> (1), 1),  /* electric potential */
+
+  dof_handler (triangulation),
+
+  prm_file (parameter_file),
+
+  n_material_ids (2)
+{}
+
+
+
+
 /**
  * This class can setup, solve, and output the results of the
  * piezoelectric problem.
@@ -139,7 +233,6 @@ private:
 
   void output_results (const unsigned int cycle) const;
   void output_material_id (const unsigned int cycle) const;
-
 
   // A local copy of the MPI communicator.
   MPI_Comm mpi_communicator;
