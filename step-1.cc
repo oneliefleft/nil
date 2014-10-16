@@ -109,9 +109,9 @@ class PiezoelectricProblem
 public:
 
   /**
-   * Constructor.
+   * Constructor. Take a parameter file name if any.
    */
-  PiezoelectricProblem (const std::string &parameter_file);
+  PiezoelectricProblem (const std::string &parameter_file = "");
 
   /**
    * Destructor.
@@ -163,7 +163,6 @@ private:
   // and second-order tensors.
   std::vector<std::vector<ValueType> > second_order_piezoelectric_coefficients;
 
-  
   // Mismatch strain tensor.
   std::vector<dealii::Tensor<2, dim, ValueType> > lattice_mismatch_tensor;
   std::vector<std::vector<ValueType> >            lattice_coefficients;
@@ -209,7 +208,7 @@ private:
 
 
 /**
- * Constructor.
+ * Constructor. This takes in a parameter file name (if any).
  */
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 PiezoelectricProblem<dim, GroupSymm, ValueType>::PiezoelectricProblem (const std::string &parameter_file)
@@ -254,6 +253,9 @@ template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void 
 PiezoelectricProblem<dim, GroupSymm, ValueType>::get_parameters ()
 {
+  AssertThrow (prm_file!="",
+	       dealii::ExcMessage ("Theparameter file name is empty or does not exist"));
+
   // Assign parameters to the parameter handler and check sanity of t
   // he parameter. @note If no file exists an unusal default is made.
   nil::ParameterReader prm_reader (prm_handler, prm_file);
