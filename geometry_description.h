@@ -72,12 +72,10 @@ namespace nil
 	Assert (left<right, 
 		dealii::ExcMessage ("The left coordinate must take a lower value than the right coordinate."));
       }
-      
-      
+
       /**
        * Return a boolean value (1) if this point <code>p</code> is in
-       * or on the hyper-cube boundary defined by a previous call to the
-       * <code>reinit</code function.
+       * or on the hyper-cube boundary.
        */
       virtual 
       double value (const dealii::Point<dim, ValueType> &p,
@@ -96,6 +94,61 @@ namespace nil
       ValueType right_;
       
       }; // HyperCube
+
+      
+      
+      /**
+       * A class that produces a solid hyper-ball from a scalar
+       * function. The hyper-ball volume is
+       * \f$4\pi/3\times\f$<code>radius</code>. By default a unit
+       * ball centred on the origin is created.
+       *
+       * @author Toby D. Young 2011, 2014
+       */
+      template <int dim, typename ValueType = double>
+      class HyperBall
+      :
+      public dealii::Function<dim>
+      {
+      public:
+      
+      /**
+       * Constructor. Takes the left and right points of the
+       * hyper-cube.
+       */  
+      HyperBall (const dealii::Point<dim, ValueType> center = dealii::Point<dim, ValueType> (),
+		 const ValueType radius                     = 0.5) 
+      : 
+      dealii::Function<dim> (),
+      center_ (center),
+      radius_ (radius)
+      {
+	Assert (radius>=0., 
+		dealii::ExcMessage ("The radius must take a positive value."));
+      }
+      
+      
+      /**
+       * Return a boolean value (1) if this point <code>p</code> is in
+       * or on the hyper-ball boundary.
+       */
+      virtual 
+      double value (const dealii::Point<dim, ValueType> &p,
+		    const unsigned int                   /* component */) const;
+      
+      private:
+      
+      /**
+       * Local copy of the center-point of the hyper-ball. 
+       */
+      dealii::Point<dim, ValueType> center_;
+      
+      /**
+       * Local copy of the radius of the hyper-ball
+       */
+      ValueType radius_;
+      
+      }; // HyperBall
     
 
     /**

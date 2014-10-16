@@ -80,6 +80,22 @@ namespace nil
       
       return is_in_hyper_cube;
     }
+
+
+    template <int dim, typename ValueType>
+    double
+    HyperBall<dim, ValueType>::value (const dealii::Point<dim, ValueType> &p,
+				      const unsigned int                   /* component */) const
+    {
+      double is_in_hyper_ball = 0.;
+     
+      const double distance = p.distance (center_);
+ 
+      if (distance<=radius_)
+	is_in_hyper_ball = 1.;
+
+      return is_in_hyper_ball;
+    }
     
 
     template <int dim, typename ValueType>
