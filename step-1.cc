@@ -661,6 +661,8 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::assemble_system ()
 
 	cell->get_dof_indices(local_dof_indices);
 
+	// Distribute the cell matrix onto the distributed system
+	// matrix and the cell vector onto the distributed rhs vector.
 	constraints.distribute_local_to_global (cell_matrix, local_dof_indices,
 						system_matrix);
 
