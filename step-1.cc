@@ -745,33 +745,61 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::output_material_id (const unsig
   // This is a speedy relatively operation, so we can get away with
   // running it on one processor only. In fact, we should attach a
   // different dof handler to this since the current one has four
-  // components but only one isneeded for material_id.
-  if (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0)
-    {      
-      dealii::DataOut<dim> data_out;
-      data_out.attach_dof_handler (dof_handler);
-
+  // components but only one is needed for material_id.
+  dealii::DataOut<dim> data_out;
+  data_out.attach_dof_handler (dof_handler);
+  
 #ifdef USE_PETSC
-      dealii::PETScWrappers::Vector projected_material_id (dof_handler.n_dofs ());
+  dealii::PETScWrappers::Vector projected_material_id (dof_handler.n_dofs ());
 #else
-      dealii::TrilinosWrappers::Vector projected_material_id (dof_handler.n_dofs ());
+  dealii::TrilinosWrappers::Vector projected_material_id (dof_handler.n_dofs ());
 #endif
+  
+  nil::GeometryDescription::HalfHyperBall<dim, ValueType> geometry (dealii::Point<dim, ValueType> (), 5.);
+  dealii::VectorTools::interpolate (dof_handler, geometry, 
+				    projected_material_id);
+  
+  const std::string filename 
+    = ("material_id-" +
+       dealii::Utilities::int_to_string (cycle, 4) +
+       "." +
+       dealii::Utilities::int_to_string (triangulation.locally_owned_subdomain(), 4) +
+       ".vtu");
+  
+  data_out.add_data_vector (projected_material_id, "projected_material_id");
+  data_out.build_patches ();
+  
+  std::ofstream output (filename.c_str()); 
+  data_out.write_vtu (output);
+
+  // For calculations in parallel it is convenient to have a master
+  // record written. This allows paravew (and friends) to read the
+  // entire structure by binding blocks (*.vtu) into a single
+  // structure (*.visit). This only needs to be done by one processor.
+  if (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0)
+    {
+      std::vector<std::string> filenames;
+
+      // The filenames to bind into the master record should match the
+      // filenames used above.
+      for (unsigned int i=0; i<dealii::Utilities::MPI::n_mpi_processes (mpi_communicator); ++i)
+	{
+	  filenames.push_back ("projected_material_id-" +
+			       dealii::Utilities::int_to_string (cycle, 4) +
+			       "." +
+			       dealii::Utilities::int_to_string (i, 4) +
+			       ".vtu");
+	}
+  
+      const std::string
+	pvtu_master_filename = ("projected_material_id-" +
+				dealii::Utilities::int_to_string (cycle, 4) +
+				".pvtu");
       
-      nil::GeometryDescription::HalfHyperBall<dim, ValueType> geometry (dealii::Point<dim, ValueType> (), 5.);
-      dealii::VectorTools::interpolate (dof_handler, geometry, 
-					projected_material_id);
-
-      const std::string filename 
-	= ("material_id-" +
-	   dealii::Utilities::int_to_string (cycle, 4) +
-	   ".vtu");
-
-      data_out.add_data_vector (projected_material_id, "projected_material_id");
-      data_out.build_patches ();
-
-      std::ofstream output (filename.c_str()); 
-      data_out.write_vtu (output);
+      std::ofstream pvtu_master (pvtu_master_filename.c_str ());
+      data_out.write_pvtu_record (pvtu_master, filenames);
     }
+
 }
 
 
