@@ -32,7 +32,7 @@
 // implied, of the nil authors.
 // -------------------------------------------------------------------
 
-#include "geometry_function.h"
+#include "../include/nil/geometry_function.h"
 
 namespace nil
 {
