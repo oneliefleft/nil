@@ -173,7 +173,7 @@ namespace nil
 	      const double theta_y = fabs (std::atan2 (fabs (p[2]), fabs (p[1])));
 	      const double theta_x = fabs (std::atan2 (fabs (p[2]), fabs (p[0])));
 
-	      if ((theta_y<theta) && (theta_x<theta))
+	      if ((theta_y<=theta) && (theta_x<=theta))
 		is_in_square_pyramid = 1.;
 	    }
 

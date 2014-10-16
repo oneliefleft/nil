@@ -249,7 +249,7 @@ namespace nil
       SquarePyramid (const ValueType base_radius                = 1.0,
 		     const ValueType hat_radius                 = 0.5,
 		     const ValueType height                     = 0.5,
-		     const dealii::Point<dim, ValueType> center = dealii::Point<dim, ValueType> ()) 
+		     const dealii::Point<dim, ValueType> center = dealii::Point<dim, ValueType> ())
       : 
       dealii::Function<dim> (),
       base_   (base_radius),
@@ -257,6 +257,9 @@ namespace nil
       height_ (height),
       center_ (center)
       {
+	AssertThrow (center==dealii::Point<dim, ValueType> (), 
+		     dealii::ExcNotImplemented ());
+
 	Assert (base_radius>=0., 
 		dealii::ExcMessage ("The base radius must take a positive value."));
 

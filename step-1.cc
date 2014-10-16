@@ -894,7 +894,7 @@ PiezoelectricProblem<dim, GroupSymm, ValueType>::output_material_id (const unsig
   dealii::TrilinosWrappers::Vector projected_material_id (dof_handler.n_dofs ());
 #endif
   
-  nil::GeometryFunction::SquarePyramid<dim, ValueType> geometry (10., 5., 5., dealii::Point<dim, ValueType> ());
+  nil::GeometryFunction::SquarePyramid<dim, ValueType> geometry (10., 5., 5.);
   dealii::VectorTools::interpolate (dof_handler, geometry, 
 				    projected_material_id);
   
