@@ -188,7 +188,27 @@ SixBandHoleProblem<dim, GroupSymm, ValueType>::SixBandHoleProblem (const std::st
   n_material_ids (2)
 {}
 
+/**
+ * Destructor. Free some memory allocation.
+ */
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+SixBandHoleProblem<dim, GroupSymm, ValueType>::~SixBandHoleProblem ()
+{
+  dof_handler.clear ();
+}
 
+
+
+/**
+ * This is the run function, which wraps all of the above into a
+ * single logical routine.
+ */
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+void 
+SixBandHoleProblem<dim, GroupSymm, ValueType>::run ()
+{
+  AssertThrow (false, dealii::ExcNotImplemented ());
+}
 
 
 /**
@@ -1091,6 +1111,10 @@ int main (int argc, char **argv)
       // Initialise the problem, 3d wurtzite, (default double).
       PiezoelectricProblem<3, nil::GroupSymmetry::Wurtzite> piezoelectric_problem ("step-1.prm");
       piezoelectric_problem.run ();
+
+      // Initialise the problem, 3d wurtzite, (default double).
+      SixBandHoleProblem<3, nil::GroupSymmetry::Wurtzite> six_band_hole_problem ("step-1.prm");
+      six_band_hole_problem.run ();
     }
 
   // ...and if this should fail, try to gather as much information as
