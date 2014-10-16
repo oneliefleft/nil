@@ -86,7 +86,7 @@
 #include "include/nil/piezoelectric_tensor.h"
 #include "include/nil/polarelectric_tensor.h"
 
-#include "geometry_description.h"
+#include "geometry_function.h"
 #include "parameter_reader.h"
 
 #include "piezoelectric_coefficients.h"

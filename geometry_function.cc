@@ -32,7 +32,7 @@
 // implied, of the nil authors.
 // -------------------------------------------------------------------
 
-#include "geometry_description.h"
+#include "geometry_function.h"
 
 namespace nil
 {
@@ -200,4 +200,4 @@ namespace nil
 
 // -------------- Explicit Instantiations -------------------------------
 
-#include "geometry_description.inst"
+#include "geometry_function.inst"

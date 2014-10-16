@@ -7,7 +7,7 @@ SET(TARGET "step-1")
 
 SET(TARGET_SRC
   command_line.cc
-  geometry_description.cc
+  geometry_function.cc
   parameter_reader.cc
 #
   source/group_symmetry.cc
