@@ -17,6 +17,7 @@ SET(TARGET_SRC
   source/base/group_symmetry.cc
   source/base/tensor_base.cc
 #
+  piezoelectric_model.cc
   piezoelectric_coefficients.cc
 #
   ${TARGET}.cc

@@ -32,6 +32,9 @@
 // implied, of the nil authors.
 // -------------------------------------------------------------------
 
+#ifndef __nil_piezoelectric_model_h
+#define __nil_piezoelectric_model_h
+
 // deal.II headers
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/index_set.h>
@@ -93,26 +96,22 @@
 
 #include "include/nil/parameter_reader.h"
 
-#include "piezoelectric_model.h"
-#include "piezoelectric_coefficients.h"
-
-#include <fstream>
-#include <iostream>
-
-
-namespace SixBandHole
+namespace nil
 {
-  
+
+namespace Piezoelectric
+{
+
   /**
    * This class can setup, solve, and output the results of the
-   * six-band hole problem.
+   * piezoelectric problem.
    *
-   * @author Toby D. Young 2014
+   * @author Toby D. Young 2012, 2014
    */ 
   template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType = double>
-  class Model
-  {
-  public:
+    class Model
+    {
+    public:
     
     /**
      * Constructor. Take a parameter file name if any.
@@ -124,13 +123,56 @@ namespace SixBandHole
      */
     ~Model ();
     
-    // Run the problem.
+    /**
+     * Run the problem.
+     */
     void run ();
     
   private:
     
+    // First is a list of functions that belong to this class (they are
+    // explained later on).
+    void get_parameters ();
+    
+    void make_coarse_grid (const unsigned int n_refinement_cycles = 0);
+    void make_boundary_constraints ();
+    
+    void setup_system ();
+    void setup_coefficient_tensors ();
+    void assemble_system ();
+    
+    unsigned int solve ();
+    void refine_grid ();
+    
+    void output_results (const unsigned int cycle) const;
+    void output_material_id (const unsigned int cycle) const;
+    
     // A local copy of the MPI communicator.
     MPI_Comm mpi_communicator;
+    
+    // Following that we have a list of the tensors that will be used
+    // in this calculation. They are, first-
+    std::vector<nil::ElasticTensor<GroupSymm, 1, ValueType> >       first_order_elastic_tensor;
+    std::vector<nil::DielectricTensor<GroupSymm, 1, ValueType> >    first_order_dielectric_tensor;
+    std::vector<nil::PiezoelectricTensor<GroupSymm, 1, ValueType> > first_order_piezoelectric_tensor;
+    std::vector<nil::PolarelectricTensor<GroupSymm, 1, ValueType> > first_order_polarelectric_tensor;
+    
+    // and second-order tensors of coefficients
+    std::vector<nil::PiezoelectricTensor<GroupSymm, 2, ValueType> > second_order_piezoelectric_tensor;
+    
+    // Additionally, lists of coefficients are needed for first-order
+    std::vector<std::vector<ValueType> > first_order_elastic_coefficients;
+    std::vector<std::vector<ValueType> > first_order_dielectric_coefficients;
+    std::vector<std::vector<ValueType> > first_order_piezoelectric_coefficients;
+    std::vector<std::vector<ValueType> > first_order_polarelectric_coefficients;
+    
+    // and second-order tensors.
+    std::vector<std::vector<ValueType> > second_order_piezoelectric_coefficients;
+    
+    // Mismatch strain tensor.
+    std::vector<dealii::Tensor<2, dim, ValueType> > lattice_mismatch_tensor;
+    std::vector<std::vector<ValueType> >            lattice_coefficients;
+    
     
     // A I<code>deal.II</code> hack that outputs to the first processor
     // only (useful for output in parallel calculations).
@@ -140,20 +182,24 @@ namespace SixBandHole
     dealii::parallel::distributed::Triangulation<dim> triangulation;
     
     // The finite element and linear algebra system.
-    const dealii::FESystem<dim> fe_q;
-    dealii::DoFHandler<dim>     dof_handler;
-    dealii::ConstraintMatrix    constraints;
-    dealii::IndexSet            locally_owned_dofs;
-    dealii::IndexSet            locally_relevant_dofs;
+    const dealii::FESystem<dim>              fe_q;
+    dealii::DoFHandler<dim>                  dof_handler;
+    dealii::ConstraintMatrix                 constraints;
+    dealii::IndexSet                         locally_owned_dofs;
+    dealii::IndexSet                         locally_relevant_dofs;
     
     // Objects for linear algebra calculation
-#ifdef USE_SLEPC
-    dealii::PETScWrappers::MPI::SparseMatrix        system_matrix;
-    dealii::PETScWrappers::MPI::SparseMatrix        mass_matrix;
-    std::vector<dealii::PETScWrappers::MPI::Vector> eigenfunctions;
-    std::vector<ValueType>                          eigenfunctions;
+#ifdef USE_PETSC
+    dealii::PETScWrappers::MPI::SparseMatrix system_matrix;
+    dealii::PETScWrappers::MPI::Vector       system_rhs;
+    dealii::PETScWrappers::MPI::Vector       solution;
+#else
+    dealii::TrilinosWrappers::SparseMatrix   system_matrix;
+    dealii::TrilinosWrappers::MPI::Vector    system_rhs;
+    dealii::TrilinosWrappers::MPI::Vector    solution;
 #endif
     
+
     // An object to hold various run-time parameters that are specified
     // in a "prm file".
     dealii::ParameterHandler prm_handler;
@@ -164,122 +210,10 @@ namespace SixBandHole
     
     // A dummy number that counts how many material ids we have.
     const unsigned int n_material_ids;
-    
   };
-
-} // namespace SixBandHole
-
-
-namespace SixBandHole
-{
   
-  
-  /**
-   * Constructor. This takes in a parameter file name (if any).
-   */
-  template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
-  Model<dim, GroupSymm, ValueType>::Model (const std::string &parameter_file)
-    :
-    mpi_communicator (MPI_COMM_WORLD),
-    
-    pcout (std::cout, (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0)),
-    
-    triangulation (mpi_communicator,
-		   typename dealii::Triangulation<dim>::MeshSmoothing
-		   (dealii::Triangulation<dim>::smoothing_on_refinement |
-		    dealii::Triangulation<dim>::smoothing_on_coarsening)),
-    
-    fe_q (dealii::FE_Q<dim> (2), 6), /* six holes */
-    
-    dof_handler (triangulation),
-    
-    prm_file (parameter_file),
-    
-    n_material_ids (2)
-  {}
-  
-  /**
-   * Destructor. Free some memory allocation.
-   */
-  template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
-  Model<dim, GroupSymm, ValueType>::~Model ()
-  {
-    dof_handler.clear ();
-  }
-  
-  
-  
-  /**
-   * This is the run function, which wraps all of the above into a
-   * single logical routine.
-   */
-  template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
-  void 
-  Model<dim, GroupSymm, ValueType>::run ()
-  {
-    AssertThrow (false, dealii::ExcNotImplemented ());
-  }
+} // namespace Piezoelectric
 
-} // namespace SixBandHole
+} // namespace nil
 
-
-
-
-  
-int main (int argc, char **argv)
-{
-
-  // Initialise MPI as we allways do.
-  dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv, dealii::numbers::invalid_unsigned_int);
-
-  try
-    {
-      dealii::deallog.depth_console (0);
-
-      // Initialise the model, 3d wurtzite, (default double).
-      nil::Piezoelectric::Model<3, nil::GroupSymmetry::Wurtzite> piezoelectric_model ("piezoelectric.prm");
-      piezoelectric_model.run ();
-
-      // Initialise the model, 3d wurtzite, (default double).
-      SixBandHole::Model<3, nil::GroupSymmetry::Wurtzite> six_band_hole_model ("sixbandhole.prm");
-      six_band_hole_model.run ();
-    }
-
-  // ...and if this should fail, try to gather as much information as
-  // possible. Specifically, if the exception that was thrown is an
-  // object of a class that is derived from the C++ standard class
-  // <code>exception</code>.
-  catch (std::exception &exc)
-    {
-      std::cerr << std::endl << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      std::cerr << "Exception on processing: " << std::endl
-                << exc.what() << std::endl
-                << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-
-      return 1;
-    }
-
-  // If the exception that was thrown somewhere was not an object of a
-  // class derived from the standard <code>exception</code> class,
-  // then nothing cane be done at all - simply print an error message
-  // and exit.
-  catch (...)
-    {
-      std::cerr << std::endl << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      std::cerr << "Unknown exception!" << std::endl
-                << "Aborting!" << std::endl
-                << "----------------------------------------------------"
-                << std::endl;
-      return 1;
-    }
-  
-  // At this point, the application performed as was expected - return
-  // without error.
-  return 0;
-}
+#endif // __nil_piezoelectric_model_h
