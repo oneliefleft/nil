@@ -34,6 +34,7 @@ private:
   bool initialized;
 };
 
+
 template <int dim>
 void
 TruncatedPyramid<dim>::reinit (const double lower_width,

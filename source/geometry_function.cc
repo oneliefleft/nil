@@ -105,8 +105,8 @@ namespace nil
     {
       double is_in_half_hyper_ball = 0.;
      
-      // This is the distance to the center that refers to a
-      // hyper-ball.
+      // This is the distance to the center, where `center' refers to
+      // the center of the corresponding hyper-ball.
       const double distance = p.distance (center_);
  
       switch (dim)
@@ -117,8 +117,7 @@ namespace nil
 	  // check if we are in the upper half of the half
 	  // hyper-ball. In 2d this happens if the 2-axis of the point
 	  // is above or on the z-axis of the center
-	  if ((p[1]>=center_[1]) && 
-	      (distance<=radius_))
+	  if ((p[1]>=center_[1]) && (distance<=radius_))
 	    is_in_half_hyper_ball = 1.;
 	  
 	  break;
@@ -128,8 +127,7 @@ namespace nil
 	  // check if we are in the upper half of the half
 	  // hyper-ball. In 3d this happens if the 3-axis of the point
 	  // is above or on the z-axis of the center
-	  if ((p[2]>=center_[2]) && 
-	      (distance<=radius_))
+	  if ((p[2]>=center_[2]) && (distance<=radius_))
 	    is_in_half_hyper_ball = 1.;
 	  
 	  break;
