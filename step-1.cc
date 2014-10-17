@@ -225,6 +225,77 @@ namespace SixBandHole
 } // namespace SixBandHole
 
 
+namespace TwoBandElectron
+{
+  
+  /**
+   * This class can setup, solve, and output the results of the
+   * six-band hole problem.
+   *
+   * @author Toby D. Young 2014
+   */ 
+  template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType = double>
+  class Model
+  {
+  public:
+    
+    /**
+     * Constructor. Take a parameter file name if any.
+     */
+    Model (const std::string &parameter_file = "");
+    
+    /**
+     * Destructor.
+     */
+    ~Model ();
+    
+    // Run the problem.
+    void run ();
+    
+  private:
+    
+    // A local copy of the MPI communicator.
+    MPI_Comm mpi_communicator;
+    
+    // A I<code>deal.II</code> hack that outputs to the first processor
+    // only (useful for output in parallel calculations).
+    dealii::ConditionalOStream pcout;
+    
+    // A parallel distributed triangulation.
+    dealii::parallel::distributed::Triangulation<dim> triangulation;
+    
+    // The finite element and linear algebra system.
+    const dealii::FESystem<dim> fe_q;
+    dealii::DoFHandler<dim>     dof_handler;
+    dealii::ConstraintMatrix    constraints;
+    dealii::IndexSet            locally_owned_dofs;
+    dealii::IndexSet            locally_relevant_dofs;
+    
+    // Objects for linear algebra calculation
+#ifdef USE_SLEPC
+    dealii::PETScWrappers::MPI::SparseMatrix        system_matrix;
+    dealii::PETScWrappers::MPI::SparseMatrix        mass_matrix;
+    std::vector<dealii::PETScWrappers::MPI::Vector> eigenfunctions;
+    std::vector<ValueType>                          eigenfunctions;
+#endif
+    
+    // An object to hold various run-time parameters that are specified
+    // in a "prm file".
+    dealii::ParameterHandler prm_handler;
+    const std::string        prm_file;
+    
+    // Piezoelectric postprocessor.
+    class Postprocessor;
+    
+    // A dummy number that counts how many material ids we have.
+    const unsigned int n_material_ids;
+    
+  };
+
+} // namespace TwoBandElectron
+
+
+
 
 
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
