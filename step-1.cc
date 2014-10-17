@@ -32,6 +32,8 @@
 // implied, of the nil authors.
 // -------------------------------------------------------------------
 
+
+
 // deal.II headers
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/index_set.h>
@@ -245,9 +247,12 @@ public:
   /**
    * The number of material ids.
    */
-  const unsigned int n_material_ids = 2;
+  unsigned int n_material_ids;
 
 private:
+
+  // Constructor of the piezoelectric model
+  // nil::Piezoelectric::Model<dim, GroupSymm, ValueType> piezoelectric_model ("piezoelectric.prm");
 
   /**
    * A local copy of the MPI communicator.
@@ -269,7 +274,9 @@ QuantumDotProblem<dim, GroupSymm, ValueType>::QuantumDotProblem ()
   mpi_communicator (MPI_COMM_WORLD),
 
   pcout (std::cout, (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0))
-{}
+{
+  n_material_ids = 2;
+}
 
 
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
@@ -278,11 +285,8 @@ QuantumDotProblem<dim, GroupSymm, ValueType>::~QuantumDotProblem ()
 
 
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
-// void nil::Piezoelectric::Model<dim, GroupSymm, ValueType>::run ()
 void QuantumDotProblem<dim, GroupSymm, ValueType>::run ()
-
 {
-  // Constructor of the piezoelectric model
   nil::Piezoelectric::Model<dim, GroupSymm, ValueType> piezoelectric_model ("piezoelectric.prm");
 
   // First find the parameters need for this calculation
@@ -317,10 +321,10 @@ void QuantumDotProblem<dim, GroupSymm, ValueType>::run ()
 #endif
   
   // Then create the coarse grid
-  piezoelectric_model.make_coarse_grid (3);
+  piezoelectric_model.make_coarse_grid (4);
   
   // Here comes the adaptive cycles
-  const unsigned int n_cycles = 3;
+  const unsigned int n_cycles = 4;
       
   for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
     {
