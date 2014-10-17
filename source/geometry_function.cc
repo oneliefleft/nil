@@ -157,8 +157,7 @@ namespace nil
 	  // First check if the z-range is in play. If not, there is
 	  // no sane reason to check the other components of the
 	  // coordinate.
-	  if ((p[2]>center_[2])          && 
-	      (p[2]<center_[2]+height_))
+	  if ((p[2]>center_[2]) && (p[2]<center_[2]+height_))
 	    {
 	      // Then check if the point is inside a possibly
 	      // truncated 3d pyramid. In this case the x- and
