@@ -127,9 +127,8 @@ namespace nil
        * This is the run function, which wraps all of the above into a
        * single logical routine.
        */
-      void run ();
-      
-      private:
+      virtual
+      void run () {};
       
       /**
        * Obtain a complete list of the coefficients needed for this
@@ -183,6 +182,8 @@ namespace nil
       void output_results (const unsigned int cycle) const;
       void output_material_id (const unsigned int cycle) const;
       
+      private:
+
       /**
        * A local copy of the MPI communicator.
        */

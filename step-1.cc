@@ -225,6 +225,159 @@ namespace SixBandHole
 
 
 
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+class QuantumDotProblem
+  :
+  public nil::Piezoelectric::Model<dim, GroupSymm, ValueType>
+{
+public:
+  
+  QuantumDotProblem ();
+
+  ~QuantumDotProblem ();
+
+  // virtual
+  // void 
+  // nil::Piezoelectric::Model<dim, GroupSymm, ValueType>::run ();
+
+  void run ();
+
+  /**
+   * The number of material ids.
+   */
+  const unsigned int n_material_ids = 2;
+
+private:
+
+  /**
+   * A local copy of the MPI communicator.
+   */
+  MPI_Comm mpi_communicator;
+
+  /**
+   * A I<code>deal.II</code> hack that outputs to the first processor
+   * only (useful for output in parallel calculations).
+   */
+  dealii::ConditionalOStream pcout;  
+
+};
+
+
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+QuantumDotProblem<dim, GroupSymm, ValueType>::QuantumDotProblem ()
+  :
+  mpi_communicator (MPI_COMM_WORLD),
+
+  pcout (std::cout, (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0))
+{}
+
+
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+QuantumDotProblem<dim, GroupSymm, ValueType>::~QuantumDotProblem ()
+{}
+
+
+template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
+// void nil::Piezoelectric::Model<dim, GroupSymm, ValueType>::run ()
+void QuantumDotProblem<dim, GroupSymm, ValueType>::run ()
+
+{
+  // Constructor of the piezoelectric model
+  nil::Piezoelectric::Model<dim, GroupSymm, ValueType> piezoelectric_model ("piezoelectric.prm");
+
+  // First find the parameters need for this calculation
+  piezoelectric_model.get_parameters ();
+  
+  // Make coefficient tensors.
+  piezoelectric_model.setup_coefficient_tensors ();
+  
+#ifdef VERBOSE
+  for (unsigned int i=0; i<n_material_ids; ++i)
+    { 
+      pcout << std::endl
+	    << "Tensors of coefficients for material " << i << ":"
+	    << std::endl
+	    << "   Lattice coefficients:            ";
+      for (unsigned int j=0; j<lattice_coefficients[i].size (); ++j)
+	pcout << lattice_coefficients[i][j] << " ";
+      pcout << std::endl
+	    << "   Lattice mismatch:                " << lattice_mismatch_tensor[i]
+	    << std::endl
+	    << "   1st-order elastic:               " << first_order_elastic_tensor[i]
+	    << std::endl
+	    << "   1st-order dielectric:            " << first_order_dielectric_tensor[i]
+	    << std::endl
+	    << "   1st-order piezoelectric:         " << first_order_piezoelectric_tensor[i]
+	    << std::endl
+	    << "   1st-order spont. polarization:   " << first_order_polarelectric_tensor[i]
+	    << std::endl
+	    << "   2nd-order piezoelectric:         " << second_order_piezoelectric_tensor[i]
+	    << std::endl;
+    }
+#endif
+  
+  // Then create the coarse grid
+  piezoelectric_model.make_coarse_grid (3);
+  
+  // Here comes the adaptive cycles
+  const unsigned int n_cycles = 3;
+      
+  for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
+    {
+      
+      pcout << std::endl
+	    << "Cycle:                              "
+	    << cycle
+	    << std::endl;
+
+#ifdef VERBOSE      
+      pcout << "   Number of active cells:          "
+	    << triangulation.n_global_active_cells ()
+	    << " (on "
+	    << triangulation.n_levels ()
+	    << " levels)"
+	    << std::endl;
+#endif
+      
+      // Distribute degrees of freedom and reinitialize matrices and
+      // vectors.
+      piezoelectric_model.setup_system ();
+      
+#ifdef VERBOSE
+      pcout << "   Number of degrees of freedom:    "
+	    << dof_handler.n_dofs ()
+	    << std::endl;
+#endif      
+
+      // Assemble the matrix and rhs vector.
+      piezoelectric_model.assemble_system ();
+      
+#ifdef VERBOSE
+      pcout << "   Number of non-zero elements:     "
+	    << system_matrix.n_nonzero_elements ()
+	    << std::endl
+	    << "   System rhs l2-norm:              "
+	    << system_rhs.l2_norm ()
+	    << std::endl;
+#endif 
+      
+      // Solve the problem.
+      const unsigned int n_iterations = piezoelectric_model.solve ();
+      
+      pcout << "   Solver converged in:             "
+	    << n_iterations << " iterations"
+	    << std::endl;
+      
+      // Write derived quantities to files.
+      piezoelectric_model.output_results (cycle);
+      piezoelectric_model.output_material_id (cycle);
+      
+      // Finally use Kelly's error estimate to refine the grid.
+      piezoelectric_model.refine_grid ();
+    }
+}
+
+
   
 int main (int argc, char **argv)
 {
@@ -237,8 +390,10 @@ int main (int argc, char **argv)
       dealii::deallog.depth_console (0);
 
       // Initialise the model, 3d wurtzite, (default double).
-      nil::Piezoelectric::Model<3, nil::GroupSymmetry::Wurtzite> piezoelectric_model ("piezoelectric.prm");
-      piezoelectric_model.run ();
+      // nil::Piezoelectric::Model<3, nil::GroupSymmetry::Wurtzite> piezoelectric_model ("piezoelectric.prm");
+      // piezoelectric_model.run ();
+      QuantumDotProblem<3, nil::GroupSymmetry::Wurtzite, double> quantum_dot_problem;
+      quantum_dot_problem.run ();
 
       // Initialise the model, 3d wurtzite, (default double).
       SixBandHole::Model<3, nil::GroupSymmetry::Wurtzite> six_band_hole_model ("sixbandhole.prm");
