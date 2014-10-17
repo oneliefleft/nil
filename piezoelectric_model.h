@@ -98,122 +98,160 @@
 
 namespace nil
 {
-
-namespace Piezoelectric
-{
-
-  /**
-   * This class can setup, solve, and output the results of the
-   * piezoelectric problem.
-   *
-   * @author Toby D. Young 2012, 2014
-   */ 
-  template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType = double>
-    class Model
-    {
-    public:
-    
-    /**
-     * Constructor. Take a parameter file name if any.
-     */
-    Model (const std::string &parameter_file = "");
-    
-    /**
-     * Destructor.
-     */
-    ~Model ();
-    
-    /**
-     * Run the problem.
-     */
-    void run ();
-    
-  private:
-    
-    // First is a list of functions that belong to this class (they are
-    // explained later on).
-    void get_parameters ();
-    
-    void make_coarse_grid (const unsigned int n_refinement_cycles = 0);
-    void make_boundary_constraints ();
-    
-    void setup_system ();
-    void setup_coefficient_tensors ();
-    void assemble_system ();
-    
-    unsigned int solve ();
-    void refine_grid ();
-    
-    void output_results (const unsigned int cycle) const;
-    void output_material_id (const unsigned int cycle) const;
-    
-    // A local copy of the MPI communicator.
-    MPI_Comm mpi_communicator;
-    
-    // Following that we have a list of the tensors that will be used
-    // in this calculation. They are, first-
-    std::vector<nil::ElasticTensor<GroupSymm, 1, ValueType> >       first_order_elastic_tensor;
-    std::vector<nil::DielectricTensor<GroupSymm, 1, ValueType> >    first_order_dielectric_tensor;
-    std::vector<nil::PiezoelectricTensor<GroupSymm, 1, ValueType> > first_order_piezoelectric_tensor;
-    std::vector<nil::PolarelectricTensor<GroupSymm, 1, ValueType> > first_order_polarelectric_tensor;
-    
-    // and second-order tensors of coefficients
-    std::vector<nil::PiezoelectricTensor<GroupSymm, 2, ValueType> > second_order_piezoelectric_tensor;
-    
-    // Additionally, lists of coefficients are needed for first-order
-    std::vector<std::vector<ValueType> > first_order_elastic_coefficients;
-    std::vector<std::vector<ValueType> > first_order_dielectric_coefficients;
-    std::vector<std::vector<ValueType> > first_order_piezoelectric_coefficients;
-    std::vector<std::vector<ValueType> > first_order_polarelectric_coefficients;
-    
-    // and second-order tensors.
-    std::vector<std::vector<ValueType> > second_order_piezoelectric_coefficients;
-    
-    // Mismatch strain tensor.
-    std::vector<dealii::Tensor<2, dim, ValueType> > lattice_mismatch_tensor;
-    std::vector<std::vector<ValueType> >            lattice_coefficients;
-    
-    
-    // A I<code>deal.II</code> hack that outputs to the first processor
-    // only (useful for output in parallel calculations).
-    dealii::ConditionalOStream pcout;
-    
-    // A parallel distributed triangulation.
-    dealii::parallel::distributed::Triangulation<dim> triangulation;
-    
-    // The finite element and linear algebra system.
-    const dealii::FESystem<dim>              fe_q;
-    dealii::DoFHandler<dim>                  dof_handler;
-    dealii::ConstraintMatrix                 constraints;
-    dealii::IndexSet                         locally_owned_dofs;
-    dealii::IndexSet                         locally_relevant_dofs;
-    
-    // Objects for linear algebra calculation
-#ifdef USE_PETSC
-    dealii::PETScWrappers::MPI::SparseMatrix system_matrix;
-    dealii::PETScWrappers::MPI::Vector       system_rhs;
-    dealii::PETScWrappers::MPI::Vector       solution;
-#else
-    dealii::TrilinosWrappers::SparseMatrix   system_matrix;
-    dealii::TrilinosWrappers::MPI::Vector    system_rhs;
-    dealii::TrilinosWrappers::MPI::Vector    solution;
-#endif
-    
-
-    // An object to hold various run-time parameters that are specified
-    // in a "prm file".
-    dealii::ParameterHandler prm_handler;
-    const std::string        prm_file;
-    
-    // Piezoelectric postprocessor.
-    class Postprocessor;
-    
-    // A dummy number that counts how many material ids we have.
-    const unsigned int n_material_ids;
-  };
   
-} // namespace Piezoelectric
+  namespace Piezoelectric
+  {
+    
+    /**
+     * This class can setup, solve, and output the results of the
+     * piezoelectric problem.
+     *
+     * @author Toby D. Young 2012, 2014
+     */ 
+    template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType = double>
+      class Model
+      {
+      public:
+      
+      /**
+       * Constructor. Take a parameter file name if any.
+       */
+      Model (const std::string &parameter_file = "");
+      
+      /**
+       * Destructor.
+       */
+      ~Model ();
+      
+      /**
+       * This is the run function, which wraps all of the above into a
+       * single logical routine.
+       */
+      void run ();
+      
+      private:
+      
+      /**
+       * Obtain a complete list of the coefficients needed for this
+       * calculation. First comes a declaration of the entries
+       * expected to be find in the parameter file and then they are
+       * read into the object parameters.
+       */
+      void get_parameters ();
+      
+      /**
+       * Generate the coarse grid that will be used for this
+       * calculation.
+       */
+      void make_coarse_grid (const unsigned int n_refinement_cycles = 0);
+      void make_boundary_constraints ();
+      
+      /**
+       * Setup the linear algebra problem by initialising the boundary
+       * constraints, matrices and vectors required for finding the
+       * solution.
+       */
+      void setup_system ();
 
+      /**
+       * This function distribute coefficients onto the tensors of
+       * coefficients. Before distribution, the tensors are
+       * reinitialised to a zero state.
+       */
+      void setup_coefficient_tensors ();
+
+      /**
+       * This function assembles the system matrix and right-hand-side
+       * vector.
+       */
+      void assemble_system ();
+      
+      /**
+       * Solve the linear algebra system. @note In the general case,
+       * the matrix is not symmetric.
+       */
+      unsigned int solve ();
+
+      /**
+       * Adaptively refine the grid.
+       */
+      void refine_grid ();
+
+      /**
+       * Soutput the solution.
+       */      
+      void output_results (const unsigned int cycle) const;
+      void output_material_id (const unsigned int cycle) const;
+      
+      /**
+       * A local copy of the MPI communicator.
+       */
+      MPI_Comm mpi_communicator;
+      
+      // Following that we have a list of the tensors that will be
+      // used in this calculation. They are, first-
+      std::vector<nil::ElasticTensor<GroupSymm, 1, ValueType> >       first_order_elastic_tensor;
+      std::vector<nil::DielectricTensor<GroupSymm, 1, ValueType> >    first_order_dielectric_tensor;
+      std::vector<nil::PiezoelectricTensor<GroupSymm, 1, ValueType> > first_order_piezoelectric_tensor;
+      std::vector<nil::PolarelectricTensor<GroupSymm, 1, ValueType> > first_order_polarelectric_tensor;
+      
+      // and second-order tensors of coefficients
+      std::vector<nil::PiezoelectricTensor<GroupSymm, 2, ValueType> > second_order_piezoelectric_tensor;
+      
+      // Additionally, lists of coefficients are needed for first-order
+      std::vector<std::vector<ValueType> > first_order_elastic_coefficients;
+      std::vector<std::vector<ValueType> > first_order_dielectric_coefficients;
+      std::vector<std::vector<ValueType> > first_order_piezoelectric_coefficients;
+      std::vector<std::vector<ValueType> > first_order_polarelectric_coefficients;
+      
+      // and second-order tensors.
+      std::vector<std::vector<ValueType> > second_order_piezoelectric_coefficients;
+      
+      // Mismatch strain tensor.
+      std::vector<dealii::Tensor<2, dim, ValueType> > lattice_mismatch_tensor;
+      std::vector<std::vector<ValueType> >            lattice_coefficients;
+      
+    
+      // A I<code>deal.II</code> hack that outputs to the first
+      // processor only (useful for output in parallel calculations).
+      dealii::ConditionalOStream pcout;
+      
+      // A parallel distributed triangulation.
+      dealii::parallel::distributed::Triangulation<dim> triangulation;
+      
+      // The finite element and linear algebra system.
+      const dealii::FESystem<dim>              fe_q;
+      dealii::DoFHandler<dim>                  dof_handler;
+      dealii::ConstraintMatrix                 constraints;
+      dealii::IndexSet                         locally_owned_dofs;
+      dealii::IndexSet                         locally_relevant_dofs;
+      
+      // Objects for linear algebra calculation
+#ifdef USE_PETSC
+      dealii::PETScWrappers::MPI::SparseMatrix system_matrix;
+      dealii::PETScWrappers::MPI::Vector       system_rhs;
+      dealii::PETScWrappers::MPI::Vector       solution;
+#else
+      dealii::TrilinosWrappers::SparseMatrix   system_matrix;
+      dealii::TrilinosWrappers::MPI::Vector    system_rhs;
+      dealii::TrilinosWrappers::MPI::Vector    solution;
+#endif
+      
+      
+      // An object to hold various run-time parameters that are specified
+      // in a "prm file".
+      dealii::ParameterHandler prm_handler;
+      const std::string        prm_file;
+      
+      // Piezoelectric postprocessor.
+      class Postprocessor;
+      
+      // A dummy number that counts how many material ids we have.
+      const unsigned int n_material_ids;
+      };
+    
+  } // namespace Piezoelectric
+  
 } // namespace nil
 
 #endif // __nil_piezoelectric_model_h
