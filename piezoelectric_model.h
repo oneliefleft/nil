@@ -114,7 +114,9 @@ namespace nil
       public:
       
       /**
-       * Constructor. Take a coarse_grid.
+       * Constructor. Take a coarse_grid. Optionally and MPI
+       * communicator for parallel processes can be passed into the
+       * constructor.
        */
       Model (dealii::parallel::distributed::Triangulation<dim> &coarse_grid,
 	     MPI_Comm                                           mpi_communicator = MPI_COMM_WORLD);
@@ -218,7 +220,9 @@ namespace nil
       // processor only (useful for output in parallel calculations).
       dealii::ConditionalOStream pcout;
       
-      // A parallel distributed triangulation.
+      /**
+       * Smart pointer to a parallel distributed triangulation.
+       */
       dealii::SmartPointer<dealii::parallel::distributed::Triangulation<dim> > triangulation;
       
       // The finite element and linear algebra system.
