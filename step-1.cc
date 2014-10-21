@@ -119,7 +119,8 @@ namespace SixBandHole
     /**
      * Constructor. Take a parameter file name if any.
      */
-    Model ();
+    Model (dealii::parallel::distributed::Triangulation<dim> &coarse_grid,
+	   MPI_Comm                                           mpi_communicator = MPI_COMM_WORLD);
     
     /**
      * Destructor.
@@ -132,14 +133,16 @@ namespace SixBandHole
   private:
     
     // A local copy of the MPI communicator.
-    MPI_Comm mpi_communicator;
+    MPI_Comm mpi_comm;
     
     // A I<code>deal.II</code> hack that outputs to the first processor
     // only (useful for output in parallel calculations).
     dealii::ConditionalOStream pcout;
     
-    // A parallel distributed triangulation.
-    dealii::parallel::distributed::Triangulation<dim> triangulation;
+    /**
+     * Smart pointer to a parallel distributed triangulation.
+     */
+    dealii::SmartPointer<dealii::parallel::distributed::Triangulation<dim> > triangulation;
     
     // The finite element and linear algebra system.
     const dealii::FESystem<dim> fe_q;
@@ -179,24 +182,23 @@ namespace SixBandHole
    * Constructor. This takes in a parameter file name (if any).
    */
   template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
-  Model<dim, GroupSymm, ValueType>::Model ()
+  Model<dim, GroupSymm, ValueType>::Model (dealii::parallel::distributed::Triangulation<dim> &coarse_grid,
+					   MPI_Comm                                           mpi_communicator)
     :
-    mpi_communicator (MPI_COMM_WORLD),
+    mpi_comm (mpi_communicator),
     
     pcout (std::cout, (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0)),
     
-    triangulation (mpi_communicator,
-		   typename dealii::Triangulation<dim>::MeshSmoothing
-		   (dealii::Triangulation<dim>::smoothing_on_refinement |
-		    dealii::Triangulation<dim>::smoothing_on_coarsening)),
+    triangulation (&coarse_grid),
     
     fe_q (dealii::FE_Q<dim> (2), 6), /* six holes */
     
-    dof_handler (triangulation),
+    dof_handler (*triangulation),
     
     n_material_ids (2)
   {}
   
+
   /**
    * Destructor. Free some memory allocation.
    */
@@ -205,7 +207,6 @@ namespace SixBandHole
   {
     dof_handler.clear ();
   }
-  
   
   
   /**
@@ -453,6 +454,13 @@ void QuantumDotProblem<dim, GroupSymm, ValueType>::run ()
       // Finally use Kelly's error estimate to refine the grid.
       piezoelectric_model.refine_grid ();
     }
+
+  // Initialise the model, 3d wurtzite, (default double).
+  SixBandHole::Model<3, nil::GroupSymmetry::Wurtzite> six_band_hole_model 
+    (triangulation,
+     mpi_communicator);
+
+  six_band_hole_model.run ();
 }
 
 
@@ -470,10 +478,6 @@ int main (int argc, char **argv)
       // Initialise the model, 3d wurtzite, (default double).
       QuantumDotProblem<3, nil::GroupSymmetry::Wurtzite, double> quantum_dot_problem;
       quantum_dot_problem.run ();
-
-      // Initialise the model, 3d wurtzite, (default double).
-      SixBandHole::Model<3, nil::GroupSymmetry::Wurtzite> six_band_hole_model;
-      six_band_hole_model.run ();
     }
 
   // ...and if this should fail, try to gather as much information as
