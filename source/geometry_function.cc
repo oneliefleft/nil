@@ -147,39 +147,29 @@ namespace nil
     {
       double is_in_square_pyramid = 0.;
 
-      // Compute the angle theta of the pyramid walls.
-      const double theta = fabs (std::atan2 (height_, (base_-hat_)));
-
       switch (dim)
 	{
 	case 3:
-
-	  // First check if the z-range is in play. If not, there is
-	  // no sane reason to check the other components of the
-	  // coordinate.
-	  if ((p[2]>center_[2]) && (p[2]<center_[2]+height_))
-	    {
-	      // Then check if the point is inside a possibly
-	      // truncated 3d pyramid. In this case the x- and
-	      // y-coordinates decouple. What we need to do is to
-	      // check that the projection with respect to the slope
-	      // angle of the pyramid walls.
-	      //
-	      // To that end first get the angles we want in the x-
-	      // and y-directions.
-	      const double theta_y = fabs (std::atan2 (fabs (p[2]), fabs (p[1])));
-	      const double theta_x = fabs (std::atan2 (fabs (p[2]), fabs (p[0])));
-
-	      if ((theta_y<=theta) && (theta_x<=theta))
-		is_in_square_pyramid = 1.;
-	    }
-
-	  break;
-
-	default:
-	  AssertThrow (false, dealii::ExcNotImplemented ());
-	}
-      
+	  {
+	    // First check if we are in the correct z-range.
+	    if ((p[2]<=height_) && (p[2]>=0))
+	      {
+		const double theta = fabs (std::atan2 (height_, (base_-hat_)/2));
+		const double apex  = (base_/2) * std::tan (theta);
+		const double base_range = (base_/2) * (1-p[2]/apex);
+		
+		if ((fabs(p[0]/2)<=base_range) && (fabs(p[1]/2)<=base_range))
+		  is_in_square_pyramid = 1.;
+	      }
+	    
+	    break;
+	  }
+	  
+      default:
+	Assert (false, dealii::ExcInternalError());
+	
+      }
+   
       return is_in_square_pyramid;
     }
 
