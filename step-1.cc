@@ -119,7 +119,7 @@ namespace SixBandHole
     /**
      * Constructor. Take a parameter file name if any.
      */
-    Model (const std::string &parameter_file = "");
+    Model ();
     
     /**
      * Destructor.
@@ -159,7 +159,6 @@ namespace SixBandHole
     // An object to hold various run-time parameters that are specified
     // in a "prm file".
     dealii::ParameterHandler prm_handler;
-    const std::string        prm_file;
     
     // Piezoelectric postprocessor.
     class Postprocessor;
@@ -180,7 +179,7 @@ namespace SixBandHole
    * Constructor. This takes in a parameter file name (if any).
    */
   template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
-  Model<dim, GroupSymm, ValueType>::Model (const std::string &parameter_file)
+  Model<dim, GroupSymm, ValueType>::Model ()
     :
     mpi_communicator (MPI_COMM_WORLD),
     
@@ -194,8 +193,6 @@ namespace SixBandHole
     fe_q (dealii::FE_Q<dim> (2), 6), /* six holes */
     
     dof_handler (triangulation),
-    
-    prm_file (parameter_file),
     
     n_material_ids (2)
   {}
@@ -242,7 +239,7 @@ namespace TwoBandElectron
     /**
      * Constructor. Take a parameter file name if any.
      */
-    Model (const std::string &parameter_file = "");
+    Model ();
     
     /**
      * Destructor.
@@ -282,7 +279,6 @@ namespace TwoBandElectron
     // An object to hold various run-time parameters that are specified
     // in a "prm file".
     dealii::ParameterHandler prm_handler;
-    const std::string        prm_file;
     
     // Piezoelectric postprocessor.
     class Postprocessor;
@@ -304,14 +300,16 @@ class QuantumDotProblem
   public nil::Piezoelectric::Model<dim, GroupSymm, ValueType>
 {
 public:
-  
+
+  /**
+   * Constructor.
+   */  
   QuantumDotProblem ();
 
+  /**
+   * Destructor.
+   */
   ~QuantumDotProblem ();
-
-  // virtual
-  // void 
-  // nil::Piezoelectric::Model<dim, GroupSymm, ValueType>::run ();
 
   void run ();
 
@@ -471,7 +469,7 @@ int main (int argc, char **argv)
       quantum_dot_problem.run ();
 
       // Initialise the model, 3d wurtzite, (default double).
-      SixBandHole::Model<3, nil::GroupSymmetry::Wurtzite> six_band_hole_model ("sixbandhole.prm");
+      SixBandHole::Model<3, nil::GroupSymmetry::Wurtzite> six_band_hole_model;
       six_band_hole_model.run ();
     }
 
