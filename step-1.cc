@@ -95,204 +95,12 @@
 
 #include "include/nil/parameter_reader.h"
 
+#include "six_band_hole_model.h"
 #include "piezoelectric_model.h"
 #include "piezoelectric_coefficients.h"
 
 #include <fstream>
 #include <iostream>
-
-
-namespace SixBandHole
-{
-  
-  /**
-   * This class can setup, solve, and output the results of the
-   * six-band hole problem.
-   *
-   * @author Toby D. Young 2014
-   */ 
-  template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType = double>
-  class Model
-  {
-  public:
-    
-    /**
-     * Constructor. Take a parameter file name if any.
-     */
-    Model (dealii::parallel::distributed::Triangulation<dim> &coarse_grid,
-	   MPI_Comm                                           mpi_communicator = MPI_COMM_WORLD);
-    
-    /**
-     * Destructor.
-     */
-    ~Model ();
-    
-    // Run the problem.
-    void run ();
-    
-  private:
-    
-    // A local copy of the MPI communicator.
-    MPI_Comm mpi_comm;
-    
-    // A I<code>deal.II</code> hack that outputs to the first processor
-    // only (useful for output in parallel calculations).
-    dealii::ConditionalOStream pcout;
-    
-    /**
-     * Smart pointer to a parallel distributed triangulation.
-     */
-    dealii::SmartPointer<dealii::parallel::distributed::Triangulation<dim> > triangulation;
-    
-    // The finite element and linear algebra system.
-    const dealii::FESystem<dim> fe_q;
-    dealii::DoFHandler<dim>     dof_handler;
-    dealii::ConstraintMatrix    constraints;
-    dealii::IndexSet            locally_owned_dofs;
-    dealii::IndexSet            locally_relevant_dofs;
-    
-    // Objects for linear algebra calculation
-#ifdef USE_SLEPC
-    dealii::PETScWrappers::MPI::SparseMatrix        system_matrix;
-    dealii::PETScWrappers::MPI::SparseMatrix        mass_matrix;
-    std::vector<dealii::PETScWrappers::MPI::Vector> eigenfunctions;
-    std::vector<ValueType>                          eigenfunctions;
-#endif
-    
-    // An object to hold various run-time parameters that are specified
-    // in a "prm file".
-    dealii::ParameterHandler prm_handler;
-    
-    // Piezoelectric postprocessor.
-    class Postprocessor;
-    
-    // A dummy number that counts how many material ids we have.
-    const unsigned int n_material_ids;
-    
-  };
-
-} // namespace SixBandHole
-
-
-namespace SixBandHole
-{
-  
-  
-  /**
-   * Constructor. This takes in a parameter file name (if any).
-   */
-  template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
-  Model<dim, GroupSymm, ValueType>::Model (dealii::parallel::distributed::Triangulation<dim> &coarse_grid,
-					   MPI_Comm                                           mpi_communicator)
-    :
-    mpi_comm (mpi_communicator),
-    
-    pcout (std::cout, (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0)),
-    
-    triangulation (&coarse_grid),
-    
-    fe_q (dealii::FE_Q<dim> (2), 6), /* six holes */
-    
-    dof_handler (*triangulation),
-    
-    n_material_ids (2)
-  {}
-  
-
-  /**
-   * Destructor. Free some memory allocation.
-   */
-  template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
-  Model<dim, GroupSymm, ValueType>::~Model ()
-  {
-    dof_handler.clear ();
-  }
-  
-  
-  /**
-   * This is the run function, which wraps all of the above into a
-   * single logical routine.
-   */
-  template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
-  void 
-  Model<dim, GroupSymm, ValueType>::run ()
-  {
-    AssertThrow (false, dealii::ExcNotImplemented ());
-  }
-
-} // namespace SixBandHole
-
-
-namespace TwoBandElectron
-{
-  
-  /**
-   * This class can setup, solve, and output the results of the
-   * six-band hole problem.
-   *
-   * @author Toby D. Young 2014
-   */ 
-  template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType = double>
-  class Model
-  {
-  public:
-    
-    /**
-     * Constructor. Take a parameter file name if any.
-     */
-    Model ();
-    
-    /**
-     * Destructor.
-     */
-    ~Model ();
-    
-    // Run the problem.
-    void run ();
-    
-  private:
-    
-    // A local copy of the MPI communicator.
-    MPI_Comm mpi_communicator;
-    
-    // A I<code>deal.II</code> hack that outputs to the first processor
-    // only (useful for output in parallel calculations).
-    dealii::ConditionalOStream pcout;
-    
-    // A parallel distributed triangulation.
-    dealii::parallel::distributed::Triangulation<dim> triangulation;
-    
-    // The finite element and linear algebra system.
-    const dealii::FESystem<dim> fe_q;
-    dealii::DoFHandler<dim>     dof_handler;
-    dealii::ConstraintMatrix    constraints;
-    dealii::IndexSet            locally_owned_dofs;
-    dealii::IndexSet            locally_relevant_dofs;
-    
-    // Objects for linear algebra calculation
-#ifdef USE_SLEPC
-    dealii::PETScWrappers::MPI::SparseMatrix        system_matrix;
-    dealii::PETScWrappers::MPI::SparseMatrix        mass_matrix;
-    std::vector<dealii::PETScWrappers::MPI::Vector> eigenfunctions;
-    std::vector<ValueType>                          eigenfunctions;
-#endif
-    
-    // An object to hold various run-time parameters that are specified
-    // in a "prm file".
-    dealii::ParameterHandler prm_handler;
-    
-    // Piezoelectric postprocessor.
-    class Postprocessor;
-    
-    // A dummy number that counts how many material ids we have.
-    const unsigned int n_material_ids;
-    
-  };
-
-} // namespace TwoBandElectron
-
-
-
 
 
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
@@ -456,11 +264,10 @@ void QuantumDotProblem<dim, GroupSymm, ValueType>::run ()
     }
 
   // Initialise the model, 3d wurtzite, (default double).
-  SixBandHole::Model<3, nil::GroupSymmetry::Wurtzite> six_band_hole_model 
+  nil::SixBandHole::Model<3, nil::GroupSymmetry::Wurtzite> six_band_hole_model 
     (triangulation,
      mpi_communicator);
 
-  six_band_hole_model.run ();
 }
 
 
