@@ -1,9 +1,6 @@
-##
-#  CMake script for the step-6 tutorial program:
-##
 
 # Set the name of the project and target:
-SET(TARGET "step-1")
+SET(TARGET "quantum_dot_problem")
 
 SET(TARGET_SRC
   source/geometry_function.cc
