@@ -184,19 +184,63 @@ namespace nil
       switch (dim)
 	{
 	case 3:
-
-	  // Project the coordinate onto the first quadrant by using
-	  // and work with its absolute value.
-	  AssertThrow (false, dealii::ExcNotImplemented ());
+	  
+	  {
+	    // @todo This code was ported from the meshit application
+	    // (~2007) and needs to be checked can most probably be
+	    // simplified greatly.
+	    const double theta   = fabs (std::atan2 (height_, (base_-hat_)/2));
+	    const double tan_phi = hat_/((base_-hat_)/2);
+	    const double dim_rel = base_-2 * p[2]/tan_phi;
+	    
+	    const double m       = tan (2*dealii::numbers::PI/12);
+	    const double c       = dim_rel/2;
+	    
+	    if ((p[2]<=height_) && (p[2]>=0)) 
+	      {
+		if ((p[0]>=0) && (p[0]<=0.5*sqrt(3)*c) 
+		    && (p[1]>=0) 
+		    && (p[1]<=c) 
+		    && (p[1]<=-m*p[0]+c)) 
+		  {
+		    is_in_hexagonal_pyramid = 1; // xi 1
+		  }
+		
+		else if ((p[0]<=0) && (p[0]>=-0.5*sqrt(3)*c)
+			 && (p[1]>=0) 
+			 && (p[1]<=c)
+			 && (p[1]<= m*p[0]+c)) 
+		  {
+		    is_in_hexagonal_pyramid = 1.; // xi 2
+		  }
+		
+		else if ((p[0]<=0) && (p[0]>=-0.5*sqrt(3)*c) 
+			 && (p[1]<=0)
+			 && (p[1]>=-c)
+			 && (p[1]>=-m*p[0]-c)) 
+		  {
+		    is_in_hexagonal_pyramid = 1.; // xi 3
+		  }
+		
+		else if ((p[0]>=0) && (p[0]<= 0.5*sqrt(3)*c) 
+			 && (p[1]<=0) 
+			 && (p[1]>=-c) 
+			 && (p[1]>= m*p[0]-c)) 
+		  {
+		    is_in_hexagonal_pyramid = 1.; // xi 4
+		  }
+	      }
+	  } // case 3:
+	  
 	  break;
 	  
 	default:
 	  AssertThrow (false, dealii::ExcNotImplemented ());
 	}
-
+      
       return is_in_hexagonal_pyramid;
     }
-
+    
     
   } // name GeometryDescription
   

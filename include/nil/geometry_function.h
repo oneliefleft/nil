@@ -36,6 +36,7 @@
 #define __nil_geometry_description_h
 
 #include <deal.II/base/function.h>
+#include <deal.II/base/numbers.h>
 
 namespace nil
 {
