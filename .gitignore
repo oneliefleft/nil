@@ -31,8 +31,9 @@ CMakeCache.txt
 CMakeFiles
 Makefile
 cmake_install.cmake
-step-0
-step-1
+
+# Compiled binaries 
+quantum_dot_problem
 
 # Application generated files
 *.vtu
