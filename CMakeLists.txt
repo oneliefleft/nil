@@ -16,6 +16,9 @@ SET(TARGET_SRC
 #
   piezoelectric_model.cc
   piezoelectric_coefficients.cc
+
+#
+  conduction_band_model.cc
   valance_band_model.cc
 #
   ${TARGET}.cc
