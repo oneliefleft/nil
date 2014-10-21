@@ -189,7 +189,8 @@ namespace nil
 	    // @todo This code was ported from the meshit application
 	    // (~2007) and needs to be checked can most probably be
 	    // simplified greatly.
-	    const double theta   = fabs (std::atan2 (height_, (base_-hat_)/2));
+
+	    // const double theta   = fabs (std::atan2 (height_, (base_-hat_)/2));
 	    const double tan_phi = hat_/((base_-hat_)/2);
 	    const double dim_rel = base_-2 * p[2]/tan_phi;
 	    
