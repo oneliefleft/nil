@@ -383,7 +383,8 @@ namespace nil
       std::vector<dealii::types::global_dof_index> local_dof_indices (n_dofs_per_cell);
       
       // Get a copy of the geometry for the quantum dot
-      nil::GeometryFunction::HalfHyperBall<dim, ValueType> geometry (5., dealii::Point<dim, ValueType> ());
+      // nil::GeometryFunction::HalfHyperBall<dim, ValueType> geometry (5., dealii::Point<dim, ValueType> ());
+      nil::GeometryFunction::HexagonalPyramid<dim, ValueType> geometry (12.5, 3., 3.);
       std::vector<ValueType> cell_geometry (n_q_points);
       
       // So-called "finite elemnt views" that define parts of the finite
@@ -579,8 +580,8 @@ namespace nil
       dealii::TrilinosWrappers::Vector projected_material_id (dof_handler.n_dofs ());
 #endif
       
-      // nil::GeometryFunction::SquarePyramid<dim, ValueType> geometry (10., 5., 5.);
-      nil::GeometryFunction::HalfHyperBall<dim, ValueType> geometry (5., dealii::Point<dim, ValueType> ());
+      // nil::GeometryFunction::HalfHyperBall<dim, ValueType> geometry (5., dealii::Point<dim, ValueType> ());
+      nil::GeometryFunction::HexagonalPyramid<dim, ValueType> geometry (12.5, 3., 3.);
       dealii::VectorTools::interpolate (dof_handler, geometry, 
 					projected_material_id);
       
