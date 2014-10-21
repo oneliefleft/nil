@@ -41,7 +41,7 @@ namespace nil
   {
     
     template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
-    Model<dim, GroupSymm, ValueType>::Model (const std::string &parameter_file)
+    Model<dim, GroupSymm, ValueType>::Model ()
       :
       mpi_communicator (MPI_COMM_WORLD),
       
@@ -56,9 +56,7 @@ namespace nil
 	    dealii::FE_Q<dim> (1), 1),  /* electric potential */
       
       dof_handler (triangulation),
-      
-      prm_file (parameter_file),
-      
+          
       n_material_ids (2)
     {}
     
@@ -73,17 +71,17 @@ namespace nil
     
     template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
     void 
-    Model<dim, GroupSymm, ValueType>::get_parameters ()
+    Model<dim, GroupSymm, ValueType>::get_parameters (const std::string &parameter_file)
     {
       // The parameter file should not be an empty field if this
       // function is called.
-      AssertThrow (prm_file!="",
+      AssertThrow (parameter_file!="",
 		   dealii::ExcMessage ("The parameter file name is empty or does not exist"));
       
       // Assign parameters to the parameter handler and check sanity
       // of t he parameter. @note If no file exists an unusal default
       // is made.
-      nil::ParameterReader prm_reader (prm_handler, prm_file);
+      nil::ParameterReader prm_reader (prm_handler, parameter_file);
       prm_reader.read_parameters ();
       
       // then read in the parameters and store them

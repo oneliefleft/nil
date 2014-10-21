@@ -358,10 +358,10 @@ QuantumDotProblem<dim, GroupSymm, ValueType>::~QuantumDotProblem ()
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void QuantumDotProblem<dim, GroupSymm, ValueType>::run ()
 {
-  nil::Piezoelectric::Model<dim, GroupSymm, ValueType> piezoelectric_model ("piezoelectric.prm");
+  nil::Piezoelectric::Model<dim, GroupSymm, ValueType> piezoelectric_model;
 
   // First find the parameters need for this calculation
-  piezoelectric_model.get_parameters ();
+  piezoelectric_model.get_parameters ("piezoelectric.prm");
   
   // Make coefficient tensors.
   piezoelectric_model.setup_coefficient_tensors ();

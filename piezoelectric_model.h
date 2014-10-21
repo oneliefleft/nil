@@ -116,7 +116,7 @@ namespace nil
       /**
        * Constructor. Take a parameter file name if any.
        */
-      Model (const std::string &parameter_file = "");
+      Model ();
       
       /**
        * Destructor.
@@ -136,7 +136,7 @@ namespace nil
        * expected to be find in the parameter file and then they are
        * read into the object parameters.
        */
-      void get_parameters ();
+      void get_parameters (const std::string &parameter_file = "");
       
       /**
        * Generate the coarse grid that will be used for this
@@ -242,7 +242,6 @@ namespace nil
       // An object to hold various run-time parameters that are specified
       // in a "prm file".
       dealii::ParameterHandler prm_handler;
-      const std::string        prm_file;
       
       // Piezoelectric postprocessor.
       class Postprocessor;
