@@ -32,8 +32,8 @@
 // implied, of the nil authors.
 // -------------------------------------------------------------------
 
-#ifndef __nil_six_band_hole_model_h
-#define __nil_six_band_hole_model_h
+#ifndef __nil_valance_band_model_h
+#define __nil_valance_band_model_h
 
 // deal.II headers
 #include <deal.II/base/conditional_ostream.h>
@@ -89,7 +89,7 @@
 
 namespace nil
 {
-  namespace SixBandHole
+  namespace ValanceBand
   {
     
     /**
@@ -155,8 +155,8 @@ namespace nil
       
       };
     
-  } // namespace SixBandHole
+  } // namespace ValanceBand
 
 } // namespace nil
 
-#endif // __nil_six_band_hole_model_h
+#endif // __nil_valance_band_model_h

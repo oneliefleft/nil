@@ -95,9 +95,9 @@
 
 #include "include/nil/parameter_reader.h"
 
-#include "six_band_hole_model.h"
 #include "piezoelectric_model.h"
 #include "piezoelectric_coefficients.h"
+#include "valance_band_model.h"
 
 #include <fstream>
 #include <iostream>
@@ -264,9 +264,9 @@ void QuantumDotProblem<dim, GroupSymm, ValueType>::run ()
     }
 
   // Initialise the model, 3d wurtzite, (default double).
-  nil::SixBandHole::Model<3, nil::GroupSymmetry::Wurtzite> six_band_hole_model 
-    (triangulation,
-     mpi_communicator);
+  nil::ValanceBand::Model<3, nil::GroupSymmetry::Wurtzite> six_band_hole_model 
+  (triangulation,
+   mpi_communicator);
 
 }
 

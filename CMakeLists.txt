@@ -14,9 +14,9 @@ SET(TARGET_SRC
   source/base/group_symmetry.cc
   source/base/tensor_base.cc
 #
-  six_band_hole_model.cc
   piezoelectric_model.cc
   piezoelectric_coefficients.cc
+  valance_band_model.cc
 #
   ${TARGET}.cc
   )

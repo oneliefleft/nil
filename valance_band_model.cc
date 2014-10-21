@@ -32,12 +32,12 @@
 // implied, of the nil authors.
 // -------------------------------------------------------------------
 
-#include "six_band_hole_model.h"
+#include "valance_band_model.h"
 
 namespace nil
 {
 
-  namespace SixBandHole
+  namespace ValanceBand
   {
     template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
     Model<dim, GroupSymm, ValueType>::Model (dealii::parallel::distributed::Triangulation<dim> &coarse_grid,
@@ -62,14 +62,14 @@ namespace nil
       dof_handler.clear ();
     }
     
-  } // namespace SixBandHole
+  } // namespace ValanceBand
 
 } // namespace nil
 
 // -------------- Explicit Instantiations -------------------------------
 
 template class 
-nil::SixBandHole::Model<3, nil::GroupSymmetry::ZincBlende, double>;
+nil::ValanceBand::Model<3, nil::GroupSymmetry::ZincBlende, double>;
 
 template class 
-nil::SixBandHole::Model<3, nil::GroupSymmetry::Wurtzite, double>;
+nil::ValanceBand::Model<3, nil::GroupSymmetry::Wurtzite, double>;
