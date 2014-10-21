@@ -45,8 +45,6 @@ namespace nil
 					     MPI_Comm                                           mpi_communicator)
       :
       mpi_comm (mpi_communicator),
-      
-      pcout (std::cout, (dealii::Utilities::MPI::this_mpi_process (mpi_comm) == 0)),
 
       triangulation (&coarse_grid),
       

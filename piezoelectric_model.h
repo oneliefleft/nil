@@ -181,8 +181,12 @@ namespace nil
 
       /**
        * Soutput the solution.
-       */      
+       */ 
       void output_results (const unsigned int cycle) const;
+
+      /**
+       * Soutput the material identification.
+       */      
       void output_material_id (const unsigned int cycle) const;
       
       private:
@@ -192,34 +196,66 @@ namespace nil
        */
       MPI_Comm mpi_comm;
       
-      // Following that we have a list of the tensors that will be
-      // used in this calculation. They are, first-
-      std::vector<nil::ElasticTensor<GroupSymm, 1, ValueType> >       first_order_elastic_tensor;
-      std::vector<nil::DielectricTensor<GroupSymm, 1, ValueType> >    first_order_dielectric_tensor;
+      /**
+       * First order elastic tensor.
+       */
+      std::vector<nil::ElasticTensor<GroupSymm, 1, ValueType> > first_order_elastic_tensor;
+
+      /**
+       * First order dielectric tensor.
+       */
+      std::vector<nil::DielectricTensor<GroupSymm, 1, ValueType> > first_order_dielectric_tensor;
+
+      /**
+       * First order piezoelectric tensor.
+       */
       std::vector<nil::PiezoelectricTensor<GroupSymm, 1, ValueType> > first_order_piezoelectric_tensor;
+
+      /**
+       * First order polarelectric tensor.
+       */
       std::vector<nil::PolarelectricTensor<GroupSymm, 1, ValueType> > first_order_polarelectric_tensor;
       
-      // and second-order tensors of coefficients
+      /**
+       * Second order piezoelectric tensor.
+       */
       std::vector<nil::PiezoelectricTensor<GroupSymm, 2, ValueType> > second_order_piezoelectric_tensor;
       
-      // Additionally, lists of coefficients are needed for first-order
+      /**
+       * Elastic coefficients.
+       */
       std::vector<std::vector<ValueType> > first_order_elastic_coefficients;
+
+      /**
+       * Dielectric coefficients.
+       */
       std::vector<std::vector<ValueType> > first_order_dielectric_coefficients;
+
+      /**
+       * Piezoelectric coefficients.
+       */
       std::vector<std::vector<ValueType> > first_order_piezoelectric_coefficients;
+
+      /**
+       * Polarelectric coefficients.
+       */
       std::vector<std::vector<ValueType> > first_order_polarelectric_coefficients;
       
-      // and second-order tensors.
+      /**
+       * Second order piezoelectric tensor.
+       */
       std::vector<std::vector<ValueType> > second_order_piezoelectric_coefficients;
       
-      // Mismatch strain tensor.
+      /**
+       * Lattice mismatch tensor.
+       */
       std::vector<dealii::Tensor<2, dim, ValueType> > lattice_mismatch_tensor;
-      std::vector<std::vector<ValueType> >            lattice_coefficients;
-      
+
+      /**
+       * Lattice coefficients.
+       */
+      std::vector<std::vector<ValueType> > lattice_coefficients;
     
-      // A I<code>deal.II</code> hack that outputs to the first
-      // processor only (useful for output in parallel calculations).
-      dealii::ConditionalOStream pcout;
-      
       /**
        * Smart pointer to a parallel distributed triangulation.
        */
