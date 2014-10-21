@@ -41,21 +41,19 @@ namespace nil
   {
     
     template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
-    Model<dim, GroupSymm, ValueType>::Model ()
+    Model<dim, GroupSymm, ValueType>::Model (dealii::parallel::distributed::Triangulation<dim> &coarse_grid,
+					     MPI_Comm                                           mpi_communicator)
       :
-      mpi_communicator (MPI_COMM_WORLD),
+      mpi_comm (mpi_communicator),
       
-      pcout (std::cout, (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0)),
-      
-      triangulation (mpi_communicator,
-		     typename dealii::Triangulation<dim>::MeshSmoothing
-		     (dealii::Triangulation<dim>::smoothing_on_refinement |
-		      dealii::Triangulation<dim>::smoothing_on_coarsening)),
+      pcout (std::cout, (dealii::Utilities::MPI::this_mpi_process (mpi_comm) == 0)),
+
+      triangulation (&coarse_grid),
       
       fe_q (dealii::FE_Q<dim> (2), dim, /* displacement       */
 	    dealii::FE_Q<dim> (1), 1),  /* electric potential */
       
-      dof_handler (triangulation),
+      dof_handler (*triangulation),
           
       n_material_ids (2)
     {}
@@ -273,12 +271,12 @@ namespace nil
     void 
     Model<dim, GroupSymm, ValueType>::make_coarse_grid (const unsigned int n_refinement_cycles)
     {
-      dealii::GridGenerator::hyper_rectangle (triangulation,
+      dealii::GridGenerator::hyper_rectangle (*triangulation,
 					      dealii::Point<dim> (-20,-20,-20),
 					      dealii::Point<dim> ( 20, 20, 20),
 					      true);
       
-      triangulation.refine_global (n_refinement_cycles);
+      (*triangulation).refine_global (n_refinement_cycles);
     }
     
     
@@ -343,19 +341,19 @@ namespace nil
       dealii::DoFTools::make_sparsity_pattern (dof_handler, csp, constraints, false);
       dealii::SparsityTools::distribute_sparsity_pattern (csp,
 							  dof_handler.n_locally_owned_dofs_per_processor (),
-							  mpi_communicator,
+							  mpi_comm,
 							  locally_relevant_dofs);
       
       // @todo The system_matrix initialisation screws up with petsc-3.5.x.
       system_matrix.reinit (locally_owned_dofs,
 			    locally_owned_dofs,
 			    csp,
-			    mpi_communicator);
+			    mpi_comm);
       
-      system_rhs.reinit (locally_owned_dofs, mpi_communicator);
+      system_rhs.reinit (locally_owned_dofs, mpi_comm);
       
       // The solution vector has ghost elements.
-      solution.reinit (locally_owned_dofs, locally_relevant_dofs, mpi_communicator);
+      solution.reinit (locally_owned_dofs, locally_relevant_dofs, mpi_comm);
       
     }
     
@@ -516,11 +514,11 @@ namespace nil
       // necessary.
       dealii::SolverControl solver_control (system_matrix.m (), 1e-09*system_rhs.l2_norm ());
 #ifdef USE_PETSC
-      dealii::PETScWrappers::MPI::Vector distributed_solution (locally_owned_dofs, mpi_communicator);
+      dealii::PETScWrappers::MPI::Vector distributed_solution (locally_owned_dofs, mpi_comm);
       dealii::PETScWrappers::PreconditionBlockJacobi preconditioner (system_matrix);
-      dealii::PETScWrappers::SolverBicgstab solver (solver_control, mpi_communicator);
+      dealii::PETScWrappers::SolverBicgstab solver (solver_control, mpi_comm);
 #else
-      dealii::TrilinosWrappers::MPI::Vector distributed_solution (locally_owned_dofs, mpi_communicator);
+      dealii::TrilinosWrappers::MPI::Vector distributed_solution (locally_owned_dofs, mpi_comm);
       dealii::TrilinosWrappers::PreconditionBlockJacobi preconditioner;
       preconditioner.initialize (system_matrix);
       dealii::TrilinosWrappers::SolverBicgstab solver (solver_control);
@@ -540,7 +538,7 @@ namespace nil
     void
     Model<dim, GroupSymm, ValueType>::refine_grid ()
     {
-      dealii::Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+      dealii::Vector<float> estimated_error_per_cell ((*triangulation).n_active_cells());
       
       // Attempt an estimate based on Kelly's error estimate of each
       // component of the solution vector. @todo The Gauss quadrature
@@ -553,12 +551,12 @@ namespace nil
       
       // Setup grid refinement by fixed numbers.
       dealii::parallel::distributed::GridRefinement::
-	refine_and_coarsen_fixed_number (triangulation,
+	refine_and_coarsen_fixed_number (*triangulation,
 					 estimated_error_per_cell,
 					 0.125, 0.00);
       
       // Actually refine the grid.
-      triangulation.execute_coarsening_and_refinement ();
+      (*triangulation).execute_coarsening_and_refinement ();
     }
     
     
@@ -589,7 +587,7 @@ namespace nil
 	= ("projected_material_id-" +
 	   dealii::Utilities::int_to_string (cycle, 4) +
 	   "." +
-	   dealii::Utilities::int_to_string (triangulation.locally_owned_subdomain(), 4) +
+	   dealii::Utilities::int_to_string ((*triangulation).locally_owned_subdomain (), 4) +
 	   ".vtu");
       
       data_out.add_data_vector (projected_material_id, "projected_material_id");
@@ -603,13 +601,13 @@ namespace nil
       // read the entire structure by binding blocks (*.vtu) into a
       // single structure (*.visit). This only needs to be done by one
       // processor.
-      if (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0)
+      if (dealii::Utilities::MPI::this_mpi_process (mpi_comm) == 0)
 	{
 	  std::vector<std::string> filenames;
 	  
 	  // The filenames to bind into the master record should match
 	  // the filenames used above.
-	  for (unsigned int i=0; i<dealii::Utilities::MPI::n_mpi_processes (mpi_communicator); ++i)
+	  for (unsigned int i=0; i<dealii::Utilities::MPI::n_mpi_processes (mpi_comm); ++i)
 	    {
 	      filenames.push_back ("projected_material_id-" +
 				   dealii::Utilities::int_to_string (cycle, 4) +
@@ -634,7 +632,7 @@ namespace nil
     void
     Model<dim, GroupSymm, ValueType>::output_results (const unsigned int cycle) const
     {
-      Model::Postprocessor postprocessor (dealii::Utilities::MPI::this_mpi_process (mpi_communicator));
+      Model::Postprocessor postprocessor (dealii::Utilities::MPI::this_mpi_process (mpi_comm));
       
       dealii::DataOut<dim> data_out;
       data_out.attach_dof_handler (dof_handler);
@@ -645,7 +643,7 @@ namespace nil
 	= ("solution-" +
 	   dealii::Utilities::int_to_string (cycle, 4) +
 	   "." +
-	   dealii::Utilities::int_to_string (triangulation.locally_owned_subdomain(), 4) +
+	   dealii::Utilities::int_to_string ((*triangulation).locally_owned_subdomain(), 4) +
 	   ".vtu");
       
       std::ofstream output (filename.c_str());
@@ -656,13 +654,13 @@ namespace nil
       // read the entire structure by binding blocks (*.vtu) into a
       // single structure (*.visit). This only needs to be done by one
       // processor.
-      if (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0)
+      if (dealii::Utilities::MPI::this_mpi_process (mpi_comm) == 0)
 	{
 	  std::vector<std::string> filenames;
 	  
 	  // The filenames to bind into the master record should match
 	  // the filenames used above.
-	  for (unsigned int i=0; i<dealii::Utilities::MPI::n_mpi_processes (mpi_communicator); ++i)
+	  for (unsigned int i=0; i<dealii::Utilities::MPI::n_mpi_processes (mpi_comm); ++i)
 	    {
 	      filenames.push_back ("solution-" +
 				   dealii::Utilities::int_to_string (cycle, 4) +

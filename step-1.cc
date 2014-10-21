@@ -296,8 +296,6 @@ namespace TwoBandElectron
 
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 class QuantumDotProblem
-  :
-  public nil::Piezoelectric::Model<dim, GroupSymm, ValueType>
 {
 public:
 
@@ -320,9 +318,6 @@ public:
 
 private:
 
-  // Constructor of the piezoelectric model
-  // nil::Piezoelectric::Model<dim, GroupSymm, ValueType> piezoelectric_model ("piezoelectric.prm");
-
   /**
    * A local copy of the MPI communicator.
    */
@@ -334,6 +329,8 @@ private:
    */
   dealii::ConditionalOStream pcout;  
 
+  // A parallel distributed triangulation.
+  dealii::parallel::distributed::Triangulation<dim> triangulation;
 };
 
 
@@ -342,7 +339,12 @@ QuantumDotProblem<dim, GroupSymm, ValueType>::QuantumDotProblem ()
   :
   mpi_communicator (MPI_COMM_WORLD),
 
-  pcout (std::cout, (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0))
+  pcout (std::cout, (dealii::Utilities::MPI::this_mpi_process (mpi_communicator) == 0)),
+  
+  triangulation (mpi_communicator,
+		 typename dealii::Triangulation<dim>::MeshSmoothing
+		 (dealii::Triangulation<dim>::smoothing_on_refinement |
+		  dealii::Triangulation<dim>::smoothing_on_coarsening))
 {
   n_material_ids = 2;
 }
@@ -356,7 +358,10 @@ QuantumDotProblem<dim, GroupSymm, ValueType>::~QuantumDotProblem ()
 template <int dim, enum nil::GroupSymmetry GroupSymm, typename ValueType>
 void QuantumDotProblem<dim, GroupSymm, ValueType>::run ()
 {
-  nil::Piezoelectric::Model<dim, GroupSymm, ValueType> piezoelectric_model;
+  // Call the constructor for the piezoelectric problem.
+  nil::Piezoelectric::Model<dim, GroupSymm, ValueType> piezoelectric_model 
+    (triangulation,
+     mpi_communicator);
 
   // First find the parameters need for this calculation
   piezoelectric_model.get_parameters ("piezoelectric.prm");
@@ -463,8 +468,6 @@ int main (int argc, char **argv)
       dealii::deallog.depth_console (0);
 
       // Initialise the model, 3d wurtzite, (default double).
-      // nil::Piezoelectric::Model<3, nil::GroupSymmetry::Wurtzite> piezoelectric_model ("piezoelectric.prm");
-      // piezoelectric_model.run ();
       QuantumDotProblem<3, nil::GroupSymmetry::Wurtzite, double> quantum_dot_problem;
       quantum_dot_problem.run ();
 

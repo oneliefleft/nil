@@ -114,9 +114,10 @@ namespace nil
       public:
       
       /**
-       * Constructor. Take a parameter file name if any.
+       * Constructor. Take a coarse_grid.
        */
-      Model ();
+      Model (dealii::parallel::distributed::Triangulation<dim> &coarse_grid,
+	     MPI_Comm                                           mpi_communicator = MPI_COMM_WORLD);
       
       /**
        * Destructor.
@@ -187,7 +188,7 @@ namespace nil
       /**
        * A local copy of the MPI communicator.
        */
-      MPI_Comm mpi_communicator;
+      MPI_Comm mpi_comm;
       
       // Following that we have a list of the tensors that will be
       // used in this calculation. They are, first-
@@ -218,7 +219,7 @@ namespace nil
       dealii::ConditionalOStream pcout;
       
       // A parallel distributed triangulation.
-      dealii::parallel::distributed::Triangulation<dim> triangulation;
+      dealii::SmartPointer<dealii::parallel::distributed::Triangulation<dim> > triangulation;
       
       // The finite element and linear algebra system.
       const dealii::FESystem<dim>              fe_q;
